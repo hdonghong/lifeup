@@ -1,5 +1,6 @@
 package com.hdh.lifeup.controller;
 
+import com.google.common.collect.Maps;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
@@ -9,6 +10,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Map;
 
 /**
  * UserInfoController class<br/>
@@ -23,6 +29,21 @@ public class UserInfoController {
 
     @Autowired
     private UserInfoService userInfoService;
+
+    @PostMapping("/test")
+    public ResultVO<?> test(@RequestBody Map<String, LocalDateTime> requestMap) {
+        LocalDateTime nowDateTime = LocalDateTime.now();
+        LocalDate nowDate = nowDateTime.toLocalDate();
+        LocalTime nowTime = nowDateTime.toLocalTime();
+
+        Map<String, Object> map = Maps.newHashMap();
+        map.put("nowDateTime", nowDateTime);
+        map.put("nowDate", nowDate);
+        map.put("nowTime", nowTime);
+
+        System.out.println(requestMap);
+        return Result.success(map);
+    }
 
     /**
      * paramType：参数放在哪个地方

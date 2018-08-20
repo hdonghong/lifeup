@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * UserInfoDO class<br/>
@@ -47,7 +48,7 @@ public class UserInfoDO extends BaseDO {
     private Integer userStatus;
 
     /** '创建时间' */
-    private Instant createTime;
+    private LocalDateTime createTime;
 
     /** 通用字段 0存在；1被删除 */
     @TableLogic

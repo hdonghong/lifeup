@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * BaseDTO class<br/>
- * 通用的DTO父类，提供默认DTO与DO的优雅转换
+ * 通用的DTO父类，提供默认DTO与DO的优雅转换，方法命名仿自JDK8日期API
  * @author hdonghong
  * @since 2018/08/18
  */
@@ -21,7 +21,7 @@ public abstract class BaseDTO implements Serializable {
      * @param <DO> DO类型
      * @return DO对象
      */
-    public <DO extends BaseDO> DO convertToDo(Class<DO> doClass) {
+    public <DO extends BaseDO> DO toDO(Class<DO> doClass) {
         Preconditions.checkNotNull(doClass, "DO class can not be null");
         try {
             DO aDO = doClass.newInstance();
@@ -41,11 +41,11 @@ public abstract class BaseDTO implements Serializable {
      * @param <DO> DO泛型类型
      * @return DTO对象
      */
-    public static <DTO extends BaseDTO, DO extends BaseDO> DTO convertForDto(DO aDO, Class<DTO> dtoClass) {
+    public static <DTO extends BaseDTO, DO extends BaseDO> DTO from(DO aDO, Class<DTO> dtoClass) {
         Preconditions.checkNotNull(dtoClass, "DTO class can not be null");
         try {
             DTO aDTO = dtoClass.newInstance();
-            return aDTO.convertForDto(aDO);
+            return aDTO.from(aDO);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -60,7 +60,7 @@ public abstract class BaseDTO implements Serializable {
      * @return 当前DTO对象
      */
     @SuppressWarnings("unchecked")
-    public <DTO extends BaseDTO, DO extends BaseDO> DTO convertForDto(DO aDO) {
+    public <DTO extends BaseDTO, DO extends BaseDO> DTO from(DO aDO) {
         Preconditions.checkNotNull(aDO, "DO object can not be null");
         BeanUtils.copyProperties(aDO, this);
         return (DTO) this;

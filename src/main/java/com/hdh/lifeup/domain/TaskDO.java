@@ -9,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /**
  * TaskDO class<br/>
@@ -61,5 +62,5 @@ public class TaskDO extends BaseDO {
     private Integer isDel;
 
     /** 创建时间 */
-    private Instant createTime;
+    private LocalDateTime createTime;
 }

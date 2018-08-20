@@ -34,7 +34,7 @@ public class PageDTO<T> implements Serializable {
         Preconditions.checkNotNull(iPage, "iPage不能为空");
         List<DO> doList = iPage.getRecords();
         List<DTO> dtoList = doList.stream()
-                                  .map(aDo -> BaseDTO.convertForDto(aDo, dtoClass))
+                                  .map(aDo -> BaseDTO.from(aDo, dtoClass))
                                   .collect(Collectors.toList());
 
         return PageDTO.<DTO>builder()
