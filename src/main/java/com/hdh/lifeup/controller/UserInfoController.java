@@ -30,8 +30,8 @@ public class UserInfoController {
     @Autowired
     private UserInfoService userInfoService;
 
-    @PostMapping("/test")
-    public ResultVO<?> test(@RequestBody Map<String, LocalDateTime> requestMap) {
+    @GetMapping("/test")
+    public ResultVO<?> test() {
         LocalDateTime nowDateTime = LocalDateTime.now();
         LocalDate nowDate = nowDateTime.toLocalDate();
         LocalTime nowTime = nowDateTime.toLocalTime();
@@ -40,8 +40,8 @@ public class UserInfoController {
         map.put("nowDateTime", nowDateTime);
         map.put("nowDate", nowDate);
         map.put("nowTime", nowTime);
+        map.put("stupid hao", "滑稽.jpg");
 
-        System.out.println(requestMap);
         return Result.success(map);
     }
 

@@ -1,11 +1,11 @@
 package com.hdh.lifeup.dto;
 
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.domain.TaskDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
-import java.io.Serializable;
 import java.time.Instant;
 
 /**
@@ -17,7 +17,7 @@ import java.time.Instant;
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class TaskDTO extends BaseDTO {
+public class TaskDTO extends BaseDTO<TaskDO> {
     private static final long serialVersionUID = 495764481739950903L;
 
     private Long taskId;

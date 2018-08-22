@@ -2,10 +2,13 @@ package com.hdh.lifeup;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.time.*;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,5 +55,17 @@ public class OtherTest {
         System.out.println("Min:" + instant);
         instant = nowDateTime.toInstant(ZoneOffset.UTC);
         System.out.println("UTC:" + instant);
+    }
+
+    @Test
+    public void testJackson() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        List<String> authTypes = Lists.newArrayList("qq", "phone");
+        String str = objectMapper.writeValueAsString(authTypes);
+        System.out.println(str);
+
+        List list = objectMapper.readValue(str, List.class);
+        System.out.println(list);
     }
 }

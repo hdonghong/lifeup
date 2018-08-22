@@ -32,23 +32,22 @@ public class UserInfoDO extends BaseDO {
     /** '用户昵称' */
     private String nickName;
 
-    /** '联系方式' */
-    private String userPhone;
-
-    /** '用户密码' */
-    private String userPassword;
-
     /** '0女，1男，2保密' */
     private Integer userSex;
 
     /**'用户地区'  */
     private String userAddress;
 
-    /** '-1封号，0未激活，1正常' */
+    /** 头像 */
+    private String userHead;
+
+    /** '0封号，1正常' */
     private Integer userStatus;
 
     /** '创建时间' */
     private LocalDateTime createTime;
+
+    private String authTypes;
 
     /** 通用字段 0存在；1被删除 */
     @TableLogic

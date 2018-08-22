@@ -1,11 +1,18 @@
 package com.hdh.lifeup.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.domain.UserInfoDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.beans.BeanUtils;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.List;
 
 /**
  * UserInfoDTO class<br/>
@@ -16,7 +23,7 @@ import java.time.Instant;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class UserInfoDTO extends BaseDTO {
+public class UserInfoDTO extends BaseDTO<UserInfoDO> {
 
     private static final long serialVersionUID = 3900595581562692523L;
 
@@ -25,22 +32,63 @@ public class UserInfoDTO extends BaseDTO {
     /** '用户昵称' */
     private String nickName;
 
-    /** '联系方式' */
-    private String userPhone;
-
-    /** '用户密码' */
-    private String userPassword;
-
     /** '0女，1男，2保密' */
     private Integer userSex;
 
     /**'用户地区'  */
     private String userAddress;
 
+    /** 用户头像 */
+    private String userHead;
+
     /** '-1已删除，0未激活，1正常' */
     private Integer userStatus;
 
-    /** '创建时间' */
+    /** '注册时间' */
     private Instant createTime;
 
+    /** 当有绑定手机时，手机号 */
+    private String phone;
+
+    /** 绑定的类型 */
+    private List<String> authTypes;
+
+    public static UserInfoDTO fromYbUser(JsonNode userInfoJson) {
+        Preconditions.checkNotNull(userInfoJson, "userInfoJson can not be empty!");
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        userInfoDTO.setNickName(userInfoJson.get("yb_username").asText())
+                .setUserSex("M".equals(userInfoJson.get("yb_sex").asText()) ? 1 : 0)
+                .setUserHead(userInfoJson.get("yb_userhead").asText())
+                .setUserAddress(userInfoJson.get("yb_schoolname").asText());
+        return userInfoDTO;
+    }
+
+    @Override
+    public UserInfoDO toDO(Class<UserInfoDO> doClass) {
+        try {
+            UserInfoDO userInfoDO = doClass.newInstance();
+            BeanUtils.copyProperties(this, userInfoDO, "authTypes");
+            if (this.authTypes != null && this.authTypes.size() > 0) {
+                userInfoDO.setAuthTypes(new ObjectMapper().writeValueAsString(this.authTypes));
+            }
+            return userInfoDO;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <DTO extends BaseDTO> DTO from(UserInfoDO aDO) {
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        BeanUtils.copyProperties(aDO, userInfoDTO, "authTypes");
+        try {
+            userInfoDTO.setAuthTypes(new ObjectMapper().readValue(aDO.getAuthTypes(), List.class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return (DTO) userInfoDTO;
+    }
 }

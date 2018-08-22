@@ -18,11 +18,14 @@ public enum CodeMsgEnum {
     PARAMETER_ERROR(500101, "请求参数校验错误"),
     PARAMETER_NULL(500102, "传递了空值"),
 
-    /** 用户模块 5002XX */
-    USER_NOT_EXIST(500201, "用户不存在"),
+    /** 授权登录模块 */
+    UNSUPPORTED_AUTH_TYPE(500201, "不支持的授权类型"),
 
-    /** 事项模块 5003XX */
-    TASK_NOT_EXIST(500301, "个人事项不存在"),
+    /** 用户模块 5003XX */
+    USER_NOT_EXIST(500301, "用户不存在"),
+
+    /** 事项模块 5004XX */
+    TASK_NOT_EXIST(500401, "个人事项不存在"),
 
     ;
 

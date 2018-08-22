@@ -35,9 +35,8 @@ public class UserInfoServiceImplTest {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUserId(1L)
                 .setNickName("bbb")
-                .setUserPhone("15522112921")
                 .setUserAddress("广东省广州市天河区龙口东路创逸大厦11202")
-                .setUserPassword("a");
+                ;
         Assert.assertEquals("", "");
     }
 

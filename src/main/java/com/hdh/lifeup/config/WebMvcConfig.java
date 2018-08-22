@@ -23,18 +23,4 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowCredentials(true);
     }
 
-/*    @Override
-    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-        Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-        builder.serializationInclusion(JsonInclude.Include.NON_NULL);
-
-        // builder.serializationInclusion(JsonInclude.Include.NON_EMPTY);
-
-//         builder.indentOutput(true).dateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-
-        builder.serializerByType(LocalDateTime.class,new LocalDateTime2LongSerializer());
-        // 自定义Long类型转换 超过12个数字用String格式返回，由于js的number只能表示15个数字
-//        builder.serializerByType(Long.TYPE,new LocalDateTime2LongSerializer());
-        converters.add(0,new MappingJackson2HttpMessageConverter(builder.build()));
-    }*/
 }
