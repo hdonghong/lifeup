@@ -17,9 +17,12 @@ public enum CodeMsgEnum {
     SERVER_ERROR(500100, "服务端异常错误"),
     PARAMETER_ERROR(500101, "请求参数校验错误"),
     PARAMETER_NULL(500102, "传递了空值"),
+    DATABASE_EXCEPTION(500103, "数据库crud操作异常"),
 
     /** 授权登录模块 */
     UNSUPPORTED_AUTH_TYPE(500201, "不支持的授权类型"),
+    TOKEN_ABSENT(500202, "请求头中缺少鉴权TOKEN"),
+    TOKEN_INVALID(500203, "不合法的Token或者Token失效"),
 
     /** 用户模块 5003XX */
     USER_NOT_EXIST(500301, "用户不存在"),

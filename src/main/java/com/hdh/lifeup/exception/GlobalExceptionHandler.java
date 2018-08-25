@@ -47,6 +47,19 @@ public class GlobalExceptionHandler {
                      .appendArgs(defaultMessage);
     }
 
+
+    /**
+     * 系统内部异常，专门处理空指针
+     * @param e 异常
+     * @return 通用result
+     */
+    @ExceptionHandler(value = NullPointerException.class)
+    public ResultVO<String> handlerNullPointerException(NullPointerException e) {
+        log.error("【系统内部异常】stacktrace = [{}]", e.toString());
+        e.printStackTrace();
+        return Result.error(CodeMsgEnum.PARAMETER_NULL);
+    }
+
     /**
      * 系统内部异常，打印异常栈
      * @param e 异常

@@ -10,4 +10,9 @@ import com.hdh.lifeup.dto.UserInfoDTO;
  * @since 2018/08/14
  */
 public interface UserInfoService extends BaseService<UserInfoDTO, Long> {
+
+    /**
+     * 缓存取，缓存存，通过token获取user
+     */
+    UserInfoDTO getByToken(String authenticityToken);
 }

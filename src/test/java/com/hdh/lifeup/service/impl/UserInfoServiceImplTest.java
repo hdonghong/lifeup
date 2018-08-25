@@ -42,6 +42,8 @@ public class UserInfoServiceImplTest {
 
     @Test
     public void insert() throws Exception {
+        UserInfoDTO userInfoDTO = userInfoService.insert(null);
+
     }
 
     @Test

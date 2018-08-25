@@ -35,6 +35,9 @@ public class UserInfoDO extends BaseDO {
     /** '0女，1男，2保密' */
     private Integer userSex;
 
+    /** 特有的盐 */
+    private String pwdSalt;
+
     /**'用户地区'  */
     private String userAddress;
 

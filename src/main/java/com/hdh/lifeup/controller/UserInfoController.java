@@ -1,6 +1,8 @@
 package com.hdh.lifeup.controller;
 
 import com.google.common.collect.Maps;
+import com.hdh.lifeup.auth.ApiLimiting;
+import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
@@ -30,21 +32,6 @@ public class UserInfoController {
     @Autowired
     private UserInfoService userInfoService;
 
-    @GetMapping("/test")
-    public ResultVO<?> test() {
-        LocalDateTime nowDateTime = LocalDateTime.now();
-        LocalDate nowDate = nowDateTime.toLocalDate();
-        LocalTime nowTime = nowDateTime.toLocalTime();
-
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("nowDateTime", nowDateTime);
-        map.put("nowDate", nowDate);
-        map.put("nowTime", nowTime);
-        map.put("stupid hao", "滑稽.jpg");
-
-        return Result.success(map);
-    }
-
     /**
      * paramType：参数放在哪个地方
                  header-->请求参数的获取：@RequestHeader
@@ -54,23 +41,27 @@ public class UserInfoController {
                  form（不常用）
         详细参考：http://www.cnblogs.com/java-zhao/p/5348113.html
      */
+    @ApiLimiting
     @ApiOperation(value = "查询指定用户的个人信息", notes = "用于打开自己的个人信息页面，以及其他用户的个人信息页面。")
-    @ApiImplicitParam(name = "userId", value = "用户主键", required = true, paramType = "path", dataType = "Long")
-    @GetMapping("/{userId}")
-    public ResultVO<UserInfoDTO> getOne(@PathVariable("userId") Long userId) {
-        UserInfoDTO getResult = userInfoService.getOne(userId);
-        return Result.success(getResult);
+    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @GetMapping("/profile")
+    public ResultVO<UserInfoDTO> getMine() {
+        return Result.success(UserContext.get());
     }
 
-    @ApiOperation(value = " 修改自己的公众信息", notes = "昵称、性别、居住地。还要讨论下要不要做头像？")
-    @PutMapping("/profile/{userId}")
+    @ApiLimiting
+    @ApiOperation(value = " 修改自己的公众信息", notes = "不传id，昵称、性别、居住地。还要讨论下要不要做头像？")
+    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @PutMapping("/profile")
     public ResultVO<UserInfoDTO> updateProfile(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);
     }
 
-    @ApiOperation(value = " 修改自己的私人信息", notes = "比如密码修改")
-    @PutMapping("/account/{userId}")
+    @ApiLimiting
+    @ApiOperation(value = " 修改自己的私人信息", notes = "不传id，比如密码修改。目前修改公众信息和私人信息接口一样，但以后不会一样，客户端需要按功能含义使用接口，不传递不必要的数据")
+    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @PutMapping("/account")
     public ResultVO<UserInfoDTO> updateAccount(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);

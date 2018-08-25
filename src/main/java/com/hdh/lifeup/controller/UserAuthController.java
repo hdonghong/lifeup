@@ -13,6 +13,7 @@ import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,10 @@ public class UserAuthController {
     }
 
     @ApiOperation(value = "获取请求第三方授权的URL", notes = "支持多种授权，比如易班、QQ")
-    @ApiImplicitParam(name = "redirectUri", value = "回调的URI，格式形如：http://lifeup/，不传的话默认为http://net.sarasarasa.lifeup/redirect", required = false, paramType = "query", dataType = "String")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "authType", value = "授权类型，比如yb、qq", required = true, paramType = "path"),
+        @ApiImplicitParam(name = "redirectUri", value = "回调的URI，格式形如：http://lifeup/，不传的话默认为http://net.sarasarasa.lifeup/redirect", paramType = "query")
+    })
     @GetMapping("/{authType}")
     public ResultVO<String> getOauthPath(@PathVariable("authType")String authType, String redirectUri) {
         String callback;
@@ -68,7 +72,7 @@ public class UserAuthController {
         switch (authType) {
             case AuthTypeConst.YB: callback = ybConfig.getRedirectUri();
                                    originalOauthPath = ybConfig.getOauthPath();
-                                   appId = ybConfig.getOauthPath();
+                                   appId = ybConfig.getAppId();
                                    break;
             case AuthTypeConst.QQ:
             default: throw new GlobalException(CodeMsgEnum.UNSUPPORTED_AUTH_TYPE);

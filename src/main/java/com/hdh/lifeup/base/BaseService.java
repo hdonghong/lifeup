@@ -29,7 +29,7 @@ public interface BaseService<DTO extends BaseDTO, ID extends Serializable> {
     <T> List<DTO> listByConditions(T queryCondition);
 
     /**
-     * 根据条件获取目标页码数分页 FIXME 返回值待确认
+     * 根据条件获取目标页码数分页
      * @param queryCondition 查询条件
      * @param currPage 目标页码数
      * @param pageSize 页面数据量

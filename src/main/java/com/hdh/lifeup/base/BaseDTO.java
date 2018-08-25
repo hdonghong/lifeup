@@ -39,6 +39,7 @@ public abstract class BaseDTO<DO extends BaseDO> implements Serializable {
      * @param <DTO> DTO泛型类型
      * @return DTO对象
      */
+    @SuppressWarnings("unchecked")
     public static <DTO extends BaseDTO, DO extends BaseDO> DTO from(DO aDO, Class<DTO> dtoClass) {
         Preconditions.checkNotNull(dtoClass, "DTO class can not be null");
         try {

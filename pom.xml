@@ -27,12 +27,6 @@
 	</properties>
 
 	<dependencies>
-		<!-- redis -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-redis</artifactId>
-		</dependency>
-
 		<!-- web mvc -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -53,10 +47,17 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- mybatis-plus -->
 		<dependency>
 			<groupId>com.baomidou</groupId>
 			<artifactId>mybatis-plus-boot-starter</artifactId>
 			<version>${mybatis.plus.version}</version>
+		</dependency>
+
+		<!-- redis -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
 
 		<!-- lombok插件 -->

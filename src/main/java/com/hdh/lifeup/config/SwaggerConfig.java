@@ -43,7 +43,7 @@ public class SwaggerConfig {
                 // 描述
                 .description("「人升」的后端接口文档，目前仍采用userId区别用户，以后会全部去掉")
                 // 创建人
-                .contact(new Contact("hdonghong", "https://github.com/hdonghong",""))
+                .contact(new Contact("hdonghong", "https://github.com/hdonghong/lifeup",""))
                 // 版本号
                 .version("1.0")
                 .build();

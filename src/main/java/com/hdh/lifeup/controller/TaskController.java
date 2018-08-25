@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
  * @author hdonghong
  * @since 2018/08/18
  */
-@Api(description = "个人事项模块")
+@Api(description = "个人事项模块，还没写文档。。。")
 @RestController
 @RequestMapping("/task")
 public class TaskController {
