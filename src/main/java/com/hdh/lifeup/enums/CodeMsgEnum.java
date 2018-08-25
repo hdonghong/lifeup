@@ -23,12 +23,19 @@ public enum CodeMsgEnum {
     UNSUPPORTED_AUTH_TYPE(500201, "不支持的授权类型"),
     TOKEN_ABSENT(500202, "请求头中缺少鉴权TOKEN"),
     TOKEN_INVALID(500203, "不合法的Token或者Token失效"),
+    ACCESS_ILLEGAL(500204, "非法访问他人资源"),
+    ACCOUNT_ALREADY_EXISTED(500205, "账号已被注册"),
+    PASSWORD_ERROR(500206, "密码错误"),
 
     /** 用户模块 5003XX */
     USER_NOT_EXIST(500301, "用户不存在"),
 
     /** 事项模块 5004XX */
     TASK_NOT_EXIST(500401, "个人事项不存在"),
+
+
+    /** 属性模块 5005XX */
+    ATTRIBUTE_NOT_EXIST(500402, "人物属性不存在"),
 
     ;
 

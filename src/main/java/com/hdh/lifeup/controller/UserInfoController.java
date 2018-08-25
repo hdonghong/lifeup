@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
@@ -29,8 +30,15 @@ import java.util.Map;
 @RequestMapping("/user")
 public class UserInfoController {
 
-    @Autowired
     private UserInfoService userInfoService;
+
+    private UserAuthService userAuthService;
+
+    @Autowired
+    public UserInfoController(UserInfoService userInfoService, UserAuthService userAuthService) {
+        this.userInfoService = userInfoService;
+        this.userAuthService = userAuthService;
+    }
 
     /**
      * paramType：参数放在哪个地方

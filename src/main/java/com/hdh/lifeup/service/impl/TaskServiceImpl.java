@@ -3,6 +3,7 @@ package com.hdh.lifeup.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.domain.TaskDO;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.TaskDTO;
@@ -10,6 +11,7 @@ import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.TaskMapper;
 import com.hdh.lifeup.service.TaskService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 /**
  * TaskServiceImpl class<br/>
@@ -61,22 +63,18 @@ public class TaskServiceImpl implements TaskService {
     public <T> PageDTO<TaskDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
         IPage<TaskDO> taskDOPage = taskMapper.selectPage(
                 new Page<>(1, 10),
-                new QueryWrapper<>()
+                new QueryWrapper<TaskDO>().eq("user_id", UserContext.get().getUserId())
         );
         return PageDTO.create(taskDOPage, TaskDTO.class);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public TaskDTO insert(TaskDTO taskDTO) {
-        if (taskDTO == null) {
-            log.error("【新增个人事项】taskDTO为空");
-            throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
-        }
-        TaskDO taskDO = new TaskDO();
-        BeanUtils.copyProperties(taskDTO, taskDO);
-        int insertResult = Optional.ofNullable(taskMapper.insert(taskDO)).orElse(0);
-        if (insertResult == 0) {
+    public TaskDTO insert(@NonNull TaskDTO taskDTO) {
+        taskDTO.setUserId(UserContext.get().getUserId());
+        TaskDO taskDO = taskDTO.toDO(TaskDO.class);
+        Integer result = taskMapper.insert(taskDO);
+        if (Objects.equals(1, result)) {
             log.error("【新增个人事项】新增失败，taskDTO = [{}]", taskDTO);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }
@@ -86,34 +84,32 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public TaskDTO update(TaskDTO taskDTO) {
-        if (taskDTO == null) {
-            log.error("【更新个人事项】taskDTO为空");
-            throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
-        }
+    public TaskDTO update(@NonNull TaskDTO taskDTO) {
         if (taskDTO.getTaskId() == null) {
             log.error("【更新个人事项】");
             throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
         }
-        TaskDO taskDO = new TaskDO();
-        BeanUtils.copyProperties(taskDTO, taskDO);
-        int updateResult = Optional.ofNullable(taskMapper.updateById(taskDO)).orElse(0);
-        if (updateResult == 0) {
+        taskDTO.setUserId(UserContext.get().getUserId());
+        Integer result = taskMapper.update(
+                taskDTO.toDO(TaskDO.class),
+                new QueryWrapper<TaskDO>().eq("task_id", taskDTO.getTaskId())
+                                          .eq("user_id", taskDTO.getUserId())
+        );
+        if (Objects.equals(1, result)) {
             log.error("【删除个人事项】不存在的个人事项，taskDTO = [{}]", taskDTO);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }
-        return null;
+        return taskDTO;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public TaskDTO deleteLogically(Long taskId) {
-        if (taskId == null) {
-            log.error("【删除个人事项】taskId为空");
-            throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
-        }
-        int deleteResult = Optional.ofNullable(taskMapper.deleteById(taskId)).orElse(0);
-        if (deleteResult == 0) {
+    public TaskDTO deleteLogically(@NonNull Long taskId) {
+        Integer result = taskMapper.delete(
+                new QueryWrapper<TaskDO>().eq("task_id", taskId)
+                        .eq("user_id", UserContext.get().getUserId())
+        );
+        if (Objects.equals(1, result)) {
             log.error("【删除个人事项】不存在的个人事项，taskId = [{}]", taskId);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }

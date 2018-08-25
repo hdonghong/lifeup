@@ -39,20 +39,29 @@ public class TaskDO extends BaseDO {
     /** '困难程度，1-4' */
     private Integer difficultDegree;
 
-    /** '奖励的属性，是一个json字符串' */
+    /** '奖励的属性名，空格分开 */
     private String rewardAttributes;
 
-    /** 完成期限，可为空 */
-    private Instant taskDeadline;
+    /** '对应的属性经验值 */
+    private Integer rewardExp;
 
-    /** '任务频率，1即不重复' */
+    /** '任务频率，0即不重复，1即1天/次；7即1周/次；30即1个月/次 */
     private Integer taskFrequency;
 
     /** 是否分享到社区0否；1是 */
     private Integer isShared;
 
-    /** 任务状态：0未完成；1完成；2逾期；3放弃 */
+    /** 任务状态：0进行中；1完成；2逾期；3放弃 */
     private Integer taskStatus;
+
+    /** 用户预计的首次到期完成时间（可选，为空表示随时可完成,不用最后通知' */
+    private LocalDateTime firstExpireTime;
+
+    /** 首次提醒时间，当首次期间存在时需要小于它； */
+    private LocalDateTime firstRemindTime;
+
+    /** 整个事项的完成时间 */
+    private LocalDateTime taskCompleteTime;
 
     /** '关联的用户id' */
     private Long userId;

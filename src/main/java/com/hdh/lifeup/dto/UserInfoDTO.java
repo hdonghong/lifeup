@@ -53,6 +53,10 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
     /** 绑定的类型 */
     private List<String> authTypes;
 
+    private String pwdSalt;
+
+    private String password;
+
     public static UserInfoDTO fromYbUser(JsonNode userInfoJson) {
         Preconditions.checkNotNull(userInfoJson, "userInfoJson can not be empty!");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
@@ -67,7 +71,7 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
     public UserInfoDO toDO(Class<UserInfoDO> doClass) {
         try {
             UserInfoDO userInfoDO = doClass.newInstance();
-            BeanUtils.copyProperties(this, userInfoDO, "authTypes");
+            BeanUtils.copyProperties(this, userInfoDO, "authTypes", "password");
             if (this.authTypes != null && this.authTypes.size() > 0) {
                 userInfoDO.setAuthTypes(new ObjectMapper().writeValueAsString(this.authTypes));
             }

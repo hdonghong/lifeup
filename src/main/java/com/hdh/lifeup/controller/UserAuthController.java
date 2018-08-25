@@ -32,7 +32,7 @@ import java.util.Optional;
  * @since 2018/08/20
  */
 @Slf4j
-@Api(description = "用户授权登录模块，包含第三方应用登录和本应用登录")
+@Api(description = "授权/注册/登录模块，包含第三方应用登录和本应用登录")
 @RestController
 @RequestMapping("/auth")
 public class UserAuthController {
@@ -86,7 +86,7 @@ public class UserAuthController {
     @ApiOperation(value = "发送code", notes = "拿到code后务必发送给后端")
     @ApiImplicitParam(name = "code", value = "用于拉取access_token", required = true, paramType = "query", dataType = "String")
     @PostMapping("/yb/login")
-    public ResultVO<?> ybLogin(@RequestParam("code") String code) throws IOException {
+    public ResultVO<String> ybLogin(@RequestParam("code") String code) throws IOException {
         String accessTokenPath = String.format(ybConfig.getTokenPath(),
                 code, ybConfig.getAppId(), ybConfig.getAppSecret(), ybConfig.getRedirectUri());
 
@@ -106,9 +106,23 @@ public class UserAuthController {
         UserAuthDTO userAuthDTO = UserAuthDTO.fromYbUser(userInfoJson);
         UserInfoDTO userInfoDTO = UserInfoDTO.fromYbUser(userInfoJson);
 
-        String token = userAuthService.login(userAuthDTO, userInfoDTO);
+        String token = userAuthService.oauthLogin(userAuthDTO, userInfoDTO);
         return Result.success(token);
     }
 
+    @PostMapping("/phone/login")
+    @ApiImplicitParam(name = "UserAuthDTO", value = "包含用户信息", required = true, paramType = "post", dataType = "json")
+    public ResultVO<String> phoneLogin(@RequestBody UserAuthDTO userAuthDTO) throws IOException {
+        userAuthDTO.setAuthType(AuthTypeConst.PHONE);
+        return Result.success(userAuthService.appLogin(userAuthDTO));
+    }
+
+
+    @ApiOperation(value = " 注册新账号", notes = "传递手机号，密码需要客户端md5一下再传，不需要的字段别传")
+    @ApiImplicitParam(name = "UserAuthDTO", value = "包含用户信息", required = true, paramType = "post", dataType = "json")
+    @PostMapping("/register")
+    public ResultVO<String> register(@RequestBody UserInfoDTO userInfoDTO) {
+        return Result.success(userAuthService.register(userInfoDTO));
+    }
 
 }

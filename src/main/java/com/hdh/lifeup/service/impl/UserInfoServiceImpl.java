@@ -1,15 +1,16 @@
 package com.hdh.lifeup.service.impl;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.auth.TokenContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.domain.UserInfoDO;
+import com.hdh.lifeup.dto.AttributeDTO;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.UserInfoMapper;
+import com.hdh.lifeup.service.AttributeService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -42,9 +44,12 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     private UserInfoMapper userInfoMapper;
 
+    private AttributeService attributeService;
+
     @Autowired
-    public UserInfoServiceImpl(UserInfoMapper userInfoMapper) {
+    public UserInfoServiceImpl(UserInfoMapper userInfoMapper, AttributeService attributeService) {
         this.userInfoMapper = userInfoMapper;
+        this.attributeService = attributeService;
     }
 
     @Override
@@ -70,13 +75,17 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO insert(@NonNull UserInfoDTO userInfoDTO) {
+        userInfoDTO.setPwdSalt(PasswordUtil.getSalt());
         UserInfoDO userInfoDO = userInfoDTO.toDO(UserInfoDO.class);
-        userInfoDO.setPwdSalt(PasswordUtil.getSalt());
         Integer result = userInfoMapper.insert(userInfoDO);
-        if (!Objects.equal(1, result)) {
+        if (!Objects.equals(1, result)) {
             log.error("【新增用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
+        // 新建账号的时候需要顺便新建人物的属性表
+        AttributeDTO attributeDTO = new AttributeDTO()
+                                        .setUserId(userInfoDO.getUserId());
+        attributeService.insert(attributeDTO);
         return userInfoDTO.setUserId(userInfoDO.getUserId());
     }
 
@@ -84,9 +93,9 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO update(@NonNull UserInfoDTO userInfoDTO) {
         UserInfoDTO storedUserInfoDTO = UserContext.get();
-        BeanUtils.copyProperties(userInfoDTO, storedUserInfoDTO, "user_id", "createTime");
+        BeanUtils.copyProperties(userInfoDTO, storedUserInfoDTO, "userId", "createTime");
         Integer result = userInfoMapper.updateById(storedUserInfoDTO.toDO(UserInfoDO.class));
-        if (!Objects.equal(1, result)) {
+        if (!Objects.equals(1, result)) {
             log.error("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
@@ -126,4 +135,5 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         return userInfoDTO;
     }
+
 }
