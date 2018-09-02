@@ -1,8 +1,6 @@
 package com.hdh.lifeup.vo;
 
 import com.hdh.lifeup.enums.CodeMsgEnum;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiResponse;
 import lombok.Getter;
 import lombok.ToString;
 

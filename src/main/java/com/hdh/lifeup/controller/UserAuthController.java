@@ -2,6 +2,7 @@ package com.hdh.lifeup.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import com.hdh.lifeup.config.YbConfig;
 import com.hdh.lifeup.constant.AuthTypeConst;
 import com.hdh.lifeup.dto.UserAuthDTO;
@@ -11,11 +12,13 @@ import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.vo.UserAuthVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
@@ -23,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -74,7 +78,6 @@ public class UserAuthController {
                                    originalOauthPath = ybConfig.getOauthPath();
                                    appId = ybConfig.getAppId();
                                    break;
-            case AuthTypeConst.QQ:
             default: throw new GlobalException(CodeMsgEnum.UNSUPPORTED_AUTH_TYPE);
         }
         callback = Optional.ofNullable(redirectUri).orElse(callback);
@@ -83,7 +86,7 @@ public class UserAuthController {
         return Result.success(oauthPath);
     }
 
-    @ApiOperation(value = "发送code", notes = "拿到code后务必发送给后端")
+    @ApiOperation(value = "易班登录", notes = "拿到code后务必发送给后端")
     @ApiImplicitParam(name = "code", value = "用于拉取access_token", required = true, paramType = "query", dataType = "String")
     @PostMapping("/yb/login")
     public ResultVO<String> ybLogin(@RequestParam("code") String code) throws IOException {
@@ -110,19 +113,34 @@ public class UserAuthController {
         return Result.success(token);
     }
 
+    @ApiOperation(value = " 手机号登录")
     @PostMapping("/phone/login")
-    @ApiImplicitParam(name = "UserAuthDTO", value = "包含用户信息", required = true, paramType = "post", dataType = "json")
-    public ResultVO<String> phoneLogin(@RequestBody UserAuthDTO userAuthDTO) throws IOException {
+    public ResultVO<String> phoneLogin(@RequestBody @Valid UserAuthDTO userAuthDTO) {
         userAuthDTO.setAuthType(AuthTypeConst.PHONE);
         return Result.success(userAuthService.appLogin(userAuthDTO));
     }
 
+    @ApiOperation(value = " QQ登录")
+    @PostMapping("/qq/login")
+    public ResultVO<String> qqLogin(@RequestBody @Valid UserAuthVO userAuthVO) {
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        BeanUtils.copyProperties(userAuthVO, userInfoDTO);
+        // 注册类型：目前有手机号、QQ
+        userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthVO.getAuthType()));
 
-    @ApiOperation(value = " 注册新账号", notes = "传递手机号，密码需要客户端md5一下再传，不需要的字段别传")
-    @ApiImplicitParam(name = "UserAuthDTO", value = "包含用户信息", required = true, paramType = "post", dataType = "json")
+        UserAuthDTO userAuthDTO = new UserAuthDTO();
+        // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
+        userAuthDTO.setAuthType(AuthTypeConst.QQ)
+                   .setAuthIdentifier(userAuthVO.getAuthIdentifier());
+
+        return  Result.success(userAuthService.oauthLogin(userAuthDTO, userInfoDTO));
+    }
+
+
+    @ApiOperation(value = " 注册系统账号", notes = "传递手机号，密码需要客户端md5一下再传，不需要的字段别传")
     @PostMapping("/register")
-    public ResultVO<String> register(@RequestBody UserInfoDTO userInfoDTO) {
-        return Result.success(userAuthService.register(userInfoDTO));
+    public ResultVO<String> register(@RequestBody @Valid UserAuthVO userAuthVO) {
+        return Result.success(userAuthService.register(userAuthVO));
     }
 
 }

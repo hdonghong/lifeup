@@ -15,7 +15,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class VersionVO {
 
+    /** 示例：1 */
     private Integer newVersion;
 
+    /** 最新版本链接 */
     private String downloadUrl;
+
+    /** 示例：v1.0 */
+    private String versionName;
 }

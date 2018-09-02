@@ -3,6 +3,7 @@ package com.hdh.lifeup.service;
 import com.hdh.lifeup.base.BaseService;
 import com.hdh.lifeup.dto.UserAuthDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.vo.UserAuthVO;
 
 /**
  * UserAuthService interface<br/>
@@ -30,8 +31,8 @@ public interface UserAuthService extends BaseService<UserAuthDTO, Long> {
 
     /**
      * 系统账号注册
-     * @param userInfoDTO 注册DTO
+     * @param userAuthVO 注册VO
      * @return token
      */
-    String register(UserInfoDTO userInfoDTO);
+    String register(UserAuthVO userAuthVO);
 }

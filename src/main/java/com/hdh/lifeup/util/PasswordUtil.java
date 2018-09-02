@@ -30,5 +30,16 @@ public class PasswordUtil {
 
     public static void main(String[] args) {
         System.out.println(convertClientPwdToDbPwd("sss", "salt").length());
+
+        // f9a9404272b87a357d890d02a7003ca8
+        String client = "f9a9404272b87a357d890d02a7003ca8";
+        String salt = "0f7f91dc";
+        String db = "aa229adf36a158d543a5607715614dff";
+        System.out.println("client: " + client);
+        System.out.println("salt: " + salt);
+        System.out.println("db: " + db);
+
+        System.out.println(convertClientPwdToDbPwd(client, salt));
+        System.out.println(checkPwd(client, salt, db));
     }
 }

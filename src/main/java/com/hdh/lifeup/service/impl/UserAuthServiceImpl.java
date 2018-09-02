@@ -15,8 +15,10 @@ import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
+import com.hdh.lifeup.vo.UserAuthVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -72,7 +74,7 @@ public class UserAuthServiceImpl implements UserAuthService {
 
         // 新增前检查是否已经注册过
         UserAuthDO queryResult = userAuthMapper.selectOne(
-                new QueryWrapper<>(userAuthDO).eq("auth_type", userAuthDO.getAuthType())
+                new QueryWrapper<UserAuthDO>().eq("auth_type", userAuthDO.getAuthType())
                         .eq("auth_identifier", userAuthDO.getAuthIdentifier())
         );
         if (queryResult != null) {
@@ -147,7 +149,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         }
         UserInfoDTO userInfoResult = userInfoService.getOne(userAuthDO.getUserId());
         boolean match = PasswordUtil.checkPwd(
-                    userAuthDTO.getAccessToken(), userInfoResult.getPwdSalt(), userInfoResult.getPassword());
+                    userAuthDTO.getAccessToken(), userInfoResult.getPwdSalt(), userAuthDO.getAccessToken());
         if (!match) {
             log.error("【APP账号登录】密码错误");
             throw new GlobalException(CodeMsgEnum.PASSWORD_ERROR);
@@ -160,17 +162,23 @@ public class UserAuthServiceImpl implements UserAuthService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public String register(@NonNull UserInfoDTO userInfoDTO) {
-        // 注册类型：目前只有手机号、可能以后有邮箱
-        userInfoDTO.setAuthTypes(Lists.newArrayList(AuthTypeConst.PHONE));
+    public String register(@NonNull UserAuthVO userAuthVO) {
+        UserInfoDTO userInfoDTO = new UserInfoDTO();
+        BeanUtils.copyProperties(userAuthVO, userInfoDTO);
+        // 注册类型：目前有手机号、QQ
+        userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthVO.getAuthType()));
         UserInfoDTO userInfoResult = userInfoService.insert(userInfoDTO);
+
+        log.info("【注册账号】clientPwd = [{}]", userAuthVO.getAccessToken());
 
         UserAuthDTO userAuthDTO = new UserAuthDTO();
         // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
-        userAuthDTO.setAuthType(AuthTypeConst.PHONE)
-                .setUserId(userInfoResult.getUserId())
-                .setAuthIdentifier(userInfoResult.getPhone())
-                .setAccessToken(PasswordUtil.convertClientPwdToDbPwd(userInfoResult.getPassword(), userInfoResult.getPwdSalt()));
+        userAuthDTO.setAuthType(userAuthVO.getAuthType())
+                   .setUserId(userInfoResult.getUserId())
+                   .setAuthIdentifier(userAuthVO.getAuthIdentifier());
+        if (AuthTypeConst.PHONE.equals(userAuthVO.getAuthType())) {
+            userAuthDTO.setAccessToken(PasswordUtil.convertClientPwdToDbPwd(userAuthVO.getAccessToken(), userInfoResult.getPwdSalt()));
+        }
         insert(userAuthDTO);
         // userInfoDTO放到缓存，返回token
         String token = TokenUtil.get();

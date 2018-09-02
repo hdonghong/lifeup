@@ -5,12 +5,11 @@ import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
-import org.springframework.validation.ObjectError;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 /**
  * GlobalExceptionHandler class<br/>
@@ -38,13 +37,16 @@ public class GlobalExceptionHandler {
      * @param e 异常
      * @return 通用result
      */
-    @ExceptionHandler(value = BindException.class)
-    public ResultVO<?> handleBindException(BindException e) {
-        List<ObjectError> errorList = e.getAllErrors();
-        ObjectError objectError = errorList.get(0);
-        String defaultMessage = objectError.getDefaultMessage();
+    @ExceptionHandler(value = {BindException.class, MethodArgumentNotValidException.class})
+    public ResultVO<?> handleBindException(Exception e) {
+        BindingResult bindingResult = BindException.class.isInstance(e) ?
+                ((BindException) e).getBindingResult() : ((MethodArgumentNotValidException) e).getBindingResult();
+        Object[] messageArr = bindingResult.getFieldErrors()
+                                           .stream()
+                                           .map(error -> error.getField() + error.getDefaultMessage())
+                                           .toArray();
         return Result.error(CodeMsgEnum.PARAMETER_ERROR)
-                     .appendArgs(defaultMessage);
+                     .appendArgs(messageArr);
     }
 
 

@@ -1,6 +1,5 @@
 package com.hdh.lifeup.controller;
 
-import com.google.common.collect.Maps;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.dto.UserInfoDTO;
@@ -13,11 +12,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Map;
 
 /**
  * UserInfoController class<br/>
