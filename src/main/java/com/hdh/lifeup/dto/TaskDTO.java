@@ -1,14 +1,13 @@
 package com.hdh.lifeup.dto;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TaskDO;
+import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -74,7 +73,7 @@ public class TaskDTO extends BaseDTO<TaskDO> {
             TaskDO taskDO = doClass.newInstance();
             BeanUtils.copyProperties(this, taskDO, "rewardAttributes");
             if (this.rewardAttributes != null && this.rewardAttributes.size() > 0) {
-                taskDO.setRewardAttributes(new ObjectMapper().writeValueAsString(this.rewardAttributes));
+                taskDO.setRewardAttributes(JsonUtil.toJson(this.rewardAttributes));
             }
             return taskDO;
         } catch (Exception e) {
@@ -83,17 +82,12 @@ public class TaskDTO extends BaseDTO<TaskDO> {
         return null;
     }
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public <DTO extends BaseDTO> DTO from(TaskDO aDO) {
         TaskDTO taskDTO = new TaskDTO();
         BeanUtils.copyProperties(aDO, taskDTO, "authTypes");
-        try {
-            taskDTO.setRewardAttributes(new ObjectMapper().readValue(aDO.getRewardAttributes(), List.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        taskDTO.setRewardAttributes(JsonUtil.jsonToList(aDO.getRewardAttributes(), String.class));
         return (DTO) taskDTO;
     }
 }

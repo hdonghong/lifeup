@@ -1,16 +1,15 @@
 package com.hdh.lifeup.dto;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.UserInfoDO;
+import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 
@@ -71,7 +70,7 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
             UserInfoDO userInfoDO = doClass.newInstance();
             BeanUtils.copyProperties(this, userInfoDO, "authTypes", "password");
             if (this.authTypes != null && this.authTypes.size() > 0) {
-                userInfoDO.setAuthTypes(new ObjectMapper().writeValueAsString(this.authTypes));
+                userInfoDO.setAuthTypes(JsonUtil.toJson(this.authTypes));
             }
             return userInfoDO;
         } catch (Exception e) {
@@ -85,12 +84,7 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
     public <DTO extends BaseDTO> DTO from(UserInfoDO aDO) {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         BeanUtils.copyProperties(aDO, userInfoDTO, "authTypes");
-        try {
-            userInfoDTO.setAuthTypes(new ObjectMapper().readValue(aDO.getAuthTypes(), List.class));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        userInfoDTO.setAuthTypes(JsonUtil.jsonToList(aDO.getAuthTypes(), String.class));
         return (DTO) userInfoDTO;
     }
 }

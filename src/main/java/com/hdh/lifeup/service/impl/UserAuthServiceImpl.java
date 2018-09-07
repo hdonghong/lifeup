@@ -14,6 +14,7 @@ import com.hdh.lifeup.mapper.UserAuthMapper;
 import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
+import com.hdh.lifeup.util.RedisUtil;
 import com.hdh.lifeup.util.TokenUtil;
 import com.hdh.lifeup.vo.UserAuthVO;
 import lombok.NonNull;
@@ -41,12 +42,15 @@ public class UserAuthServiceImpl implements UserAuthService {
     @Resource
     private RedisTemplate<String, UserInfoDTO> redisTemplate;
 
+    private RedisUtil redisUtil;
+
     private UserAuthMapper userAuthMapper;
 
     private UserInfoService userInfoService;
 
     @Autowired
-    public UserAuthServiceImpl(UserAuthMapper userAuthMapper, UserInfoService userInfoService) {
+    public UserAuthServiceImpl(RedisUtil redisUtil, UserAuthMapper userAuthMapper, UserInfoService userInfoService) {
+        this.redisUtil = redisUtil;
         this.userAuthMapper = userAuthMapper;
         this.userInfoService = userInfoService;
     }
