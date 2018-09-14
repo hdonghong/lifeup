@@ -10,27 +10,31 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * TeamMemberDO class<br/>
- *
+ * TeamMemberRecordDO class<br/>
+ * 成员签到动态
  * @author hdonghong
- * @since 2018/09/02
+ * @since 2018/09/11
  */
-@TableName("`team_member`")
+@TableName("`team_member_record`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class TeamMemberDO extends BaseDO {
+public class TeamMemberRecordDO extends BaseDO {
 
-    private static final long serialVersionUID = -1879347102581849048L;
+    private static final long serialVersionUID = 3280320349458708093L;
 
     @TableId
-    private Long memberId;
+    private Long memberRecordId;
 
-    private Long userId;
+    private Long teamRecordId;
 
     private Long teamId;
 
-    private String teamRole;
+    private Long userId;
+
+    private String userActivity;
 
     private LocalDateTime createTime;
+
+
 }

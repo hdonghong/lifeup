@@ -1,6 +1,8 @@
 package com.hdh.lifeup.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,10 +12,11 @@ import java.time.LocalDateTime;
 
 /**
  * TeamRecordDO class<br/>
- *
+ * 团队的签到记录情况表
  * @author hdonghong
  * @since 2018/09/02
  */
+@TableName("`team_record`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
@@ -26,17 +29,17 @@ public class TeamRecordDO extends BaseDO {
 
     private Long teamId;
 
-    private Long userId;
-
-    /** 用户动态 */
-    private String userActivity;
-
     /** 下一次的提醒开始签到的时间 */
     private LocalDateTime nextStartTime;
 
+    /** 下一次的结束签到的时间 */
     private LocalDateTime nextEndTime;
 
-    private LocalDateTime signinTime;
+    /** 当前已签到的人数 */
+    private Integer signNumber;
+
+    @TableLogic
+    private Integer isDel;
 
     private LocalDateTime createTime;
 

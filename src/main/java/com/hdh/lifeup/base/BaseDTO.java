@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 /**
  * BaseDTO class<br/>
- * 通用的DTO父类，提供默认DTO与DO的优雅转换，方法命名仿自JDK8日期API
+ * 通用的DTO父类，提供默认DTO与DO的转换，方法命名仿自JDK8日期API
  * @author hdonghong
  * @since 2018/08/18
  */

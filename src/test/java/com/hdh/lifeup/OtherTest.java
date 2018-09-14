@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.time.*;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -68,4 +69,26 @@ public class OtherTest {
         List list = objectMapper.readValue(str, List.class);
         System.out.println(list);
     }
+
+    @Test
+    public void testClass() {
+        String clazzName3 = new Object() {
+            private String getClassName() {
+                String clazzName = this.getClass().getName();
+                return clazzName.substring(0, clazzName.lastIndexOf('$'));
+            }
+        }.getClassName();
+        try {
+            Class<?> aClass = Class.forName(clazzName3);
+            OtherTest o = (OtherTest) aClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void testDate() {
+        System.out.println(new Date());
+    }
+
 }

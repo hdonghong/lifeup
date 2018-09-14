@@ -2,6 +2,7 @@ package com.hdh.lifeup.domain;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -17,6 +18,7 @@ import java.time.LocalTime;
  * @author hdonghong
  * @since 2018/09/02
  */
+@TableName("`team_task`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
@@ -30,6 +32,8 @@ public class TeamTaskDO extends BaseDO {
     private String teamTitle;
 
     private String teamDesc;
+
+    private String teamHead;
 
     private String rewardAttr;
 
@@ -47,6 +51,7 @@ public class TeamTaskDO extends BaseDO {
     /** 结束签到的时间，必须开始后才能签到，与startTime在同一天，不填写的话默认为当天23.59.59点 */
     private LocalTime endTime;
 
+    /** 团队状态，0未开始；1进行中；2完成；3放弃 */
     private Integer teamStatus;
 
     private LocalDateTime completeTime;

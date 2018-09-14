@@ -33,9 +33,11 @@ public enum CodeMsgEnum {
     /** 事项模块 5004XX */
     TASK_NOT_EXIST(500401, "个人事项不存在"),
 
-
     /** 属性模块 5005XX */
-    ATTRIBUTE_NOT_EXIST(500402, "人物属性不存在"),
+    ATTRIBUTE_NOT_EXIST(500501, "人物属性不存在"),
+
+    /** 团队模块 5006XX */
+    TEAM_NOT_EXIST(500601, "团队不存在"),
 
     ;
 

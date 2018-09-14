@@ -32,5 +32,5 @@ public class NextSignVO implements Serializable {
     private LocalDateTime nextStartTime;
 
     @ApiModelProperty("下一次结束签到的时间")
-    private LocalDateTime nextEndTIme;
+    private LocalDateTime nextEndTime;
 }

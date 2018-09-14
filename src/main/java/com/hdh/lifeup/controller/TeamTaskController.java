@@ -1,9 +1,13 @@
 package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
+import com.hdh.lifeup.dto.PageDTO;
+import com.hdh.lifeup.dto.TeamTaskDTO;
 import com.hdh.lifeup.service.TeamTaskService;
+import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.NextSignVO;
 import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.vo.TeamDetailVO;
 import com.hdh.lifeup.vo.TeamTaskVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,7 +41,21 @@ public class TeamTaskController {
     })
     @PostMapping("/new")
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
-        return null;
+        return Result.success(
+                teamTaskService.addTeam(teamTaskVO)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "团队详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+    })
+    @GetMapping("/{teamId}")
+    public ResultVO<TeamDetailVO> get(@PathVariable("teamId") Long teamId) {
+        return Result.success(
+                teamTaskService.getDetail(teamId)
+        );
     }
 
     @ApiLimiting
@@ -48,6 +66,21 @@ public class TeamTaskController {
     })
     @GetMapping("/{teamId}/next_sign")
     public ResultVO<NextSignVO> getNextSign(@PathVariable("teamId") Long teamId) {
-        return null;
+        return Result.success(
+                teamTaskService.getNextSign(teamId)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "获取团队列表分页")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+    })
+    @GetMapping
+    public ResultVO<PageDTO<TeamTaskDTO>> getPage(@RequestBody PageDTO pageDTO) {
+
+        return Result.success(
+                teamTaskService.page(pageDTO)
+        );
     }
 }

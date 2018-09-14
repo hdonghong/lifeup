@@ -1,6 +1,5 @@
 package com.hdh.lifeup.dto;
 
-import com.hdh.lifeup.base.BaseDO;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamTaskDO;
 import lombok.Data;
@@ -10,6 +9,7 @@ import lombok.experimental.Accessors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * TeamTaskDO class<br/>
@@ -30,7 +30,9 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
 
     private String teamDesc;
 
-    private String rewardAttr;
+    private String teamHead;
+
+    private List<String> rewardAttrs;
 
     private Integer rewardExp;
 
@@ -46,6 +48,7 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     /** 结束签到的时间，必须开始后才能签到，与startTime在同一天，不填写的话默认为当天23.59.59点 */
     private LocalTime endTime;
 
+    /** 团队状态，0未开始；1进行中；2完成；3放弃 */
     private Integer teamStatus;
 
     private LocalDateTime completeTime;

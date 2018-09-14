@@ -1,8 +1,7 @@
-package com.hdh.lifeup.domain;
+package com.hdh.lifeup.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.hdh.lifeup.base.BaseDO;
+import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.domain.TeamMemberDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -10,20 +9,18 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * TeamMemberDO class<br/>
+ * TeamMemberDTO class<br/>
  *
  * @author hdonghong
- * @since 2018/09/02
+ * @since 2018/09/11
  */
-@TableName("`team_member`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class TeamMemberDO extends BaseDO {
+public class TeamMemberDTO extends BaseDTO<TeamMemberDO> {
 
-    private static final long serialVersionUID = -1879347102581849048L;
+    private static final long serialVersionUID = -7050659369013952349L;
 
-    @TableId
     private Long memberId;
 
     private Long userId;

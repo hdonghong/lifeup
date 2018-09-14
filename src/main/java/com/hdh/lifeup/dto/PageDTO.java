@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.base.BaseDO;
 import com.hdh.lifeup.base.BaseDTO;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
@@ -21,13 +23,20 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @ToString
+@ApiModel("分页查询的DTO类，暂时是这样，还未处理重复的情况！")
 public class PageDTO<T> implements Serializable {
     private static final long serialVersionUID = -6321188008468846904L;
 
+    @ApiModelProperty("当前页码，从1开始，查询必传")
     private Long currentPage;
 
+    @ApiModelProperty("当前页展示的数据量，大于0，查询必传")
+    private Long size;
+
+    @ApiModelProperty("总页码，由后端返回")
     private Long totalPage;
 
+    @ApiModelProperty("查询结果，有后端返回")
     private List<T> list;
 
     public static <DTO extends BaseDTO, DO extends BaseDO> PageDTO<DTO> create(IPage<DO> iPage, Class<DTO> dtoClass) {
