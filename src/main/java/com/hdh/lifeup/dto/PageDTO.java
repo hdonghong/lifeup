@@ -6,9 +6,8 @@ import com.hdh.lifeup.base.BaseDO;
 import com.hdh.lifeup.base.BaseDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,6 +22,9 @@ import java.util.stream.Collectors;
 @Getter
 @Builder
 @ToString
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel("分页查询的DTO类，暂时是这样，还未处理重复的情况！")
 public class PageDTO<T> implements Serializable {
     private static final long serialVersionUID = -6321188008468846904L;
@@ -52,4 +54,28 @@ public class PageDTO<T> implements Serializable {
                       .list(dtoList)
                       .build();
     }
+
+    public static <T, V> PageDTO<V> createFreely(IPage<T> iPage, Class<V> valueClass) {
+        Preconditions.checkNotNull(iPage, "iPage不能为空");
+        List<T> pageList = iPage.getRecords();
+        List<V> result = pageList.stream()
+                .map(pageRecord -> {
+                    V value = null;
+                    try {
+                        value = valueClass.newInstance();
+                        BeanUtils.copyProperties(pageRecord, value);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return value;
+                })
+                .collect(Collectors.toList());
+
+        return PageDTO.<V>builder()
+                .currentPage(iPage.getCurrent())
+                .totalPage((long) Math.ceil((iPage.getTotal() * 1.0) / iPage.getSize()))
+                .list(result)
+                .build();
+    }
+
 }

@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +26,7 @@ public class UserInfoMapperTest {
     @Test
     public void testInsert() {
         UserInfoDO userInfoDO = new UserInfoDO();
-        userInfoDO.setNickName("nick")
+        userInfoDO.setNickname("nick")
                 .setUserAddress("2018-08-18 08:44:12 广东省广州市天河区龙口东路创逸大厦11202");
         Integer result = userInfoMapper.insert(userInfoDO);
         assertEquals(1, result.intValue());

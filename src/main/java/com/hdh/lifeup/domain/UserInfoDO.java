@@ -29,7 +29,7 @@ public class UserInfoDO extends BaseDO {
     private Long userId;
 
     /** '用户昵称' */
-    private String nickName;
+    private String nickname;
 
     /** '0女，1男，2保密' */
     private Integer userSex;

@@ -25,6 +25,8 @@ public class NextSignVO implements Serializable {
 
     private Long teamId;
 
+    private Long teamRecordId;
+
     @ApiModelProperty(value = "团队标题，也是事项标题")
     private String teamTitle;
 

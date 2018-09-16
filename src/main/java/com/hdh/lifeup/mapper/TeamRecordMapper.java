@@ -10,4 +10,6 @@ import com.hdh.lifeup.domain.TeamRecordDO;
  * @since 2018/09/02
  */
 public interface TeamRecordMapper extends SuperMapper<TeamRecordDO> {
+
+
 }

@@ -1,44 +1,41 @@
-package com.hdh.lifeup.domain;
+package com.hdh.lifeup.dto;
 
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.hdh.lifeup.base.BaseDO;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**
- * TeamMemberRecordDO class<br/>
- * 成员签到动态
+ * RecordDTO class<br/>
+ *
  * @author hdonghong
- * @since 2018/09/11
+ * @since 2018/09/16
  */
-@TableName("`team_member_record`")
 @Data
 @Accessors(chain = true)
-@EqualsAndHashCode(callSuper = false)
-public class TeamMemberRecordDO extends BaseDO {
+public class RecordDTO implements Serializable {
 
     private static final long serialVersionUID = 3280320349458708093L;
 
-    @TableId
     private Long memberRecordId;
 
     private Long teamRecordId;
 
-    private String teamTitle;
-
     private Long teamId;
 
+    private String teamTitle;
+
     private Long userId;
+
+    private String nickname;
+
+    private String userHead;
 
     private String userActivity;
 
     private Integer activityIcon;
 
     private LocalDateTime createTime;
-
 
 }

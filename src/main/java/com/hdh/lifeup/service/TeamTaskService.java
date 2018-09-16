@@ -37,4 +37,11 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
      * @return 签到信息
      */
     NextSignVO getNextSign(Long teamId);
+
+    /**
+     * 成员加入团队
+     * @param teamId 团队id
+     * @return 签到信息
+     */
+    NextSignVO joinTeam(Long teamId);
 }

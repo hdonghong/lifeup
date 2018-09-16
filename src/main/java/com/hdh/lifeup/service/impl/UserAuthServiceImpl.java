@@ -61,16 +61,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public <T> List<UserAuthDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<UserAuthDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        return null;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthDTO insert(UserAuthDTO userAuthDTO) {
         Preconditions.checkNotNull(userAuthDTO, "【新增用户鉴权记录】UserAuthDTO类不能为空");

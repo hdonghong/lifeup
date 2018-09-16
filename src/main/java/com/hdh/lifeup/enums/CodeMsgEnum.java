@@ -38,6 +38,10 @@ public enum CodeMsgEnum {
 
     /** 团队模块 5006XX */
     TEAM_NOT_EXIST(500601, "团队不存在"),
+    OUT_OF_DATE(500602, "逾期加入团队"),
+
+    /** 团队成员模块 */
+    NOT_TEAM_MEMBER(500701, "不是团队成员"),
 
     ;
 

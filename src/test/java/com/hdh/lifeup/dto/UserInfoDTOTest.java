@@ -5,9 +5,6 @@ import com.google.common.collect.Lists;
 import com.hdh.lifeup.constant.AuthTypeConst;
 import com.hdh.lifeup.domain.UserInfoDO;
 import org.junit.Test;
-import org.springframework.beans.BeanUtils;
-
-import static org.junit.Assert.*;
 
 public class UserInfoDTOTest {
 
@@ -16,7 +13,7 @@ public class UserInfoDTOTest {
     public void toDO() throws Exception {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUserId(1L)
-                .setNickName("bbb")
+                .setNickname("bbb")
                 .setUserAddress("广东省广州市天河区龙口东路创逸大厦11202")
                 .setAuthTypes(Lists.newArrayList(AuthTypeConst.YB, AuthTypeConst.QQ));
         UserInfoDO userInfoDO = userInfoDTO.toDO(UserInfoDO.class);

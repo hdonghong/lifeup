@@ -55,20 +55,6 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public <T> List<TaskDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<TaskDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        IPage<TaskDO> taskDOPage = taskMapper.selectPage(
-                new Page<>(1, 10),
-                new QueryWrapper<TaskDO>().eq("user_id", UserContext.get().getUserId())
-        );
-        return PageDTO.create(taskDOPage, TaskDTO.class);
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public TaskDTO insert(@NonNull TaskDTO taskDTO) {
         taskDTO.setUserId(UserContext.get().getUserId());

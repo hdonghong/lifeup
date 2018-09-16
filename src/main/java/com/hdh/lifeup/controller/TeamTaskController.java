@@ -77,10 +77,23 @@ public class TeamTaskController {
             @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping
-    public ResultVO<PageDTO<TeamTaskDTO>> getPage(@RequestBody PageDTO pageDTO) {
+    public ResultVO<PageDTO<TeamTaskDTO>> getPage(PageDTO pageDTO) {
 
         return Result.success(
                 teamTaskService.page(pageDTO)
         );
     }
+
+    @ApiLimiting
+    @ApiOperation(value = "加入团队")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+    })
+    @PostMapping("/{teamId}")
+    public ResultVO<?> joinTeam(@PathVariable Long teamId) {
+        return Result.success(
+                teamTaskService.joinTeam(teamId)
+        );
+    }
+
 }

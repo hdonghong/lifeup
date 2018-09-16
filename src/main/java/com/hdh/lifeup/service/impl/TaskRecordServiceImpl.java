@@ -33,16 +33,6 @@ public class TaskRecordServiceImpl implements TaskRecordService {
     }
 
     @Override
-    public <T> List<TaskRecordDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<TaskRecordDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        return null;
-    }
-
-    @Override
     public TaskRecordDTO insert(TaskRecordDTO dto) {
         return null;
     }

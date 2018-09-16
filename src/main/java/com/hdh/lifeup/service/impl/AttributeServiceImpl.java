@@ -42,16 +42,6 @@ public class AttributeServiceImpl implements AttributeService {
     }
 
     @Override
-    public <T> List<AttributeDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<AttributeDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        return null;
-    }
-
-    @Override
     public AttributeDTO insert(@NonNull AttributeDTO attributeDTO) {
         attributeMapper.insert(attributeDTO.toDO(AttributeDO.class));
         return attributeDTO;

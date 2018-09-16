@@ -34,7 +34,7 @@ public class UserInfoServiceImplTest {
     public void save() throws Exception {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         userInfoDTO.setUserId(1L)
-                .setNickName("bbb")
+                .setNickname("bbb")
                 .setUserAddress("广东省广州市天河区龙口东路创逸大厦11202")
                 ;
         Assert.assertEquals("", "");

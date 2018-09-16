@@ -21,24 +21,6 @@ public interface BaseService<DTO extends BaseDTO, ID extends Serializable> {
     DTO getOne(ID id);
 
     /**
-     * 根据条件获取整个列表
-     * @param queryCondition 查询条件
-     * @param <T> 列表泛型
-     * @return 列表
-     */
-    <T> List<DTO> listByConditions(T queryCondition);
-
-    /**
-     * 根据条件获取目标页码数分页
-     * @param queryCondition 查询条件
-     * @param currPage 目标页码数
-     * @param pageSize 页面数据量
-     * @param <T> 列表泛型
-     * @return 列表分页
-     */
-    <T> PageDTO<DTO> pageByConditions(T queryCondition, int currPage, int pageSize);
-
-    /**
      * 新增，用于做必要的复杂逻辑
      * @param dto 源DTO类
      * @return 结果DTO

@@ -2,9 +2,11 @@ package com.hdh.lifeup.dto;
 
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamTaskDO;
+import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -56,4 +58,28 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     private Long userId;
 
     private LocalDateTime createTime;
+
+    @Override
+    public TeamTaskDO toDO(Class<TeamTaskDO> doClass) {
+        try {
+            TeamTaskDO taskDO = doClass.newInstance();
+            BeanUtils.copyProperties(this, taskDO, "rewardAttrs");
+            if (this.rewardAttrs != null && this.rewardAttrs.size() > 0) {
+                taskDO.setRewardAttrs(JsonUtil.toJson(this.rewardAttrs));
+            }
+            return taskDO;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <DTO extends BaseDTO> DTO from(TeamTaskDO aDO) {
+        TeamTaskDTO teamDTO = new TeamTaskDTO();
+        BeanUtils.copyProperties(aDO, teamDTO, "rewardAttrs");
+        teamDTO.setRewardAttrs(JsonUtil.jsonToList(aDO.getRewardAttrs(), String.class));
+        return (DTO) teamDTO;
+    }
 }

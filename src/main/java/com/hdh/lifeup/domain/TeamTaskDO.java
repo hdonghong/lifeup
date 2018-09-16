@@ -35,7 +35,7 @@ public class TeamTaskDO extends BaseDO {
 
     private String teamHead;
 
-    private String rewardAttr;
+    private String rewardAttrs;
 
     private Integer rewardExp;
 

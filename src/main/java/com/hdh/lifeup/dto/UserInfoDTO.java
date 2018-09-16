@@ -29,7 +29,7 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
     private Long userId;
 
     /** '用户昵称' */
-    private String nickName;
+    private String nickname;
 
     /** '0女，1男，2保密' */
     private Integer userSex;
@@ -57,7 +57,7 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
     public static UserInfoDTO fromYbUser(JsonNode userInfoJson) {
         Preconditions.checkNotNull(userInfoJson, "userInfoJson can not be empty!");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
-        userInfoDTO.setNickName(userInfoJson.get("yb_username").asText())
+        userInfoDTO.setNickname(userInfoJson.get("yb_username").asText())
                 .setUserSex("M".equals(userInfoJson.get("yb_sex").asText()) ? 1 : 0)
                 .setUserHead(userInfoJson.get("yb_userhead").asText())
                 .setUserAddress(userInfoJson.get("yb_schoolname").asText());

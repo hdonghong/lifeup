@@ -6,13 +6,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.constant.TeamRole;
 import com.hdh.lifeup.domain.TeamRecordDO;
 import com.hdh.lifeup.domain.TeamTaskDO;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.TeamMemberDTO;
-import com.hdh.lifeup.dto.TeamTaskDTO;
-import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.dto.*;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.TeamRecordMapper;
@@ -30,9 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
+
+import static com.hdh.lifeup.constant.TaskConst.*;
 
 /**
  * TeamTaskServiceImpl class<br/>
@@ -48,7 +46,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
     private TeamRecordMapper teamRecordMapper;
 
-    private TeamMemberService teamMemberService;
+    private TeamMemberService memberService;
 
     private UserInfoService userInfoService;
 
@@ -59,7 +57,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                                UserInfoService userInfoService) {
         this.teamTaskMapper = teamTaskMapper;
         this.teamRecordMapper = teamRecordMapper;
-        this.teamMemberService = teamMemberService;
+        this.memberService = teamMemberService;
         this.userInfoService = userInfoService;
     }
 
@@ -72,16 +70,6 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             throw new GlobalException(CodeMsgEnum.TEAM_NOT_EXIST);
         }
         return BaseDTO.from(teamTaskDO, TeamTaskDTO.class);
-    }
-
-    @Override
-    public <T> List<TeamTaskDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<TeamTaskDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        return null;
     }
 
     @Override
@@ -111,21 +99,28 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                    .setUserId(UserContext.get().getUserId())
                    .setTeamHead(UserContext.get().getUserHead());
         this.insert(teamTaskDTO);
+        Long teamId = teamTaskDTO.getTeamId();
 
         // 存团队记录情况表
         TeamRecordDO teamRecordDO = new TeamRecordDO().setNextStartTime(firstStartTime)
                                                       .setNextEndTime(firstEndTime)
-                                                      .setTeamId(teamTaskDTO.getTeamId());
+                                                      .setTeamId(teamId);
         teamRecordMapper.insert(teamRecordDO);
 
         // 创建者作为新成员写入成员表
-        TeamMemberDTO teamMemberDTO = new TeamMemberDTO()
-                                            .setTeamId(teamTaskDTO.getTeamId())
-                                            .setUserId(UserContext.get().getUserId())
+        TeamMemberDTO memberDTO = new TeamMemberDTO()
+                                            .setTeamId(teamId)
                                             .setTeamRole(TeamRole.MEMBER);
-        teamMemberService.insert(teamMemberDTO);
+        // 创建者默认发布第一条团队成员动态
+        TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
+                                            .setTeamId(teamId)
+                                            .setTeamTitle(teamTaskDTO.getTeamTitle())
+                                            .setTeamRecordId(teamRecordDO.getTeamRecordId())
+                                            .setUserActivity("创建了团队「" +  teamTaskVO.getTeamTitle() +"」")
+                                            .setActivityIcon(ActivityIcon.IC_NEW);
+        memberService.addMember(memberDTO, memberRecordDTO);
 
-        return new NextSignVO().setTeamId(teamTaskDTO.getTeamId())
+        return new NextSignVO().setTeamId(teamId)
                                .setNextStartTime(firstStartTime)
                                .setNextEndTime(firstEndTime);
 
@@ -133,9 +128,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
     @Override
     public PageDTO<TeamTaskDTO> page(PageDTO pageDTO) {
+        log.info("pageNo = " + pageDTO.getCurrentPage());
         IPage<TeamTaskDO> taskDOPage = teamTaskMapper.selectPage(
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
-                new QueryWrapper<TeamTaskDO>().eq("user_id", UserContext.get().getUserId())
+                new QueryWrapper<TeamTaskDO>().orderByDesc("create_time")
         );
         return PageDTO.create(taskDOPage, TeamTaskDTO.class);
     }
@@ -143,7 +139,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Override
     public TeamDetailVO getDetail(@NonNull Long teamId) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
-        int memberAmount = teamMemberService.countByTeamId(teamId);
+        int memberAmount = memberService.countMembersByTeamId(teamId);
         UserInfoDTO owner = userInfoService.getOne(teamTaskDTO.getUserId());
         NextSignVO nextSign = getNextSign(teamId);
 
@@ -169,6 +165,30 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         NextSignVO nextSignVO = new NextSignVO();
         BeanUtils.copyProperties(teamRecordDO, nextSignVO);
         return nextSignVO;
+    }
+
+    @Override
+    public NextSignVO joinTeam(Long teamId) {
+        TeamTaskDTO teamTaskDTO = this.getOne(teamId);
+        if (LocalDate.now().isAfter(teamTaskDTO.getStartDate())) {
+            log.error("【加入团队】已超过加入团队的截止日期，startDate() = [{}]", teamTaskDTO.getStartDate());
+            throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
+        }
+
+        NextSignVO nextSign = getNextSign(teamId);
+        // 创建者作为新成员写入成员表
+        TeamMemberDTO memberDTO = new TeamMemberDTO()
+                .setTeamId(teamId)
+                .setTeamRole(TeamRole.MEMBER);
+        // 创建者默认发布第一条团队成员动态
+        TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
+                .setTeamId(teamId)
+                .setTeamTitle(teamTaskDTO.getTeamTitle())
+                .setTeamRecordId(nextSign.getTeamRecordId())
+                .setUserActivity("欢迎"+ UserContext.get().getNickname() +"加入团队[" +  nextSign.getTeamTitle() +"]")
+                .setActivityIcon(ActivityIcon.IC_JOIN);
+        memberService.addMember(memberDTO, memberRecordDTO);
+        return nextSign;
     }
 
     @Override

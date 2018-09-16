@@ -41,11 +41,11 @@ public class SwaggerConfig {
                 // 页面标题
                 .title("LifeUP RestFul API DOC")
                 // 描述
-                .description("「人升」的后端接口文档，目前仍采用userId区别用户，以后会全部去掉")
+                .description("「人升」的后端接口文档")
                 // 创建人
                 .contact(new Contact("hdonghong", "https://github.com/hdonghong/lifeup",""))
                 // 版本号
-                .version("1.0")
+                .version("1.2")
                 .build();
     }
 }

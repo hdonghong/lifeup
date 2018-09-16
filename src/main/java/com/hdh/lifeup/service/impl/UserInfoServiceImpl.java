@@ -63,16 +63,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public <T> List<UserInfoDTO> listByConditions(T queryCondition) {
-        return null;
-    }
-
-    @Override
-    public <T> PageDTO<UserInfoDTO> pageByConditions(T queryCondition, int currPage, int pageSize) {
-        return null;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO insert(@NonNull UserInfoDTO userInfoDTO) {
         userInfoDTO.setPwdSalt(PasswordUtil.getSalt());
