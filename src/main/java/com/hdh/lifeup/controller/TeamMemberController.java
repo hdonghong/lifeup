@@ -15,6 +15,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * TeamMemberController class<br/>
  *
@@ -56,5 +58,15 @@ public class TeamMemberController {
         return Result.success(
                 memberService.pageMemberRecords(teamId, pageDTO)
         );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "成员退出团队")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+    })
+    @DeleteMapping("/members/quit")
+    public ResultVO<PageDTO<RecordDTO>> quitTeam() {
+        return Result.success();
     }
 }

@@ -27,5 +27,5 @@ public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> 
             "where r.user_id = u.user_id " +
             "and r.team_id = #{teamId} " +
             "order by r.create_time desc limit #{page.currentPage}, #{page.size} ")
-    List<RecordDTO> getMembersRecords(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
+    List<RecordDTO> getMemberRecords(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
 }

@@ -25,7 +25,7 @@ public class AppPropertiesConfigTest {
         System.out.println(ybConfig);
 
         String redirectUri = "redirect";
-        String callback = appConfig.getPath()
+        String callback = appConfig.getAppPath()
                 + Optional.ofNullable(redirectUri).orElse(ybConfig.getRedirectUri());
         String oauthPath = String.format(ybConfig.getOauthPath(), ybConfig.getAppId(), callback);
         System.out.println(Result.success(oauthPath));

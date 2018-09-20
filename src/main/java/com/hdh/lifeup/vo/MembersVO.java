@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
+
 /**
  * MembersVO class<br/>
  * 团队成员VO类
@@ -17,13 +19,17 @@ import lombok.experimental.Accessors;
 public class MembersVO {
 
     /** '用户昵称' */
-    private String nickName;
+    private String nickname;
 
     /**'用户地区'  */
     private String userAddress;
 
     /** 用户头像 */
     private String userHead;
+
+    private Long userId;
+
+    private LocalDateTime createTime;
 
     @ApiModelProperty("1已关注，0未关注")
     private Integer isFollow;

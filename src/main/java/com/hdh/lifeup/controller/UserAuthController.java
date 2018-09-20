@@ -3,6 +3,7 @@ package com.hdh.lifeup.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import com.hdh.lifeup.config.AppConfig;
 import com.hdh.lifeup.config.YbConfig;
 import com.hdh.lifeup.constant.AuthTypeConst;
 import com.hdh.lifeup.dto.UserAuthDTO;
@@ -11,6 +12,7 @@ import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.util.Result;
+import com.hdh.lifeup.vo.MobVO;
 import com.hdh.lifeup.vo.ResultVO;
 import com.hdh.lifeup.vo.UserAuthVO;
 import io.swagger.annotations.Api;
@@ -22,6 +24,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -42,24 +45,25 @@ import java.util.Optional;
 public class UserAuthController {
 
     private YbConfig ybConfig;
-
     private RestTemplateBuilder restTemplateBuilder;
-
     private ObjectMapper objectMapper;
-
     private UserAuthService userAuthService;
+    private AppConfig appConfig;
 
     private static final String ACCESS_TOKEN = "access_token";
+
 
     @Autowired
     public UserAuthController(YbConfig ybConfig,
                               RestTemplateBuilder restTemplateBuilder,
                               ObjectMapper objectMapper,
-                              UserAuthService userAuthService) {
+                              UserAuthService userAuthService,
+                              AppConfig appConfig) {
         this.ybConfig = ybConfig;
         this.restTemplateBuilder = restTemplateBuilder;
         this.objectMapper = objectMapper;
         this.userAuthService = userAuthService;
+        this.appConfig = appConfig;
     }
 
     @ApiOperation(value = "获取请求第三方授权的URL", notes = "支持多种授权，比如易班、QQ")
@@ -102,7 +106,7 @@ public class UserAuthController {
         JsonNode responseBody = objectMapper.readTree(responseEntity.getBody());
         if (!"success".equals(responseBody.get("status").asText())) {
             log.error("【易班授权】获取登录信息失败，responseBody = [{}]", responseBody);
-            throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
+            throw new GlobalException(CodeMsgEnum.YB_ERROR);
         }
 
         JsonNode userInfoJson = responseBody.get("info");
@@ -111,13 +115,6 @@ public class UserAuthController {
 
         String token = userAuthService.oauthLogin(userAuthDTO, userInfoDTO);
         return Result.success(token);
-    }
-
-    @ApiOperation(value = " 手机号登录")
-    @PostMapping("/phone/login")
-    public ResultVO<String> phoneLogin(@RequestBody @Valid UserAuthDTO userAuthDTO) {
-        userAuthDTO.setAuthType(AuthTypeConst.PHONE);
-        return Result.success(userAuthService.appLogin(userAuthDTO));
     }
 
     @ApiOperation(value = " QQ登录")
@@ -134,6 +131,42 @@ public class UserAuthController {
                    .setAuthIdentifier(userAuthVO.getAuthIdentifier());
 
         return  Result.success(userAuthService.oauthLogin(userAuthDTO, userInfoDTO));
+    }
+
+    @ApiOperation(value = "手机号+密码登录")
+    @PostMapping("/phone/login")
+    public ResultVO<String> phoneLogin(@RequestBody @Valid UserAuthDTO userAuthDTO) {
+        userAuthDTO.setAuthType(AuthTypeConst.PHONE);
+        return Result.success(userAuthService.appLogin(userAuthDTO));
+    }
+
+    @ApiOperation(value = "手机号+验证码登录")
+    @PostMapping("/code/login")
+    public ResultVO<String> verifyLogin(@RequestBody /*@Valid */MobVO mobVO) {
+        // 封装POST请求
+        mobVO.setAppKey(appConfig.getAppKey());
+
+/*        // 发起请求
+        RestTemplate restTemplate = restTemplateBuilder.build();
+        ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                appConfig.getMobApi(), mobVO, String.class
+        );
+
+        // 验证响应
+        if (responseEntity.getStatusCode() == HttpStatus.OK) {
+            return Result.success(userAuthService.codeLogin(
+                    new UserAuthDTO().setAuthType(AuthTypeConst.PHONE)
+                                     .setAuthIdentifier(mobVO.getPhone())
+            ));
+        } else {
+            // 验证失败
+            log.error("【Mob短信登录验证】验证失败，responseEntity = [{}]", responseEntity);
+            throw new GlobalException(CodeMsgEnum.MOB_VERIFY_ERROR);
+        }*/
+        return Result.success(userAuthService.codeLogin(
+                new UserAuthDTO().setAuthType(AuthTypeConst.PHONE)
+                        .setAuthIdentifier(mobVO.getPhone())
+        ));
     }
 
 

@@ -15,6 +15,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class AppConfig {
 
-    private String path;
+    /** 系统应用域名 */
+    private String appPath;
 
+    /** 静态文件的CDN服务商域名 */
+    private String cdnPath;
+
+    /** mob短信验证接口 */
+    private String mobApi;
+
+    /** 应用appkey */
+    private String appKey;
 }

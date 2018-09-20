@@ -1,20 +1,20 @@
 package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
+import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.TeamTaskDTO;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.NextSignVO;
-import com.hdh.lifeup.vo.ResultVO;
-import com.hdh.lifeup.vo.TeamDetailVO;
-import com.hdh.lifeup.vo.TeamTaskVO;
+import com.hdh.lifeup.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * TeamTaskController class<br/>
@@ -72,6 +72,19 @@ public class TeamTaskController {
     }
 
     @ApiLimiting
+    @ApiOperation(value = "获取用户所有下一次要签到的信息")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
+    })
+    @GetMapping("/next_signs")
+    public ResultVO<List<NextSignVO>> getAllNextSigns() {
+        return Result.success(
+                teamTaskService.getAllNextSigns(UserContext.get().getUserId())
+        );
+    }
+
+    @ApiLimiting
     @ApiOperation(value = "获取团队列表分页")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
@@ -95,5 +108,19 @@ public class TeamTaskController {
                 teamTaskService.joinTeam(teamId)
         );
     }
+
+    @ApiLimiting
+    @ApiOperation(value = "签到")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
+    })
+    @PostMapping("/{teamId}/sign")
+    public ResultVO<NextSignVO> signIn(@PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
+        return Result.success(
+                teamTaskService.signIn(teamId, activityVO)
+        );
+    }
+
 
 }

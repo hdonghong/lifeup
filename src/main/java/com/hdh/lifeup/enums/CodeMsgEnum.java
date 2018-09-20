@@ -26,6 +26,8 @@ public enum CodeMsgEnum {
     ACCESS_ILLEGAL(500204, "非法访问他人资源"),
     ACCOUNT_ALREADY_EXISTED(500205, "账号已被注册"),
     PASSWORD_ERROR(500206, "密码错误"),
+    YB_ERROR(500207, "易班授权登录失败"),
+    MOB_VERIFY_ERROR(500208, "短信验证失败"),
 
     /** 用户模块 5003XX */
     USER_NOT_EXIST(500301, "用户不存在"),
@@ -39,6 +41,8 @@ public enum CodeMsgEnum {
     /** 团队模块 5006XX */
     TEAM_NOT_EXIST(500601, "团队不存在"),
     OUT_OF_DATE(500602, "逾期加入团队"),
+    TEAM_IS_END(500603, "团队任务已经结束"),
+    NOT_SIGN_TIME(500604, "未到签到时间"),
 
     /** 团队成员模块 */
     NOT_TEAM_MEMBER(500701, "不是团队成员"),

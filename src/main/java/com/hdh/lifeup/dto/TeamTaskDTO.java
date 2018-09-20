@@ -45,10 +45,10 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     private LocalDate startDate;
 
     /** 开始签到的时间，必须开始后才能签到，与endTime在同一天，不填写的话默认为当天0点 */
-    private LocalTime startTime;
+    private LocalDateTime firstStartTime;
 
     /** 结束签到的时间，必须开始后才能签到，与startTime在同一天，不填写的话默认为当天23.59.59点 */
-    private LocalTime endTime;
+    private LocalDateTime firstEndTime;
 
     /** 团队状态，0未开始；1进行中；2完成；3放弃 */
     private Integer teamStatus;

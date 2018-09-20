@@ -62,4 +62,6 @@ public class TeamDetailVO {
     @ApiModelProperty("团队成员数量")
     private Integer memberAmount;
 
+    @ApiModelProperty("1已加入 0未加入")
+    private Integer isMember;
 }

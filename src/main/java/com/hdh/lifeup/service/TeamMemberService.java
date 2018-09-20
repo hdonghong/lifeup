@@ -35,7 +35,7 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * 成员发布动态
      * @param teamMemberRecordDTO 动态
      */
-    void addRecord(TeamMemberRecordDTO teamMemberRecordDTO);
+    void addMemberRecord(TeamMemberRecordDTO teamMemberRecordDTO);
 
     /**
      * 加入新成员
@@ -59,4 +59,20 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @return 动态列表
      */
     PageDTO<RecordDTO> pageMemberRecords(Long teamId, PageDTO pageDTO);
+
+    /**
+     * 是否团队成员
+     * @param teamId 团队id
+     * @param userId 成员id
+     * @return 1是 0否
+     */
+    int isMember(Long teamId, Long userId);
+
+    /**
+     * 是否签到了
+     * @param teamRecordId 团队签到记录id
+     * @param userId 成员id
+     * @return 1是 0否
+     */
+    int hasSignedIn(Long teamRecordId, Long userId);
 }

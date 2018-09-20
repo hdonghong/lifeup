@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hdh.lifeup.domain.TeamRecordDO;
+import com.hdh.lifeup.vo.NextSignVO;
 import org.junit.Test;
+import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.time.*;
@@ -91,4 +94,13 @@ public class OtherTest {
         System.out.println(new Date());
     }
 
+    @Test
+    public void testBeanUtils() {
+        NextSignVO nextSignVO = new NextSignVO().setTeamTitle("aaa").setRewardExp(1);
+        System.out.println(nextSignVO);
+
+        TeamRecordDO teamRecordDO = new TeamRecordDO().setNextStartTime(LocalDateTime.now());
+        BeanUtils.copyProperties(teamRecordDO, nextSignVO);
+        System.out.println(nextSignVO);
+    }
 }

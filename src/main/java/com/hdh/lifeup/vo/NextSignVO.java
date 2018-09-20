@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * NextSignVO class<br/>
@@ -26,6 +27,14 @@ public class NextSignVO implements Serializable {
     private Long teamId;
 
     private Long teamRecordId;
+
+    @ApiModelProperty(value = "奖励属性")
+    private List<String> rewardAttrs;
+
+    @ApiModelProperty(value = "奖励经验")
+    private Integer rewardExp;
+
+    private Integer teamFreq;
 
     @ApiModelProperty(value = "团队标题，也是事项标题")
     private String teamTitle;

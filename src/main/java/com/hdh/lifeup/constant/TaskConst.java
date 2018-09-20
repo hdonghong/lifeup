@@ -24,4 +24,12 @@ public class TaskConst {
         public static final Integer IC_JOIN = 1;
         public static final Integer IC_SIGN = 2;
     }
+
+    /** 他人对于当前用户的关系 */
+    public static class Relationship {
+
+        public static final Integer MYSELF = -1;
+        public static final Integer NOTHING = 0;
+        public static final Integer FOLLOWING = 1;
+    }
 }

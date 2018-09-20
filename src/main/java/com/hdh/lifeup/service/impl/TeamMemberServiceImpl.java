@@ -1,8 +1,6 @@
 package com.hdh.lifeup.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
@@ -27,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+
+import static com.hdh.lifeup.constant.TaskConst.*;
 
 /**
  * TeamMemberServiceImpl class<br/>
@@ -105,7 +105,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void addRecord(TeamMemberRecordDTO teamMemberRecordDTO) {
+    public void addMemberRecord(TeamMemberRecordDTO teamMemberRecordDTO) {
         teamMemberRecordDTO.setUserId(UserContext.get().getUserId());
         Integer result = memberRecordMapper.insert(teamMemberRecordDTO.toDO(TeamMemberRecordDO.class));
         if (!Objects.equals(1, result)) {
@@ -118,20 +118,38 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void addMember(TeamMemberDTO memberDTO, TeamMemberRecordDTO memberRecordDTO) {
         Long userId = UserContext.get().getUserId();
+        if (this.isMember(memberDTO.getTeamId(), userId) != 0) {
+            log.error("【加入团队】禁止重复加入团队，memberDTO = [{}]", memberDTO);
+            throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
+        }
+
         memberDTO.setUserId(userId);
         this.insert(memberDTO);
-        this.addRecord(memberRecordDTO);
+        this.addMemberRecord(memberRecordDTO);
     }
 
     @Override
     public PageDTO<MembersVO> pageMembers(Long teamId, PageDTO pageDTO) {
-        IPage<TeamMemberDO> memberDOPage = memberMapper.selectPage(
-                new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
-                new QueryWrapper<TeamMemberDO>()
-                        .eq("team_id", teamId)
-                        .orderByAsc("create_time")
+        Long currentPage = pageDTO.getCurrentPage();
+        // FIXME 没有limit
+        Integer count = memberMapper.selectCount(
+                new QueryWrapper<TeamMemberDO>().eq("team_id", teamId)
         );
-        return PageDTO.createFreely(memberDOPage, MembersVO.class);
+        List<MembersVO> membersList = Lists.newArrayList();
+        if (Optional.ofNullable(count).orElse(0) > 0) {
+            pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
+            membersList = memberMapper.getMembers(teamId, pageDTO);
+            membersList.forEach(member -> {
+                if (member.getUserId().equals(UserContext.get().getUserId())) {
+                    member.setIsFollow(Relationship.MYSELF);
+                }
+            });
+        }
+        return PageDTO.<MembersVO>builder()
+                .currentPage(currentPage)
+                .list(membersList)
+                .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
+                .build();
     }
 
     @Override
@@ -144,12 +162,30 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         List<RecordDTO> recordList = Lists.newArrayList();
         if (Optional.ofNullable(count).orElse(0) > 0) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-            recordList = memberRecordMapper.getMembersRecords(teamId, pageDTO);
+            recordList = memberRecordMapper.getMemberRecords(teamId, pageDTO);
         }
         return PageDTO.<RecordDTO>builder()
                 .currentPage(currentPage)
                 .list(recordList)
                 .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
                 .build();
+    }
+
+    @Override
+    public int isMember(Long teamId, Long userId) {
+        Integer result = memberMapper.selectCount(
+                new QueryWrapper<TeamMemberDO>().eq("team_id", teamId)
+                        .eq("user_id", userId)
+        );
+        return Optional.ofNullable(result).orElse(0);
+    }
+
+    @Override
+    public int hasSignedIn(Long teamRecordId, Long userId) {
+        Integer result = memberRecordMapper.selectCount(
+                new QueryWrapper<TeamMemberRecordDO>().eq("team_record_id", teamRecordId)
+                        .eq("user_id", userId)
+        );
+        return Optional.ofNullable(result).orElse(0);
     }
 }

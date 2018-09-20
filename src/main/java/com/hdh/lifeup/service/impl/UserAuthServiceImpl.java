@@ -155,6 +155,22 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
+    public String codeLogin(@NonNull UserAuthDTO userAuthDTO) {
+        // authType和authIdentifier查user_auth，取userId
+        UserAuthDO userAuthDO = userAuthMapper.selectOne(
+                new QueryWrapper<UserAuthDO>().eq("auth_type", userAuthDTO.getAuthType())
+                        .eq("auth_identifier", userAuthDTO.getAuthIdentifier())
+        );
+        if (userAuthDO == null) {
+            throw new GlobalException(CodeMsgEnum.USER_NOT_EXIST);
+        }
+        UserInfoDTO userInfoResult = userInfoService.getOne(userAuthDO.getUserId());
+        String token = TokenUtil.get();
+        redisTemplate.opsForValue().set(token, userInfoResult, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
+        return token;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public String register(@NonNull UserAuthVO userAuthVO) {
         UserInfoDTO userInfoDTO = new UserInfoDTO();

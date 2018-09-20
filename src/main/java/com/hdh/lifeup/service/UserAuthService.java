@@ -4,6 +4,7 @@ import com.hdh.lifeup.base.BaseService;
 import com.hdh.lifeup.dto.UserAuthDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.vo.UserAuthVO;
+import lombok.NonNull;
 
 /**
  * UserAuthService interface<br/>
@@ -28,6 +29,12 @@ public interface UserAuthService extends BaseService<UserAuthDTO, Long> {
      */
     String appLogin(UserAuthDTO userAuthDTO);
 
+    /**
+     * 验证码登录
+     * @param userAuthDTO 授权DTO
+     * @return token
+     */
+    String codeLogin(@NonNull UserAuthDTO userAuthDTO);
 
     /**
      * 系统账号注册

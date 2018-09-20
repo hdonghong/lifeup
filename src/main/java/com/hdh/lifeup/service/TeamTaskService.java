@@ -3,9 +3,12 @@ package com.hdh.lifeup.service;
 import com.hdh.lifeup.base.BaseService;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.TeamTaskDTO;
+import com.hdh.lifeup.vo.ActivityVO;
 import com.hdh.lifeup.vo.NextSignVO;
 import com.hdh.lifeup.vo.TeamDetailVO;
 import com.hdh.lifeup.vo.TeamTaskVO;
+
+import java.util.List;
 
 /**
  * TeamTaskService interface<br/>
@@ -44,4 +47,19 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
      * @return 签到信息
      */
     NextSignVO joinTeam(Long teamId);
+
+    /**
+     * 团队签到
+     * @param teamId 团队id
+     * @param activityVO 动态VO
+     * @return 下一次签到信息
+     */
+    NextSignVO signIn(Long teamId, ActivityVO activityVO);
+
+    /**
+     * 获取成员所有下一次要签到的团队信息
+     * @param memberId 成员id
+     * @return 所有下一次要签到的团队信息
+     */
+    List<NextSignVO> getAllNextSigns(Long memberId);
 }
