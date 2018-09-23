@@ -48,7 +48,7 @@ public class ResultVO<T> implements Serializable {
      * @param args 追加的参数
      * @return ResultVO
      */
-    public ResultVO<T> appendArgs(Object ... args) {
+    public ResultVO<T> appendArgs(T ... args) {
         if (args != null && args.length > 0) {
             this.msg += Arrays.toString(args);
         }

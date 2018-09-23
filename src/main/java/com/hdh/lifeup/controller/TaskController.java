@@ -35,7 +35,7 @@ public class TaskController {
     @ApiLimiting
     @ApiOperation(value = " 提交待办事项")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "taskDTO json", required = true, paramType = "post", dataType = "json"),
     })
     @PostMapping("/new")
@@ -46,7 +46,7 @@ public class TaskController {
     @ApiLimiting
     @ApiOperation(value = "获取个人的任务事项详情")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "taskId", required = true, paramType = "path", dataType = "String"),
     })
     @GetMapping("/{taskId}")
@@ -59,7 +59,7 @@ public class TaskController {
     @ApiLimiting
     @ApiOperation(value = "修改待办事项")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "taskDTO json", required = true, paramType = "post", dataType = "json"),
     })
     @PutMapping("/")
@@ -71,7 +71,7 @@ public class TaskController {
     @ApiLimiting
     @ApiOperation(value = "完成/放弃任务事项")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "taskStatus，只有两种值：success/fail", required = true, paramType = "post", dataType = "json"),
     })
     @PutMapping("/{taskId}/{taskStatus}")
@@ -86,7 +86,7 @@ public class TaskController {
     @ApiLimiting
     @ApiOperation(value = "删除任务事项")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @DeleteMapping("/{taskId}")
     public ResultVO<?> deleteTask(@PathVariable("taskId") Long taskId) {

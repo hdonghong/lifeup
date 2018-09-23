@@ -3,7 +3,6 @@ package com.hdh.lifeup.controller;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
-import com.hdh.lifeup.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.MembersVO;
@@ -14,8 +13,6 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * TeamMemberController class<br/>
@@ -39,7 +36,7 @@ public class TeamMemberController {
     @ApiLimiting
     @ApiOperation(value = "获取团队成员")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/members")
     public ResultVO<PageDTO<MembersVO>> getMembers(@PathVariable Long teamId, PageDTO pageDTO) {
@@ -51,7 +48,7 @@ public class TeamMemberController {
     @ApiLimiting
     @ApiOperation(value = "获取团队成员动态")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/records")
     public ResultVO<PageDTO<RecordDTO>> getMemberRecords(@PathVariable Long teamId, PageDTO pageDTO) {
@@ -63,10 +60,10 @@ public class TeamMemberController {
     @ApiLimiting
     @ApiOperation(value = "成员退出团队")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @DeleteMapping("/members/quit")
-    public ResultVO<PageDTO<RecordDTO>> quitTeam() {
+    public ResultVO<?> quitTeam() {
         return Result.success();
     }
 }

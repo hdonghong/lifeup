@@ -54,7 +54,7 @@ public class UserInfoController {
      */
     @ApiLimiting
     @ApiOperation(value = "查询自己的个人信息", notes = "用于打开自己的个人信息页面")
-    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @GetMapping("/profile")
     public ResultVO<UserInfoDTO> getMine() {
         return Result.success(UserContext.get());
@@ -75,7 +75,7 @@ public class UserInfoController {
 
     @ApiLimiting
     @ApiOperation(value = " 修改自己的公众信息", notes = "不传id，昵称、性别、居住地。还要讨论下要不要做头像？")
-    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @PutMapping("/profile")
     public ResultVO<UserInfoDTO> updateProfile(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
@@ -84,7 +84,7 @@ public class UserInfoController {
 
     @ApiLimiting
     @ApiOperation(value = " 修改自己的私人信息", notes = "不传id，比如密码修改。目前修改公众信息和私人信息接口一样，但以后不会一样，客户端需要按功能含义使用接口，不传递不必要的数据")
-    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @PutMapping("/account")
     public ResultVO<UserInfoDTO> updateAccount(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);

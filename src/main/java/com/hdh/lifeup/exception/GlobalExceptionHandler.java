@@ -6,6 +6,7 @@ import com.hdh.lifeup.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -70,6 +71,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResultVO<String> handlerInnerException(Exception e) {
         log.error("【系统内部异常】stacktrace = [{}]", e.toString());
-        return Result.error(CodeMsgEnum.SERVER_ERROR);
+        ResultVO<String> errorResult = Result.error(CodeMsgEnum.SERVER_ERROR);
+        if (HttpRequestMethodNotSupportedException.class.isInstance(e)) {
+            errorResult.appendArgs(HttpRequestMethodNotSupportedException.class.getName());
+        }
+        return errorResult;
     }
 }

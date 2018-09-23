@@ -37,7 +37,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "新建团队任务")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+        @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/new")
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
@@ -49,7 +49,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "团队详情")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/{teamId}")
     public ResultVO<TeamDetailVO> get(@PathVariable("teamId") Long teamId) {
@@ -61,7 +61,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "获取下一次要签到的信息")
     @ApiImplicitParams({
-        @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+        @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
         @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @GetMapping("/{teamId}/next_sign")
@@ -74,7 +74,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "获取用户所有下一次要签到的信息")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @GetMapping("/next_signs")
@@ -87,7 +87,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "获取团队列表分页")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping
     public ResultVO<PageDTO<TeamTaskDTO>> getPage(PageDTO pageDTO) {
@@ -100,7 +100,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "加入团队")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/{teamId}")
     public ResultVO<?> joinTeam(@PathVariable Long teamId) {
@@ -112,7 +112,7 @@ public class TeamTaskController {
     @ApiLimiting
     @ApiOperation(value = "签到")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @PostMapping("/{teamId}/sign")

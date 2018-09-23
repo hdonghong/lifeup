@@ -33,7 +33,7 @@ public class AttributeController {
 
     @ApiLimiting
     @ApiOperation(value = "查询指定人物属性", notes = "自己的人物，详细属性，包括经验")
-    @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
+    @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @GetMapping("/attribute")
     public ResultVO<AttributeDTO> getAttribute() {
         AttributeDTO attributeDTO = attributeService.getByUserId(UserContext.get().getUserId());
@@ -43,7 +43,7 @@ public class AttributeController {
     @ApiLimiting
     @ApiOperation(value = "修改指定人物属性")
     @ApiImplicitParams({
-            @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "AttributeDTO", required = true, paramType = "post", dataType = "json"),
     })
     @PostMapping("/attribute")
