@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamRecordDO;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.hdh.lifeup.constant.TaskConst.*;
 
@@ -135,6 +137,27 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
+    public PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO) {
+        if (userId == null) {
+            userId = UserContext.get().getUserId();
+        }
+        Long currentPage = pageDTO.getCurrentPage();
+        // FIXME 没有limit
+        int count = memberService.countUserTeams(userId);
+        List<TeamTaskDO> teamTaskDOList = Lists.newArrayList();
+        if (count > 0) {
+            pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
+            teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO);
+        }
+        return PageDTO.<TeamTaskDTO>builder()
+                .currentPage(currentPage)
+                .list(teamTaskDOList.stream().map(teamTaskDO -> TeamTaskDTO.from(teamTaskDO, TeamTaskDTO.class)).collect(Collectors.toList()))
+                .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
+                .size((long) teamTaskDOList.size())
+                .build();
+    }
+
+    @Override
     public TeamDetailVO getDetail(@NonNull Long teamId) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
         int memberAmount = memberService.countMembersByTeamId(teamId);
@@ -213,7 +236,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 .setTeamId(teamId)
                 .setTeamTitle(teamTaskDTO.getTeamTitle())
                 .setTeamRecordId(nextSign.getTeamRecordId())
-                .setUserActivity("欢迎"+ UserContext.get().getNickname() +"加入团队[" +  nextSign.getTeamTitle() +"]")
+                .setUserActivity("欢迎"+ UserContext.get().getNickname() +"加入团队「" +  nextSign.getTeamTitle() +"」")
                 .setActivityIcon(ActivityIcon.IC_JOIN);
         memberService.addMember(memberDTO, memberRecordDTO);
         return nextSign;

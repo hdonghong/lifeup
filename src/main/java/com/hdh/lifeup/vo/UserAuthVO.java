@@ -26,7 +26,7 @@ public class UserAuthVO implements Serializable {
 
     /** '用户昵称' */
     @NotEmpty
-    private String nickName;
+    private String nickname;
 
     /** '0女，1男，2保密' */
     @ApiModelProperty(value = "0女，1男，2保密")

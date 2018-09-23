@@ -5,15 +5,16 @@ import com.hdh.lifeup.auth.TokenContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.domain.UserInfoDO;
 import com.hdh.lifeup.dto.AttributeDTO;
-import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.UserInfoMapper;
 import com.hdh.lifeup.service.AttributeService;
+import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
+import com.hdh.lifeup.vo.UserDetailVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -24,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -41,15 +41,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private RedisTemplate<String, UserInfoDTO> redisTemplate;
-
     private UserInfoMapper userInfoMapper;
-
     private AttributeService attributeService;
+    private TeamMemberService memberService;
 
     @Autowired
-    public UserInfoServiceImpl(UserInfoMapper userInfoMapper, AttributeService attributeService) {
+    public UserInfoServiceImpl(UserInfoMapper userInfoMapper,
+                               AttributeService attributeService,
+                               TeamMemberService memberService) {
         this.userInfoMapper = userInfoMapper;
         this.attributeService = attributeService;
+        this.memberService = memberService;
     }
 
     @Override
@@ -124,6 +126,18 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
 
         return userInfoDTO;
+    }
+
+    @Override
+    public UserDetailVO getDetailById(Long userId) {
+        // 当传入的用户id为空时，返回当前登录的用户信息
+        UserInfoDTO userInfoDTO = (userId == null) ?
+                UserContext.get() : this.getOne(userId);
+
+        UserDetailVO userDetailVO = new UserDetailVO();
+        BeanUtils.copyProperties(userInfoDTO, userDetailVO);
+        userDetailVO.setTeamAmount(memberService.countUserTeams(userInfoDTO.getUserId()));
+        return userDetailVO;
     }
 
 }

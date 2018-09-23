@@ -39,7 +39,7 @@ import java.util.Optional;
  * @since 2018/08/20
  */
 @Slf4j
-@Api(description = "授权/注册/登录模块，包含第三方应用登录和本应用登录")
+@Api(description = "授权/注册/登录模块")
 @RestController
 @RequestMapping("/auth")
 public class UserAuthController {

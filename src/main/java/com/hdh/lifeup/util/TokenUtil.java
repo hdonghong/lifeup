@@ -10,8 +10,8 @@ import java.util.UUID;
  */
 public class TokenUtil {
 
-    /** Token鉴权，模仿自github */
-    public static final String AUTHENTICITY_TOKEN = "AUTHENTICITY_TOKEN";
+    /** Token鉴权，模仿自github，但由于Nginx默认忽略带下划线的Header，故使用中横线 */
+    public static final String AUTHENTICITY_TOKEN = "authenticity-token";
 
     /** 有效期 */
     public static final int EXPIRED_SECONDS = 3600 * 24 * 3;

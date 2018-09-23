@@ -2,13 +2,19 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.dto.PageDTO;
+import com.hdh.lifeup.dto.RecordDTO;
+import com.hdh.lifeup.dto.TeamTaskDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.service.UserAuthService;
+import com.hdh.lifeup.service.TeamMemberService;
+import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.vo.UserDetailVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,13 +31,16 @@ import org.springframework.web.bind.annotation.*;
 public class UserInfoController {
 
     private UserInfoService userInfoService;
-
-    private UserAuthService userAuthService;
+    private TeamMemberService teamMemberService;
+    private TeamTaskService teamTaskService;
 
     @Autowired
-    public UserInfoController(UserInfoService userInfoService, UserAuthService userAuthService) {
+    public UserInfoController(UserInfoService userInfoService,
+                              TeamMemberService teamMemberService,
+                              TeamTaskService teamTaskService) {
         this.userInfoService = userInfoService;
-        this.userAuthService = userAuthService;
+        this.teamMemberService = teamMemberService;
+        this.teamTaskService = teamTaskService;
     }
 
     /**
@@ -44,11 +53,24 @@ public class UserInfoController {
         详细参考：http://www.cnblogs.com/java-zhao/p/5348113.html
      */
     @ApiLimiting
-    @ApiOperation(value = "查询指定用户的个人信息", notes = "用于打开自己的个人信息页面，以及其他用户的个人信息页面。")
+    @ApiOperation(value = "查询自己的个人信息", notes = "用于打开自己的个人信息页面")
     @ApiImplicitParam(name = "AUTHENTICITY_TOKEN", required = true, paramType = "header", dataType = "String")
     @GetMapping("/profile")
     public ResultVO<UserInfoDTO> getMine() {
         return Result.success(UserContext.get());
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "查询用户的个人详情")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+    })
+    @GetMapping(value = {"/detail", "/{userId}/detail"})
+    public ResultVO<UserDetailVO> getDetail(@PathVariable(value = "userId", required = false) Long userId) {
+        return Result.success(
+                userInfoService.getDetailById(userId)
+        );
     }
 
     @ApiLimiting
@@ -67,5 +89,34 @@ public class UserInfoController {
     public ResultVO<UserInfoDTO> updateAccount(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "查询指定用户的动态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+    })
+    @GetMapping(value = {"/activities", "/{userId}/activities"})
+    public ResultVO<PageDTO<RecordDTO>> getActivities(
+            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO) {
+        return Result.success(
+                teamMemberService.pageUserRecords(userId, pageDTO)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "获取指定用户加入的团队列表")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+    })
+    @GetMapping(value = {"/teams", "/{userId}/teams"})
+    public ResultVO<PageDTO<TeamTaskDTO>> getTeams(
+            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO) {
+
+        return Result.success(
+                teamTaskService.pageUserTeams(userId, pageDTO)
+        );
     }
 }

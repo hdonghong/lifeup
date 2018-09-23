@@ -28,6 +28,14 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
     PageDTO<TeamTaskDTO> page(PageDTO pageDTO);
 
     /**
+     * 获取成员加入的团队
+     * @param userId 成员id
+     * @param pageDTO 条件
+     * @return 团队列表
+     */
+    PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO);
+
+    /**
      * 获取团队详情
      * @param teamId 团队id
      * @return 详情VO
@@ -62,4 +70,5 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
      * @return 所有下一次要签到的团队信息
      */
     List<NextSignVO> getAllNextSigns(Long memberId);
+
 }

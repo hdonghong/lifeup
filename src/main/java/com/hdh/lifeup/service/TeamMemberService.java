@@ -61,6 +61,13 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
     PageDTO<RecordDTO> pageMemberRecords(Long teamId, PageDTO pageDTO);
 
     /**
+     * 查看指定用户的userId
+     * @param userId 用户id
+     * @return 动态列表
+     */
+    PageDTO<RecordDTO> pageUserRecords(Long userId, PageDTO pageDTO);
+
+    /**
      * 是否团队成员
      * @param teamId 团队id
      * @param userId 成员id
@@ -75,4 +82,13 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @return 1是 0否
      */
     int hasSignedIn(Long teamRecordId, Long userId);
+
+
+    /**
+     * 计数用户加入的团队
+     * @param userId 用户id
+     * @return 团队数量
+     */
+    int countUserTeams(Long userId);
+
 }

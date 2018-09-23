@@ -1,11 +1,14 @@
 package com.hdh.lifeup.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamMemberDO;
 import com.hdh.lifeup.domain.TeamMemberRecordDO;
+import com.hdh.lifeup.domain.TeamTaskDO;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamMemberDTO;
@@ -172,6 +175,21 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     }
 
     @Override
+    public PageDTO<RecordDTO> pageUserRecords(Long userId, PageDTO pageDTO) {
+        // 当传入的用户id为空时，返回当前登录的用户信息
+        if (userId == null) {
+            userId = UserContext.get().getUserId();
+        }
+        IPage<TeamMemberRecordDO> userRecordsPage = memberRecordMapper.selectPage(
+                new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
+                new QueryWrapper<TeamMemberRecordDO>()
+                        .eq("user_id", userId)
+                        .orderByDesc("create_time")
+        );
+        return PageDTO.createFreely(userRecordsPage, RecordDTO.class);
+    }
+
+    @Override
     public int isMember(Long teamId, Long userId) {
         Integer result = memberMapper.selectCount(
                 new QueryWrapper<TeamMemberDO>().eq("team_id", teamId)
@@ -187,5 +205,13 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                         .eq("user_id", userId)
         );
         return Optional.ofNullable(result).orElse(0);
+    }
+
+    @Override
+    public int countUserTeams(Long userId) {
+        Integer countResult = memberMapper.selectCount(
+                new QueryWrapper<TeamMemberDO>().eq("user_id", userId)
+        );
+        return Optional.ofNullable(countResult).orElse(0);
     }
 }

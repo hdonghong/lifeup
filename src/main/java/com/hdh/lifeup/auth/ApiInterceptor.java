@@ -1,5 +1,6 @@
 package com.hdh.lifeup.auth;
 
+import com.google.common.collect.Maps;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Enumeration;
+import java.util.Map;
 
 /**
  * ApiInterceptor class<br/>
@@ -68,7 +71,14 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
     private UserInfoDTO getUser(HttpServletRequest request) {
         String authenticityToken = request.getHeader(TokenUtil.AUTHENTICITY_TOKEN);
         if (StringUtils.isEmpty(authenticityToken)) {
-            log.error("【Api接口拦截】Request Header中没有携带[{}]", TokenUtil.AUTHENTICITY_TOKEN);
+            Enumeration e1 = request.getHeaderNames();
+            Map<String, String> headersMap = Maps.newHashMap();
+            while (e1.hasMoreElements()) {
+                String headerName = (String) e1.nextElement();
+                headersMap.put("\n\t" + headerName, request.getHeader(headerName));
+            }
+
+            log.error("【Api接口拦截】Request Header中没有携带[{}], \nHeaders = [{}]", TokenUtil.AUTHENTICITY_TOKEN, headersMap);
             throw new GlobalException(CodeMsgEnum.TOKEN_ABSENT);
         }
         UserInfoDTO user = userInfoService.getByToken(authenticityToken);
