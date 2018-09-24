@@ -317,6 +317,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 0 : (long) Math.ceil((period * 1.0) / teamFreq) * teamFreq + teamFreq * (n - 1);
         LocalDateTime nextStartTime = firstStartTime.plusDays(nextSignPeriod);
         LocalDateTime nextEndTime = teamTaskDTO.getFirstEndTime().plusDays(nextSignPeriod);
+        // 如果新生成的下一次签到结束时间 小于 当前时间（也就是说新生成的团队动态就已经是结束的），则需要再加一个 频率值
+        if (nextEndTime.isBefore(nowTime)) {
+            nextStartTime = nextStartTime.plusDays(teamFreq);
+            nextEndTime = nextEndTime.plusDays(teamFreq);
+        }
 
         // 插入下n次的团队签到记录
         TeamRecordDO nextTeamRecordDO = new TeamRecordDO().setNextStartTime(nextStartTime)
