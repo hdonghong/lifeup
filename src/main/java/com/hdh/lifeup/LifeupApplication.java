@@ -14,6 +14,5 @@ public class LifeupApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LifeupApplication.class, args);
-
 	}
 }

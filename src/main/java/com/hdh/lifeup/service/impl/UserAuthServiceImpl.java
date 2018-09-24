@@ -5,30 +5,26 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.constant.AuthTypeConst;
 import com.hdh.lifeup.domain.UserAuthDO;
-import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.UserAuthDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.UserAuthMapper;
+import com.hdh.lifeup.redis.RedisOperator;
+import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
-import com.hdh.lifeup.util.RedisUtil;
 import com.hdh.lifeup.util.TokenUtil;
 import com.hdh.lifeup.vo.UserAuthVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * UserAuthServiceImpl class<br/>
@@ -39,18 +35,16 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 public class UserAuthServiceImpl implements UserAuthService {
-    @Resource
-    private RedisTemplate<String, UserInfoDTO> redisTemplate;
 
-    private RedisUtil redisUtil;
-
+    private RedisOperator redisOperator;
     private UserAuthMapper userAuthMapper;
-
     private UserInfoService userInfoService;
 
     @Autowired
-    public UserAuthServiceImpl(RedisUtil redisUtil, UserAuthMapper userAuthMapper, UserInfoService userInfoService) {
-        this.redisUtil = redisUtil;
+    public UserAuthServiceImpl(RedisOperator redisOperator,
+                               UserAuthMapper userAuthMapper,
+                               UserInfoService userInfoService) {
+        this.redisOperator = redisOperator;
         this.userAuthMapper = userAuthMapper;
         this.userInfoService = userInfoService;
     }
@@ -125,10 +119,8 @@ public class UserAuthServiceImpl implements UserAuthService {
             userAuthDTO.setUserId(userInfoResult.getUserId());
             insert(userAuthDTO);
         }
-        // userInfoDTO放到缓存，返回token
-        String token = TokenUtil.get();
-        redisTemplate.opsForValue().set(token, userInfoResult, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
-        return token;
+        // 返回token
+        return this.generateToken(userInfoResult);
     }
 
     @Override
@@ -148,10 +140,8 @@ public class UserAuthServiceImpl implements UserAuthService {
             log.error("【APP账号登录】密码错误");
             throw new GlobalException(CodeMsgEnum.PASSWORD_ERROR);
         }
-
-        String token = TokenUtil.get();
-        redisTemplate.opsForValue().set(token, userInfoResult, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
-        return token;
+        // 返回token
+        return this.generateToken(userInfoResult);
     }
 
     @Override
@@ -165,9 +155,8 @@ public class UserAuthServiceImpl implements UserAuthService {
             throw new GlobalException(CodeMsgEnum.USER_NOT_EXIST);
         }
         UserInfoDTO userInfoResult = userInfoService.getOne(userAuthDO.getUserId());
-        String token = TokenUtil.get();
-        redisTemplate.opsForValue().set(token, userInfoResult, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
-        return token;
+        // 返回token
+        return this.generateToken(userInfoResult);
     }
 
     @Override
@@ -190,9 +179,18 @@ public class UserAuthServiceImpl implements UserAuthService {
             userAuthDTO.setAccessToken(PasswordUtil.convertClientPwdToDbPwd(userAuthVO.getAccessToken(), userInfoResult.getPwdSalt()));
         }
         insert(userAuthDTO);
-        // userInfoDTO放到缓存，返回token
+        // 返回token
+        return this.generateToken(userInfoResult);
+    }
+
+    /**
+     * 用户信息userInfoDTO放到缓存，返回token
+     * @param userInfoDTO 用户信息
+     * @return token
+     */
+    private String generateToken(UserInfoDTO userInfoDTO) {
         String token = TokenUtil.get();
-        redisTemplate.opsForValue().set(token, userInfoResult, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
+        redisOperator.setex(UserKey.TOKEN, token, userInfoDTO);
         return token;
     }
 }

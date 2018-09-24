@@ -113,11 +113,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         TeamMemberDTO memberDTO = new TeamMemberDTO()
                                             .setTeamId(teamId)
                                             .setTeamRole(TeamRole.MEMBER);
-        // 创建者默认发布第一条团队成员动态
+        // 创建者默认发布第一条团队成员动态，此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                                             .setTeamId(teamId)
                                             .setTeamTitle(teamTaskDTO.getTeamTitle())
-                                            .setTeamRecordId(nextSign.getTeamRecordId())
+                                            .setTeamRecordId(teamId)
                                             .setUserActivity("创建了团队「" +  teamTaskVO.getTeamTitle() +"」")
                                             .setActivityIcon(ActivityIcon.IC_NEW);
         memberService.addMember(memberDTO, memberRecordDTO);
@@ -231,11 +231,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         TeamMemberDTO memberDTO = new TeamMemberDTO()
                 .setTeamId(teamId)
                 .setTeamRole(TeamRole.MEMBER);
-        // 创建者默认发布第一条团队成员动态
+        // 创建者默认发布第一条团队成员动态 此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                 .setTeamId(teamId)
                 .setTeamTitle(teamTaskDTO.getTeamTitle())
-                .setTeamRecordId(nextSign.getTeamRecordId())
+                .setTeamRecordId(teamId)
                 .setUserActivity("欢迎"+ UserContext.get().getNickname() +"加入团队「" +  nextSign.getTeamTitle() +"」")
                 .setActivityIcon(ActivityIcon.IC_JOIN);
         memberService.addMember(memberDTO, memberRecordDTO);
@@ -314,7 +314,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
         long nextSignPeriod = (teamFreq == 0) ?
-                0 : (long) Math.ceil((period * 1.0) / teamFreq) * teamFreq + teamFreq * n;
+                0 : (long) Math.ceil((period * 1.0) / teamFreq) * teamFreq + teamFreq * (n - 1);
         LocalDateTime nextStartTime = firstStartTime.plusDays(nextSignPeriod);
         LocalDateTime nextEndTime = teamTaskDTO.getFirstEndTime().plusDays(nextSignPeriod);
 

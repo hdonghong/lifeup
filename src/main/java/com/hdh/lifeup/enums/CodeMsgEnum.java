@@ -28,6 +28,7 @@ public enum CodeMsgEnum {
     PASSWORD_ERROR(500206, "密码错误"),
     YB_ERROR(500207, "易班授权登录失败"),
     MOB_VERIFY_ERROR(500208, "短信验证失败"),
+    TOO_MANY_ACCESSES(500209, "访问次数过多"),
 
     /** 用户模块 5003XX */
     USER_NOT_EXIST(500301, "用户不存在"),
@@ -44,9 +45,8 @@ public enum CodeMsgEnum {
     TEAM_IS_END(500603, "团队任务已经结束"),
     NOT_SIGN_TIME(500604, "未到签到时间"),
 
-    /** 团队成员模块 */
+    /** 团队成员模块 5007XX */
     NOT_TEAM_MEMBER(500701, "不是团队成员"),
-
     ;
 
     private int code;

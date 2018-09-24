@@ -9,6 +9,8 @@ import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.UserInfoMapper;
+import com.hdh.lifeup.redis.RedisOperator;
+import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.AttributeService;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.UserInfoService;
@@ -19,15 +21,11 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * UserInfoServiceImpl class<br/>
@@ -39,16 +37,17 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
 
-    @Resource
-    private RedisTemplate<String, UserInfoDTO> redisTemplate;
+    private RedisOperator redisOperator;
     private UserInfoMapper userInfoMapper;
     private AttributeService attributeService;
     private TeamMemberService memberService;
 
     @Autowired
-    public UserInfoServiceImpl(UserInfoMapper userInfoMapper,
+    public UserInfoServiceImpl(RedisOperator redisOperator,
+                               UserInfoMapper userInfoMapper,
                                AttributeService attributeService,
                                TeamMemberService memberService) {
+        this.redisOperator = redisOperator;
         this.userInfoMapper = userInfoMapper;
         this.attributeService = attributeService;
         this.memberService = memberService;
@@ -84,15 +83,15 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO update(@NonNull UserInfoDTO userInfoDTO) {
-        UserInfoDTO storedUserInfoDTO = UserContext.get();
-        BeanUtils.copyProperties(userInfoDTO, storedUserInfoDTO, "userId", "createTime");
-        Integer result = userInfoMapper.updateById(storedUserInfoDTO.toDO(UserInfoDO.class));
+        UserInfoDTO cachedUserInfoDTO = UserContext.get();
+        BeanUtils.copyProperties(userInfoDTO, cachedUserInfoDTO, "userId", "createTime");
+        Integer result = userInfoMapper.updateById(cachedUserInfoDTO.toDO(UserInfoDO.class));
         if (!Objects.equals(1, result)) {
             log.error("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
-        redisTemplate.opsForValue().set(TokenContext.get(), storedUserInfoDTO, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
-        return storedUserInfoDTO;
+        redisOperator.setex(UserKey.TOKEN, TokenContext.get(), cachedUserInfoDTO);
+        return cachedUserInfoDTO;
     }
 
     @Override
@@ -113,18 +112,17 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserInfoDTO getByToken(String authenticityToken) {
         Preconditions.checkNotNull(authenticityToken, "【通过token获取用户】传入的Token为空");
 
-        UserInfoDTO userInfoDTO = redisTemplate.opsForValue().get(authenticityToken);
+        UserInfoDTO userInfoDTO = redisOperator.get(UserKey.TOKEN, authenticityToken);
         if (userInfoDTO == null) {
             log.info("【通过token获取用户】无效的TOKEN");
             return null;
         }
 
-        Long expire = redisTemplate.boundValueOps(authenticityToken).getExpire();
-        if (Optional.ofNullable(expire).orElse(0L) < TokenUtil.MIN_EXPIRED) {
+        long expire = redisOperator.ttl(UserKey.TOKEN, authenticityToken);
+        if (expire < TokenUtil.MIN_EXPIRED) {
             log.info("【通过token获取用户】当前用户Token有效时长expire = [{}], 重设", expire);
-            redisTemplate.opsForValue().set(authenticityToken, userInfoDTO, TokenUtil.EXPIRED_SECONDS, TimeUnit.SECONDS);
+            redisOperator.expire(UserKey.TOKEN, TokenContext.get());
         }
-
         return userInfoDTO;
     }
 
