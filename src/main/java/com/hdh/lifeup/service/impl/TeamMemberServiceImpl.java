@@ -8,7 +8,6 @@ import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamMemberDO;
 import com.hdh.lifeup.domain.TeamMemberRecordDO;
-import com.hdh.lifeup.domain.TeamTaskDO;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamMemberDTO;
@@ -17,8 +16,10 @@ import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.TeamMemberMapper;
 import com.hdh.lifeup.mapper.TeamMemberRecordMapper;
+import com.hdh.lifeup.redis.RedisOperator;
+import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.TeamMemberService;
-import com.hdh.lifeup.vo.MembersVO;
+import com.hdh.lifeup.vo.UserListVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.hdh.lifeup.constant.TaskConst.*;
+import static com.hdh.lifeup.constant.UserConst.*;
 
 /**
  * TeamMemberServiceImpl class<br/>
@@ -43,13 +44,16 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     private TeamMemberMapper memberMapper;
     private TeamMemberRecordMapper memberRecordMapper;
+    private RedisOperator redisOperator;
 
 
     @Autowired
     public TeamMemberServiceImpl(TeamMemberMapper memberMapper,
-                                 TeamMemberRecordMapper memberRecordMapper) {
+                                 TeamMemberRecordMapper memberRecordMapper,
+                                 RedisOperator redisOperator) {
         this.memberMapper = memberMapper;
         this.memberRecordMapper = memberRecordMapper;
+        this.redisOperator = redisOperator;
     }
 
     @Override
@@ -132,23 +136,35 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     }
 
     @Override
-    public PageDTO<MembersVO> pageMembers(Long teamId, PageDTO pageDTO) {
+    public PageDTO<UserListVO> pageMembers(Long teamId, PageDTO pageDTO) {
         Long currentPage = pageDTO.getCurrentPage();
         // FIXME 没有limit
         Integer count = memberMapper.selectCount(
                 new QueryWrapper<TeamMemberDO>().eq("team_id", teamId)
         );
-        List<MembersVO> membersList = Lists.newArrayList();
+        List<UserListVO> membersList = Lists.newArrayList();
         if (Optional.ofNullable(count).orElse(0) > 0) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
             membersList = memberMapper.getMembers(teamId, pageDTO);
             membersList.forEach(member -> {
-                if (member.getUserId().equals(UserContext.get().getUserId())) {
-                    member.setIsFollow(Relationship.MYSELF);
+                // 默认‘我’没有关注这个member
+                int followStatus = FollowStatus.NOT_FOLLOW;
+                Long currentUserId = UserContext.get().getUserId();
+                Long memberId = member.getUserId();
+                if (currentUserId.equals(memberId)) {
+                    followStatus = FollowStatus.MYSELF;
+                } else if (redisOperator.zrank(UserKey.FOLLOWING, currentUserId, memberId) != null ){
+                    // 如果我关注了这个member
+                    followStatus = FollowStatus.FOLLOWING;
+                    // 如果这个member也关注了我
+                    if (redisOperator.zrank(UserKey.FOLLOWING, memberId, currentUserId) != null ) {
+                        followStatus = FollowStatus.INTERACTIVE;
+                    }
                 }
+                member.setIsFollow(followStatus);
             });
         }
-        return PageDTO.<MembersVO>builder()
+        return PageDTO.<UserListVO>builder()
                 .currentPage(currentPage)
                 .list(membersList)
                 .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))

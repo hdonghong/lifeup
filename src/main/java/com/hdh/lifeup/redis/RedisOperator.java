@@ -1,5 +1,6 @@
 package com.hdh.lifeup.redis;
 
+import com.google.common.collect.Sets;
 import com.hdh.lifeup.util.JsonUtil;
 import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * RedisUtil class<br/>
@@ -145,6 +147,138 @@ public class RedisOperator {
         String value = redisTemplate.opsForValue().get(realKey);
         return value != null ?
             JsonUtil.jsonToList(value, keyPrefix.getValueClass()) : null;
+    }
+
+    // set
+
+    /**
+     * 向集合添加一个或者多个成员
+     * @param keyPrefix key前缀
+     * @param key key
+     * @param members 成员
+     * @param <T> 成员类型
+     * @return 添加成功的数量
+     */
+    public <T> long sadd(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object ... members) {
+        String realKey = getRealKey(keyPrefix, key);
+        String[] jsonValues = new String[members.length];
+        for (int i = 0, len = members.length; i < len; i++) {
+            jsonValues[i] = JsonUtil.toJson(members[i]);
+        }
+        Long addCount = redisTemplate.opsForSet().add(realKey, jsonValues);
+        return Optional.ofNullable(addCount).orElse(0L);
+    }
+
+    /**
+     * 判断member元素是否是集合key的成员
+     * @param keyPrefix key前缀
+     * @param key key
+     * @param value 成员
+     * @param <T> 成员类型
+     * @return 是否
+     */
+    public <T> boolean sismember(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object value) {
+        String realKey = getRealKey(keyPrefix, key);
+        Boolean isMember = redisTemplate.opsForSet().isMember(realKey, JsonUtil.toJson(value));
+        return Optional.ofNullable(isMember).orElse(false);
+    }
+
+    /**
+     * 移除集合一个或者多个成员
+     * @param keyPrefix key前缀
+     * @param key key
+     * @param members 成员
+     * @param <T> 成员类型
+     * @return 移除成功的数量
+     */
+    public <T> long srem(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object ... members) {
+        String realKey = getRealKey(keyPrefix, key);
+        Object[] jsonValues = new String[members.length];
+        for (int i = 0, len = members.length; i < len; i++) {
+            jsonValues[i] = JsonUtil.toJson(members[i]);
+        }
+        Long addCount = redisTemplate.opsForSet().remove(realKey, jsonValues);
+        return Optional.ofNullable(addCount).orElse(0L);
+    }
+
+    /**
+     * 返回集合中的所有成员
+     * @param keyPrefix key前缀
+     * @param key key
+     * @param <T> 成员类型
+     * @return 移除成功的数量
+     */
+    public <T> Set<T> smembers(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key) {
+        String realKey = getRealKey(keyPrefix, key);
+        Set<String> members = redisTemplate.opsForSet().members(realKey);
+        return members != null ?
+                members.stream().map(member -> JsonUtil.jsonToObject(member, keyPrefix.getValueClass())).collect(Collectors.toSet()) : Sets.newHashSet();
+    }
+
+    // zset
+
+    /**
+     * 向集合添加一个或者多个成员
+     * @param keyPrefix key前缀
+     * @param key key
+     * @param scoreAndMembers 分数和成员
+     * @param <T> 成员类型
+     * @return 添加成功的数量
+     */
+    public <T> long zadd(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object ... scoreAndMembers) {
+        if (scoreAndMembers.length % 2 != 0) {
+            throw new UnsupportedOperationException("要求传参格式为,(s1, m1, s2, m2, ... sn, mn)");
+        }
+        long zaddResult = 0;
+        String realKey = getRealKey(keyPrefix, key);
+        for (int i = 0, len = scoreAndMembers.length; i < len; i += 2) {
+            double score = Double.parseDouble(scoreAndMembers[i].toString());
+            String member = JsonUtil.toJson(scoreAndMembers[i + 1]);
+            if (Optional.ofNullable(
+                    redisTemplate.opsForZSet().add(realKey, member, score)).orElse(false)
+                ) {
+                zaddResult++;
+            }
+        }
+        return zaddResult;
+    }
+
+    public <T> Set<T> zrange(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, int min, int max) {
+        String realKey = getRealKey(keyPrefix, key);
+        Set<String> members = redisTemplate.opsForZSet().range(realKey, min, max);
+        return members != null ?
+                members.stream().map(member -> JsonUtil.jsonToObject(member, keyPrefix.getValueClass())).collect(Collectors.toSet()) : Sets.newHashSet();
+    }
+
+    public <T> long zcard(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key) {
+        String realKey = getRealKey(keyPrefix, key);
+        Long membersCount = redisTemplate.opsForZSet().zCard(realKey);
+        return Optional.ofNullable(membersCount).orElse(0L);
+    }
+
+    public <T> Long zrank(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object member) {
+        String realKey = getRealKey(keyPrefix, key);
+        return redisTemplate.opsForZSet().rank(realKey, JsonUtil.toJson(member));
+    }
+
+
+
+        /**
+         * 移除集合一个或者多个成员
+         * @param keyPrefix key前缀
+         * @param key key
+         * @param members 成员
+         * @param <T> 成员类型
+         * @return 移除成功的数量
+         */
+    public <T> long zrem(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key, @NonNull Object ... members) {
+        String realKey = getRealKey(keyPrefix, key);
+        Object[] jsonValues = new String[members.length];
+        for (int i = 0, len = members.length; i < len; i++) {
+            jsonValues[i] = JsonUtil.toJson(members[i]);
+        }
+        Long addCount = redisTemplate.opsForZSet().remove(realKey, jsonValues);
+        return Optional.ofNullable(addCount).orElse(0L);
     }
 
     // hash

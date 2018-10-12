@@ -51,15 +51,15 @@ public class UserDetailVO {
     @ApiModelProperty("团队数量")
     private Integer teamAmount;
 
-    @ApiModelProperty("粉丝数量")
-    private Integer fansAmount;
+    @ApiModelProperty("我关注的数量")
+    private Long followingAmount;
 
-    @ApiModelProperty("关注数量")
-    private Integer followerAmount;
+    @ApiModelProperty("关注者数量")
+    private Long followerAmount;
 
     public UserDetailVO() {
         this.teamAmount = 0;
-        this.fansAmount = 0;
-        this.followerAmount = 0;
+        this.followingAmount = 0L;
+        this.followerAmount = 0L;
     }
 }

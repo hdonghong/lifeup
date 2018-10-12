@@ -5,7 +5,7 @@ import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamMemberDTO;
 import com.hdh.lifeup.dto.TeamMemberRecordDTO;
-import com.hdh.lifeup.vo.MembersVO;
+import com.hdh.lifeup.vo.UserListVO;
 import lombok.NonNull;
 
 /**
@@ -50,7 +50,7 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @param pageDTO 查询条件
      * @return 成员列表
      */
-    PageDTO<MembersVO> pageMembers(Long teamId, PageDTO pageDTO);
+    PageDTO<UserListVO> pageMembers(Long teamId, PageDTO pageDTO);
 
     /**
      * 获取团队成员动态列表

@@ -23,7 +23,7 @@
 hs_err_pid*
 
 /log/
-/API/
+/private/
 /target/
 /.idea/
 application-prod.yml

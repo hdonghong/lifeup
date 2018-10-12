@@ -21,7 +21,8 @@ public class BaseDTOTest {
     public void from() throws Exception {
         UserInfoDO userInfoDO = new UserInfoDO();
         userInfoDO.setNickname("nick")
-                .setUserAddress("2018-08-18 08:44:12 广东省广州市天河区龙口东路创逸大厦11202");
+                .setUserAddress("2018-08-18 08:44:12 广东省广州市天河区龙口东路创逸大厦11202")
+                .setAuthTypes("[]");
         UserInfoDTO userInfoDTO = BaseDTO.from(userInfoDO, UserInfoDTO.class);
         System.out.println(userInfoDTO);
     }

@@ -1,5 +1,6 @@
 package com.hdh.lifeup.service.impl;
 
+import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +20,22 @@ public class UserInfoServiceImplTest {
     private UserInfoService userInfoService;
 
     @Test
+    public void follow() throws Exception {
+        UserContext.set(userInfoService.getOne(1L));
+        userInfoService.follow(1033007682448465921L);
+        userInfoService.follow(1033280752341962754L);
+        userInfoService.follow(1035911424273485825L);
+    }
+
+    @Test
+    public void deleteFollowing() throws Exception {
+    }
+
+
+    @Test
     public void getOne() throws Exception {
+        UserInfoDTO userInfoDTO = userInfoService.getOne(1L);
+        System.out.println(userInfoDTO);
     }
 
     @Test

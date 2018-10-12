@@ -103,4 +103,18 @@ public class OtherTest {
         BeanUtils.copyProperties(teamRecordDO, nextSignVO);
         System.out.println(nextSignVO);
     }
+
+    @Test
+    public void testSublist() {
+        List<Integer> list = Lists.newArrayList(1, 2, 3, 4, 5, 6);
+        int size = 3;
+        System.out.println(list.subList(0, 0 + size));
+        // 1, 2, 3
+
+        System.out.println(list.subList(1, 1 + size));
+        // 2, 3, 4
+
+        System.out.println(list.subList(3, 3 + size));
+        // 4, 5, 6
+    }
 }

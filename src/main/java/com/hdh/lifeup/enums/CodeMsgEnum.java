@@ -32,6 +32,8 @@ public enum CodeMsgEnum {
 
     /** 用户模块 5003XX */
     USER_NOT_EXIST(500301, "用户不存在"),
+    FORBIT_FOLLOW_YOURSELF(500302, "用户无法关注自己"),
+    FOLLOW_ERROR(500303, "已关注或者其它异常情况"),
 
     /** 事项模块 5004XX */
     TASK_NOT_EXIST(500401, "个人事项不存在"),

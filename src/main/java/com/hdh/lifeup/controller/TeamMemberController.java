@@ -5,7 +5,7 @@ import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.MembersVO;
+import com.hdh.lifeup.vo.UserListVO;
 import com.hdh.lifeup.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -39,7 +39,7 @@ public class TeamMemberController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/members")
-    public ResultVO<PageDTO<MembersVO>> getMembers(@PathVariable Long teamId, PageDTO pageDTO) {
+    public ResultVO<PageDTO<UserListVO>> getMembers(@PathVariable Long teamId, PageDTO pageDTO) {
         return Result.success(
                 memberService.pageMembers(teamId, pageDTO)
         );

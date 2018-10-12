@@ -3,7 +3,7 @@ package com.hdh.lifeup.mapper;
 import com.hdh.lifeup.base.SuperMapper;
 import com.hdh.lifeup.domain.TeamMemberDO;
 import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.vo.MembersVO;
+import com.hdh.lifeup.vo.UserListVO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -27,5 +27,5 @@ public interface TeamMemberMapper extends SuperMapper<TeamMemberDO> {
             "where m.user_id = u.user_id " +
             "and m.team_id = #{teamId} " +
             "order by m.create_time desc limit #{page.currentPage}, #{page.size} ")
-    List<MembersVO> getMembers(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
+    List<UserListVO> getMembers(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
 }

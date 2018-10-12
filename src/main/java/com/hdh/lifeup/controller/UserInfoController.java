@@ -12,6 +12,7 @@ import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
 import com.hdh.lifeup.vo.UserDetailVO;
+import com.hdh.lifeup.vo.UserListVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -117,6 +118,58 @@ public class UserInfoController {
 
         return Result.success(
                 teamTaskService.pageUserTeams(userId, pageDTO)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "关注，我想要关注的用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", required = true, paramType = "path", dataType = "Long"),
+    })
+    @PostMapping("/following/{userId}")
+    public ResultVO<?> follow(@PathVariable(value = "userId") Long userId) {
+        userInfoService.follow(userId);
+        return Result.success();
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "取消关注")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", required = true, paramType = "path", dataType = "Long"),
+    })
+    @DeleteMapping("/following/{userId}")
+    public ResultVO<?> deleteFollowing(@PathVariable(value = "userId") Long userId) {
+        userInfoService.deleteFollowing(userId);
+        return Result.success();
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "获取{user}的关注", notes = "userId可传可不传，不传递表示当前用户，即'我的关注'")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+    })
+    @GetMapping(value = {"/following", "/{userId}/following"})
+    public ResultVO<PageDTO<UserListVO>> getFollowings(
+            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO) {
+        return Result.success(
+            userInfoService.getFollowings(userId, pageDTO)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "获取{user}的跟随者", notes = "userId可传可不传，不传递表示当前用户")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+    })
+    @GetMapping(value = {"/follower", "/{userId}/follower"})
+    public ResultVO<PageDTO<UserListVO>> getFollowers(
+            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO) {
+        return Result.success(
+                userInfoService.getFollowers(userId, pageDTO)
         );
     }
 }

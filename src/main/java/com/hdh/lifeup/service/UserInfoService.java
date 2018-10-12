@@ -1,8 +1,10 @@
 package com.hdh.lifeup.service;
 
 import com.hdh.lifeup.base.BaseService;
+import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.vo.UserDetailVO;
+import com.hdh.lifeup.vo.UserListVO;
 
 /**
  * UserInfoService interface<br/>
@@ -26,4 +28,31 @@ public interface UserInfoService extends BaseService<UserInfoDTO, Long> {
      */
     UserDetailVO getDetailById(Long userId);
 
+    /**
+     * 关注用户
+     * @param userId 用户id
+     */
+    void follow(Long userId);
+
+    /**
+     * 取消关注
+     * @param userId 用户id
+     */
+    void deleteFollowing(Long userId);
+
+    /**
+     * 获取我关注的
+     * @param userId 用户id
+     * @param pageDTO 分页条件
+     * @return 用户列表
+     */
+    PageDTO<UserListVO> getFollowings(Long userId, PageDTO pageDTO);
+
+    /**
+     * 获取关注我的
+     * @param userId 用户id
+     * @param pageDTO 分页条件
+     * @return 用户列表
+     */
+    PageDTO<UserListVO> getFollowers(Long userId, PageDTO pageDTO);
 }

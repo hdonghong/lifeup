@@ -2,11 +2,13 @@ package com.hdh.lifeup.dto;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.hdh.lifeup.base.BaseDO;
 import com.hdh.lifeup.base.BaseDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
+import lombok.experimental.Accessors;
 import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
@@ -19,10 +21,8 @@ import java.util.stream.Collectors;
  * @author hdonghong
  * @since 2018/08/18
  */
-@Getter
 @Builder
-@ToString
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @ApiModel("分页查询的DTO类，暂时是这样，还未处理重复的情况！")
@@ -75,6 +75,12 @@ public class PageDTO<T> implements Serializable {
                 .currentPage(iPage.getCurrent())
                 .totalPage((long) Math.ceil((iPage.getTotal() * 1.0) / iPage.getSize()))
                 .list(result)
+                .build();
+    }
+
+    public static <T> PageDTO<T> emptyPage() {
+        return PageDTO.<T>builder()
+                .list(Lists.newArrayList())
                 .build();
     }
 
