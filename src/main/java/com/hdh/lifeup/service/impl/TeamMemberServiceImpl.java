@@ -25,7 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -200,6 +202,17 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
                 new QueryWrapper<TeamMemberRecordDO>()
                         .eq("user_id", userId)
+                        .orderByDesc("create_time")
+        );
+        return PageDTO.createFreely(userRecordsPage, RecordDTO.class);
+    }
+
+    @Override
+    public PageDTO<RecordDTO> pageUsersRecords(@NonNull Collection<Long> userIds, PageDTO pageDTO) {
+        IPage<TeamMemberRecordDO> userRecordsPage = memberRecordMapper.selectPage(
+                new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
+                new QueryWrapper<TeamMemberRecordDO>()
+                        .in("user_id", userIds)
                         .orderByDesc("create_time")
         );
         return PageDTO.createFreely(userRecordsPage, RecordDTO.class);

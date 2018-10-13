@@ -172,4 +172,16 @@ public class UserInfoController {
                 userInfoService.getFollowers(userId, pageDTO)
         );
     }
+
+    @ApiLimiting
+    @ApiOperation(value = "获取我的朋友圈")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @GetMapping(value = {"/moments"})
+    public ResultVO<PageDTO<RecordDTO>> getMoments(PageDTO pageDTO) {
+        return Result.success(
+                userInfoService.getMoments(UserContext.get().getUserId(), pageDTO)
+        );
+    }
 }

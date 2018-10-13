@@ -8,6 +8,8 @@ import com.hdh.lifeup.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.vo.UserListVO;
 import lombok.NonNull;
 
+import java.util.Collection;
+
 /**
  * TeamMemberService interface<br/>
  *
@@ -53,7 +55,7 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
     PageDTO<UserListVO> pageMembers(Long teamId, PageDTO pageDTO);
 
     /**
-     * 获取团队成员动态列表
+     * 获取指定成员动态列表
      * @param teamId 团队id
      * @param pageDTO 查询条件
      * @return 动态列表
@@ -66,6 +68,14 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @return 动态列表
      */
     PageDTO<RecordDTO> pageUserRecords(Long userId, PageDTO pageDTO);
+
+    /**
+     * 获取多个用户动态列表
+     * @param userIds 用户ids
+     * @param pageDTO 查询条件
+     * @return 动态列表
+     */
+    PageDTO<RecordDTO> pageUsersRecords(Collection<Long> userIds, PageDTO pageDTO);
 
     /**
      * 是否团队成员

@@ -9,6 +9,7 @@ import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.UserInfoDO;
 import com.hdh.lifeup.dto.AttributeDTO;
 import com.hdh.lifeup.dto.PageDTO;
+import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
@@ -210,6 +211,13 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public PageDTO<UserListVO> getFollowers(Long userId, PageDTO pageDTO) {
         return getUserListVOs(userId, pageDTO, UserKey.FOLLOWER);
+    }
+
+    @Override
+    public PageDTO<RecordDTO> getMoments(@NonNull Long userId, PageDTO pageDTO) {
+        Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
+        userIdSet.add(userId);
+        return memberService.pageUsersRecords(userIdSet, pageDTO);
     }
 
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {

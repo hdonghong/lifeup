@@ -7,6 +7,7 @@ import com.hdh.lifeup.dto.RecordDTO;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -18,7 +19,7 @@ import java.util.List;
 public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> {
 
     /**
-     * 获取团队动态
+     * 获取某个团队成员动态
      * @param teamId 团队
      * @param pageDTO 条件
      * @return 列表
