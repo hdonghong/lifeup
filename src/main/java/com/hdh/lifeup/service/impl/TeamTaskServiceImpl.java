@@ -265,6 +265,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setTeamTitle(teamTaskDTO.getTeamTitle())
                     .setTeamRecordId(nextSign.getTeamRecordId())
                     .setUserActivity(activityVO.getActivity())
+                    .setActivityImages(activityVO.getActivityImages())
                     .setActivityIcon(ActivityIcon.IC_SIGN);
             memberService.addMemberRecord(memberRecordDTO);
         }

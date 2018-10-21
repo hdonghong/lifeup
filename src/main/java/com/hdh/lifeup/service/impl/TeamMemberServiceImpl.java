@@ -25,14 +25,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.hdh.lifeup.constant.UserConst.*;
+import static com.hdh.lifeup.constant.UserConst.FollowStatus;
 
 /**
  * TeamMemberServiceImpl class<br/>
@@ -175,11 +174,11 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     public PageDTO<RecordDTO> pageMemberRecords(Long teamId, PageDTO pageDTO) {
-        Long currentPage = pageDTO.getCurrentPage();
         // FIXME 没有limit
         Integer count = memberRecordMapper.selectCount(
                 new QueryWrapper<TeamMemberRecordDO>().eq("team_id", teamId)
         );
+        Long currentPage = pageDTO.getCurrentPage();
         List<RecordDTO> recordList = Lists.newArrayList();
         if (Optional.ofNullable(count).orElse(0) > 0) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
@@ -209,13 +208,20 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     public PageDTO<RecordDTO> pageUsersRecords(@NonNull Collection<Long> userIds, PageDTO pageDTO) {
-        IPage<TeamMemberRecordDO> userRecordsPage = memberRecordMapper.selectPage(
-                new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
-                new QueryWrapper<TeamMemberRecordDO>()
-                        .in("user_id", userIds)
-                        .orderByDesc("create_time")
+        Integer count = memberRecordMapper.selectCount(
+                new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIds)
         );
-        return PageDTO.createFreely(userRecordsPage, RecordDTO.class);
+        Long currentPage = pageDTO.getCurrentPage();
+        List<RecordDTO> recordList = Lists.newArrayList();
+        if (Optional.ofNullable(count).orElse(0) > 0) {
+            pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
+            recordList = memberRecordMapper.getUsersRecords(userIds, pageDTO);
+        }
+        return PageDTO.<RecordDTO>builder()
+                      .currentPage(currentPage)
+                      .list(recordList)
+                      .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
+                      .build();
     }
 
     @Override

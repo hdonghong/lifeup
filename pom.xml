@@ -108,6 +108,14 @@
 			<version>${swagger.version}</version>
 		</dependency>
 
+		<!-- 七牛云 -->
+		<dependency>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<!--这样写 会自动找7.2的最高版本-->
+			<version>[7.2.0, 7.2.99]</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

@@ -1,11 +1,14 @@
 package com.hdh.lifeup.controller;
 
+import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.config.QiniuConfig;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.TeamTaskDTO;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.util.Result;
+import com.hdh.lifeup.util.UploadUtil;
 import com.hdh.lifeup.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -13,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -28,10 +32,12 @@ import java.util.List;
 public class TeamTaskController {
 
     private TeamTaskService teamTaskService;
+    private QiniuConfig qiniuConfig;
 
     @Autowired
-    public TeamTaskController(TeamTaskService teamTaskService) {
+    public TeamTaskController(TeamTaskService teamTaskService, QiniuConfig qiniuConfig) {
         this.teamTaskService = teamTaskService;
+        this.qiniuConfig = qiniuConfig;
     }
 
     @ApiLimiting
@@ -110,13 +116,14 @@ public class TeamTaskController {
     }
 
     @ApiLimiting
-    @ApiOperation(value = "签到")
+    @ApiOperation(value = "签到，发动态")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
             @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @PostMapping("/{teamId}/sign")
-    public ResultVO<NextSignVO> signIn(@PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
+    public ResultVO<NextSignVO> signIn(
+            @PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
         return Result.success(
                 teamTaskService.signIn(teamId, activityVO)
         );

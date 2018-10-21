@@ -3,11 +3,14 @@ package com.hdh.lifeup.dto;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.TeamMemberRecordDO;
+import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.beans.BeanUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * TeamMemberRecordDO class<br/>
@@ -37,7 +40,31 @@ public class TeamMemberRecordDTO extends BaseDTO<TeamMemberRecordDO> {
 
     private Integer activityIcon;
 
+    private List<String> activityImages;
+
     private LocalDateTime createTime;
 
+    @Override
+    public TeamMemberRecordDO toDO(Class<TeamMemberRecordDO> doClass) {
+        try {
+            TeamMemberRecordDO teamMemberRecordDO = doClass.newInstance();
+            BeanUtils.copyProperties(this, teamMemberRecordDO, "activityImages");
+            if (this.activityImages != null && this.activityImages.size() > 0) {
+                teamMemberRecordDO.setActivityImages(JsonUtil.toJson(this.activityImages));
+            }
+            return teamMemberRecordDO;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public <DTO extends BaseDTO> DTO from(TeamMemberRecordDO aDO) {
+        TeamMemberRecordDTO teamMemberRecordDTO = new TeamMemberRecordDTO();
+        BeanUtils.copyProperties(aDO, teamMemberRecordDTO, "activityImages");
+        teamMemberRecordDTO.setActivityImages(JsonUtil.jsonToList(aDO.getActivityImages(), String.class));
+        return (DTO) teamMemberRecordDTO;
+    }
 }

@@ -2,6 +2,7 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.config.QiniuConfig;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamTaskDTO;
@@ -10,6 +11,7 @@ import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
+import com.hdh.lifeup.util.UploadUtil;
 import com.hdh.lifeup.vo.ResultVO;
 import com.hdh.lifeup.vo.UserDetailVO;
 import com.hdh.lifeup.vo.UserListVO;
@@ -19,6 +21,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * UserInfoController class<br/>
@@ -34,14 +37,17 @@ public class UserInfoController {
     private UserInfoService userInfoService;
     private TeamMemberService teamMemberService;
     private TeamTaskService teamTaskService;
+    private QiniuConfig qiniuConfig;
 
     @Autowired
     public UserInfoController(UserInfoService userInfoService,
                               TeamMemberService teamMemberService,
-                              TeamTaskService teamTaskService) {
+                              TeamTaskService teamTaskService,
+                              QiniuConfig qiniuConfig) {
         this.userInfoService = userInfoService;
         this.teamMemberService = teamMemberService;
         this.teamTaskService = teamTaskService;
+        this.qiniuConfig = qiniuConfig;
     }
 
     /**
@@ -81,6 +87,17 @@ public class UserInfoController {
     public ResultVO<UserInfoDTO> updateProfile(@RequestBody UserInfoDTO userInfoDTO) {
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = " 上传头像")
+    @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
+    @PostMapping("/avatar")
+    public ResultVO<String> upload(MultipartFile avatarImage) {
+        String imageUrl = UploadUtil.uploadImage(avatarImage, QiniuConfig.AVATAR_URI, qiniuConfig);
+        UserInfoDTO userInfoDTO = UserContext.get().setUserHead(imageUrl);
+        userInfoService.update(userInfoDTO);
+        return Result.success(imageUrl);
     }
 
     @ApiLimiting

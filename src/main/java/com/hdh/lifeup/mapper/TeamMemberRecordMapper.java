@@ -29,4 +29,15 @@ public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> 
             "and r.team_id = #{teamId} " +
             "order by r.create_time desc limit #{page.currentPage}, #{page.size} ")
     List<RecordDTO> getMemberRecords(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
+
+    @Select("<script>" +
+            "select r.*, u.nickname, u.user_head from team_member_record r, user_info u " +
+            "where r.user_id = u.user_id " +
+            "and u.user_id in " +
+                "<foreach item='id' index='index' collection='userIds' open='(' separator=',' close=')'>" +
+                "${id}" +
+                "</foreach>" +
+            "order by r.create_time desc limit #{page.currentPage}, #{page.size} " +
+            "</script>")
+    List<RecordDTO> getUsersRecords(@Param("userIds") Collection<Long> userIds, @Param("page") PageDTO pageDTO);
 }

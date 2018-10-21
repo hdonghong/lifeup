@@ -1,10 +1,12 @@
 package com.hdh.lifeup.dto;
 
+import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * RecordDTO class<br/>
@@ -34,8 +36,13 @@ public class RecordDTO implements Serializable {
 
     private String userActivity;
 
+    private List<String> activityImages;
+
     private Integer activityIcon;
 
     private LocalDateTime createTime;
 
+    public void setActivityImages(String activityImages) {
+        this.activityImages = JsonUtil.jsonToList(activityImages, String.class);
+    }
 }

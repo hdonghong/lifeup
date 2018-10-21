@@ -55,7 +55,7 @@ public class PageDTO<T> implements Serializable {
                       .build();
     }
 
-    public static <T, V> PageDTO<V> createFreely(IPage<T> iPage, Class<V> valueClass) {
+    public static <T, V> PageDTO<V> createFreely(IPage<T> iPage, Class<V> valueClass, String... ignoreProperties) {
         Preconditions.checkNotNull(iPage, "iPage不能为空");
         List<T> pageList = iPage.getRecords();
         List<V> result = pageList.stream()
@@ -63,7 +63,7 @@ public class PageDTO<T> implements Serializable {
                     V value = null;
                     try {
                         value = valueClass.newInstance();
-                        BeanUtils.copyProperties(pageRecord, value);
+                        BeanUtils.copyProperties(pageRecord, value, ignoreProperties);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

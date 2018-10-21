@@ -38,6 +38,8 @@ public class TeamMemberRecordDO extends BaseDO {
 
     private Integer activityIcon;
 
+    private String activityImages;
+
     private LocalDateTime createTime;
 
 
