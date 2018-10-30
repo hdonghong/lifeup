@@ -71,4 +71,9 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
      */
     List<NextSignVO> getAllNextSigns(Long memberId);
 
+    /**
+     * 终结团队
+     * @param teamId 团队id
+     */
+    void endTeam(Long teamId);
 }

@@ -2,51 +2,47 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.dto.ReportTypeDTO;
-import com.hdh.lifeup.dto.TaskDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
-import com.hdh.lifeup.service.ReportTypeService;
+import com.hdh.lifeup.dto.PageDTO;
+import com.hdh.lifeup.service.TeamMemberService;
+import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
-import io.swagger.annotations.Api;
+import com.hdh.lifeup.vo.UserListVO;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
- * ReportTypeController class<br/>
+ * AchievementController class<br/>
  *
  * @author hdonghong
- * @since 2018/10/21
+ * @since 2018/10/28
  */
-@Api(description = "举报类型模块")
 @RestController
-@RequestMapping("/report/types")
-public class ReportTypeController {
+@RequestMapping("/achieve")
+public class AchievementController {
 
-    private ReportTypeService reportTypeService;
+    private UserInfoService userInfoService;
 
     @Autowired
-    public ReportTypeController(ReportTypeService reportTypeService) {
-        this.reportTypeService = reportTypeService;
+    public AchievementController(UserInfoService userInfoService) {
+        this.userInfoService = userInfoService;
     }
 
     @ApiLimiting
-    @ApiOperation(value = "获取所有举报类型")
+    @ApiOperation(value = "获取关注者的周属性排行榜")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
-    @GetMapping
-    public ResultVO<List<ReportTypeDTO>> listAll() {
+    @GetMapping("/rank/following")
+    public ResultVO<PageDTO<UserListVO>> followingsRank(PageDTO pageDTO) {
         return Result.success(
-                reportTypeService.listAll()
+                userInfoService.getFollowingsRank(UserContext.get().getUserId(), pageDTO)
         );
     }
 }

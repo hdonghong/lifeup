@@ -187,6 +187,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     private NextSignVO getNextSign(TeamTaskDTO teamTaskDTO) {
+        if (TaskStatus.DOING.equals(teamTaskDTO.getTeamStatus())) {
+            throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
+        }
+
         List<TeamRecordDO> teamRecordDOList = teamRecordMapper.selectList(
                 new QueryWrapper<TeamRecordDO>().eq("team_id", teamTaskDTO.getTeamId())
                                                 .gt("next_end_time", LocalDateTime.now())
@@ -276,6 +280,13 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Override
     public List<NextSignVO> getAllNextSigns(Long memberId) {
         return null;
+    }
+
+    @Override
+    public void endTeam(Long teamId) {
+        TeamTaskDTO teamTaskDTO = getOne(teamId);
+        teamTaskDTO.setTeamStatus(TaskStatus.COMPLETE);
+        teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
     }
 
     @Override

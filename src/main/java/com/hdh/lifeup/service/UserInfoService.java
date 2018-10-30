@@ -64,4 +64,12 @@ public interface UserInfoService extends BaseService<UserInfoDTO, Long> {
      * @return 动态列表
      */
     PageDTO<RecordDTO> getMoments(Long userId, PageDTO pageDTO);
+
+    /**
+     * 获取关注者的属性排行榜
+     * @param userId 用户id
+     * @param pageDTO 分页条件
+     * @return 用户列表
+     */
+    PageDTO<UserListVO> getFollowingsRank(Long userId, PageDTO pageDTO);
 }

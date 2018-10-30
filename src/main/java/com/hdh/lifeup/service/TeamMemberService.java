@@ -101,4 +101,5 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      */
     int countUserTeams(Long userId);
 
+    int getAttributeWeekly(Long userId);
 }

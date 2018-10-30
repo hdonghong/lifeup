@@ -78,9 +78,10 @@ public class PageDTO<T> implements Serializable {
                 .build();
     }
 
-    public static <T> PageDTO<T> emptyPage() {
+    public static <T> PageDTO<T> emptyPage(long totalPage) {
         return PageDTO.<T>builder()
                 .list(Lists.newArrayList())
+                .totalPage(totalPage)
                 .build();
     }
 

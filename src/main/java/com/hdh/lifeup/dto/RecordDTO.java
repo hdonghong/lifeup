@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -43,6 +44,7 @@ public class RecordDTO implements Serializable {
     private LocalDateTime createTime;
 
     public void setActivityImages(String activityImages) {
-        this.activityImages = JsonUtil.jsonToList(activityImages, String.class);
+        this.activityImages = activityImages == null ?
+                new ArrayList<>() : JsonUtil.jsonToList(activityImages, String.class);
     }
 }

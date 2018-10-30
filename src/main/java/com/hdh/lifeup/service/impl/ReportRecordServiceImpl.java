@@ -33,7 +33,7 @@ public class ReportRecordServiceImpl implements ReportRecordService {
     @Override
     public ReportRecordDTO insert(ReportRecordDTO reportRecordDTO) {
         Preconditions.checkNotNull(reportRecordDTO, "【新增举报记录】reportRecordDTO不能为空");
-        reportRecordDTO.setCriminalUserId(UserContext.get().getUserId());
+        reportRecordDTO.setReportUserId(UserContext.get().getUserId());
         reportRecordMapper.insert(reportRecordDTO.toDO(ReportRecordDO.class));
         return reportRecordDTO;
     }

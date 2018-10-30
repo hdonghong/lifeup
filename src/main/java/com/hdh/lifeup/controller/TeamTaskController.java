@@ -122,11 +122,22 @@ public class TeamTaskController {
             @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @PostMapping("/{teamId}/sign")
-    public ResultVO<NextSignVO> signIn(
+    public ResultVO<NextSignVO> sizgnIn(
             @PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
         return Result.success(
                 teamTaskService.signIn(teamId, activityVO)
         );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "终止团队")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @PostMapping("/{teamId}/end")
+    public ResultVO<?> end(@PathVariable("teamId") Long teamId) {
+        teamTaskService.endTeam(teamId);
+        return Result.success();
     }
 
 

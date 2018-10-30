@@ -16,6 +16,7 @@ import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.mapper.TeamMemberMapper;
 import com.hdh.lifeup.mapper.TeamMemberRecordMapper;
+import com.hdh.lifeup.mapper.TeamTaskMapper;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.TeamMemberService;
@@ -26,10 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalField;
+import java.time.temporal.WeekFields;
+import java.util.*;
 
 import static com.hdh.lifeup.constant.UserConst.FollowStatus;
 
@@ -248,5 +252,24 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 new QueryWrapper<TeamMemberDO>().eq("user_id", userId)
         );
         return Optional.ofNullable(countResult).orElse(0);
+    }
+
+    @Autowired
+    private TeamTaskMapper teamTaskMapper;
+
+    @Override
+    @Deprecated // FIXME 极丑的实现
+    public int getAttributeWeekly(Long userId) {
+        TemporalField fieldISO = WeekFields.of(Locale.CHINA).dayOfWeek();
+        LocalDateTime monday = LocalDateTime.of(LocalDate.now().with(fieldISO, 1), LocalTime.MIN);
+        LocalDateTime sunday = LocalDateTime.of(LocalDate.now().with(fieldISO, 7), LocalTime.MAX);
+        List<TeamMemberRecordDO> memberRecordDOList = memberRecordMapper.selectList(
+                new QueryWrapper<TeamMemberRecordDO>().eq("user_id", userId)
+//                                                      .gt("create_time", monday)
+//                                                      .lt("create_time", sunday)
+        );
+        return memberRecordDOList.stream()
+                .map(memberRecordDO -> teamTaskMapper.selectById(memberRecordDO.getTeamId()).getRewardExp())
+                .reduce(0, (sum, e) -> sum + e);
     }
 }

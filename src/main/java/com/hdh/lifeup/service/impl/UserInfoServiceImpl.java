@@ -205,11 +205,17 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Override
     public PageDTO<UserListVO> getFollowings(Long userId, PageDTO pageDTO) {
+        if (userId == null) {
+            userId = UserContext.get().getUserId();
+        }
         return getUserListVOs(userId, pageDTO, UserKey.FOLLOWING);
     }
 
     @Override
     public PageDTO<UserListVO> getFollowers(Long userId, PageDTO pageDTO) {
+        if (userId == null) {
+            userId = UserContext.get().getUserId();
+        }
         return getUserListVOs(userId, pageDTO, UserKey.FOLLOWER);
     }
 
@@ -220,6 +226,45 @@ public class UserInfoServiceImpl implements UserInfoService {
         return memberService.pageUsersRecords(userIdSet, pageDTO);
     }
 
+    @Override
+    @Deprecated // FIXME 极丑的实现
+    public PageDTO<UserListVO> getFollowingsRank(Long userId, PageDTO pageDTO) {
+        Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
+        userIdSet.add(userId);
+        List<UserInfoDO> userInfoDOList = userInfoMapper.selectList(
+                new QueryWrapper<UserInfoDO>().in("user_id", userIdSet)
+        );
+
+        int fromIndex = (int) ((pageDTO.getCurrentPage() - 1) * pageDTO.getSize());
+        int toIndex = fromIndex + pageDTO.getSize().intValue();
+        int userSize = userIdSet.size();
+        if (fromIndex >= userSize) {
+            return PageDTO.emptyPage((long) Math.ceil((userSize * 1.0) / pageDTO.getSize()));
+        } else if (toIndex > userSize) {
+            toIndex = userSize;
+        }
+
+        List<UserListVO> userList = Lists.newArrayListWithCapacity(userSize);
+        userInfoDOList.forEach(userInfoDO -> {
+            UserListVO userListVO = new UserListVO();
+            userList.add(userListVO);
+            BeanUtils.copyProperties(userInfoDO, userListVO);
+            int attribute = memberService.getAttributeWeekly(userInfoDO.getUserId());
+            userListVO.setPoint(attribute);
+        });
+        userList.sort((o1, o2) -> o2.getPoint() - o1.getPoint());
+//        userList.sort(Comparator.comparingInt(UserListVO::getPoint));
+        for (int i = 0, len = userList.size(); i < len; i++) {
+            userList.get(i).setRank(i + 1);
+        }
+
+        return PageDTO.<UserListVO>builder()
+                .currentPage(pageDTO.getCurrentPage())
+                .list(userList.subList(fromIndex, toIndex))
+                .totalPage((long) Math.ceil((userSize * 1.0) / pageDTO.getSize()))
+                .build();
+    }
+
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {
         Set<Long> userIdSet = redisOperator.zrange(userKey, userId, 0, -1);
 
@@ -227,7 +272,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         int toIndex = fromIndex + pageDTO.getSize().intValue();
         int userSize = userIdSet.size();
         if (fromIndex >= userSize) {
-            return PageDTO.emptyPage();
+            return PageDTO.emptyPage((long) Math.ceil((userSize * 1.0) / pageDTO.getSize()));
         } else if (toIndex > userSize) {
             toIndex = userSize;
         }

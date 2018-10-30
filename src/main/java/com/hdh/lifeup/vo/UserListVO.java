@@ -34,4 +34,9 @@ public class UserListVO {
     @ApiModelProperty("1已关注，0未关注")
     private Integer isFollow;
 
+    @ApiModelProperty("属性排行版的属性")
+    private Integer point;
+
+    private Integer rank;
+
 }

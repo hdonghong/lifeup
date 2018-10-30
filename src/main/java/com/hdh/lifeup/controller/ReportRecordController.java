@@ -40,7 +40,7 @@ public class ReportRecordController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/new")
-    public ResultVO<TaskDTO> addRecord(@RequestBody ReportRecordDTO reportRecordDTO) {
+    public ResultVO<?> addRecord(@RequestBody ReportRecordDTO reportRecordDTO) {
         reportRecordService.insert(reportRecordDTO);
         return Result.success();
     }
