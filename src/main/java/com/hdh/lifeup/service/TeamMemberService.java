@@ -101,5 +101,16 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      */
     int countUserTeams(Long userId);
 
+    /** 排行榜的临时实现：获取用户的经验值
+     * @param userId 用户id
+     * @return 用户的总经验值
+     */
     int getAttributeWeekly(Long userId);
+
+    /**
+     * 当前用户退出团队
+     * @param teamId 团队id
+     * @return 1退出成功；0失败
+     */
+    int quitTeam(Long teamId);
 }

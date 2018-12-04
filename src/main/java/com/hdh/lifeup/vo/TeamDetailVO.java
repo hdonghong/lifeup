@@ -64,4 +64,7 @@ public class TeamDetailVO {
 
     @ApiModelProperty("1已加入 0未加入")
     private Integer isMember;
+
+    @ApiModelProperty("1创建者 0不是")
+    private Integer isOwner;
 }

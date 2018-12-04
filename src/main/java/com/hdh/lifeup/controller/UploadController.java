@@ -10,6 +10,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -25,6 +26,7 @@ import java.util.List;
 @Api(description = "上传模块")
 @RestController
 @RequestMapping("/upload")
+@Slf4j
 public class UploadController {
 
     private QiniuConfig qiniuConfig;
@@ -46,9 +48,11 @@ public class UploadController {
             @PathVariable("imageCategory") String imageCategory) {
         List<String> imagePaths = Lists.newArrayList();
         if (imageFiles.size() > 0) {
+            log.info("开始上传{}张图片", imageFiles.size());
             for (MultipartFile image : imageFiles) {
                 imagePaths.add(UploadUtil.uploadImage(image, QiniuConfig.getImageURI(imageCategory), qiniuConfig));
             }
+            log.info("上传图片成功");
         }
         return Result.success(imagePaths);
     }

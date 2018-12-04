@@ -31,7 +31,7 @@ public class UserListVO {
 
     private LocalDateTime createTime;
 
-    @ApiModelProperty("1已关注，0未关注")
+    @ApiModelProperty("-1自己；0未关注；1已关注；互相关注")
     private Integer isFollow;
 
     @ApiModelProperty("属性排行版的属性")

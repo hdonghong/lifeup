@@ -14,6 +14,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -96,10 +97,9 @@ public class TeamTaskController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping
-    public ResultVO<PageDTO<TeamTaskDTO>> getPage(PageDTO pageDTO) {
-
+    public ResultVO<PageDTO<TeamTaskDTO>> getPage(PageDTO pageDTO, String teamTitle) {
         return Result.success(
-                teamTaskService.page(pageDTO)
+                teamTaskService.page(pageDTO, teamTitle)
         );
     }
 
@@ -137,6 +137,19 @@ public class TeamTaskController {
     @PostMapping("/{teamId}/end")
     public ResultVO<?> end(@PathVariable("teamId") Long teamId) {
         teamTaskService.endTeam(teamId);
+        return Result.success();
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "编辑团队")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @PutMapping("/{teamId}")
+    public ResultVO<?> editTeam(@RequestBody TeamEditVO teamEditVO) {
+        TeamTaskDTO teamTaskDTO = new TeamTaskDTO();
+        BeanUtils.copyProperties(teamEditVO, teamTaskDTO);
+        teamTaskService.update(teamTaskDTO);
         return Result.success();
     }
 

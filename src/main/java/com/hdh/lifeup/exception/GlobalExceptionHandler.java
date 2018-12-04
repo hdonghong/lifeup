@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * GlobalExceptionHandler class<br/>
- *
+ * 全局异常处理
  * @author hdonghong
  * @since 2018/08/12
  */
@@ -30,6 +30,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = GlobalException.class)
     public ResultVO<?> handlerGlobalException(GlobalException e) {
+        log.error("【系统预知异常】e = [{}]", e);
         return Result.error((e.getCodeMsgEnum()));
     }
 

@@ -6,8 +6,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.constant.TaskConst;
 import com.hdh.lifeup.domain.TeamMemberDO;
 import com.hdh.lifeup.domain.TeamMemberRecordDO;
+import com.hdh.lifeup.domain.TeamTaskDO;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamMemberDTO;
@@ -27,7 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -50,15 +51,18 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     private TeamMemberMapper memberMapper;
     private TeamMemberRecordMapper memberRecordMapper;
     private RedisOperator redisOperator;
-
+    // FIXME
+    private TeamTaskMapper teamTaskMapper;
 
     @Autowired
     public TeamMemberServiceImpl(TeamMemberMapper memberMapper,
                                  TeamMemberRecordMapper memberRecordMapper,
-                                 RedisOperator redisOperator) {
+                                 RedisOperator redisOperator,
+                                 TeamTaskMapper teamTaskMapper) {
         this.memberMapper = memberMapper;
         this.memberRecordMapper = memberRecordMapper;
         this.redisOperator = redisOperator;
+        this.teamTaskMapper = teamTaskMapper;
     }
 
     @Override
@@ -118,7 +122,19 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addMemberRecord(TeamMemberRecordDTO teamMemberRecordDTO) {
-        teamMemberRecordDTO.setUserId(UserContext.get().getUserId());
+        Long memberUserId = UserContext.get().getUserId();
+        // 用户退出团队后 重新加入不再发加入的动态。
+        if (TaskConst.ActivityIcon.IC_JOIN.equals(teamMemberRecordDTO.getActivityIcon())) {
+            Integer count = memberRecordMapper.selectCount(
+                    new QueryWrapper<TeamMemberRecordDO>()
+                            .eq("user_id", memberUserId)
+                            .eq("team_id", teamMemberRecordDTO.getTeamId())
+            );
+            if (!Objects.equals(0, count)) {
+                return;
+            }
+        }
+        teamMemberRecordDTO.setUserId(memberUserId);
         Integer result = memberRecordMapper.insert(teamMemberRecordDTO.toDO(TeamMemberRecordDO.class));
         if (!Objects.equals(1, result)) {
             log.error("【团队成员发布动态】新增失败, teamMemberRecordDTO = [{}]", teamMemberRecordDTO);
@@ -254,8 +270,6 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         return Optional.ofNullable(countResult).orElse(0);
     }
 
-    @Autowired
-    private TeamTaskMapper teamTaskMapper;
 
     @Override
     @Deprecated // FIXME 极丑的实现
@@ -269,7 +283,24 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 //                                                      .lt("create_time", sunday)
         );
         return memberRecordDOList.stream()
-                .map(memberRecordDO -> teamTaskMapper.selectById(memberRecordDO.getTeamId()).getRewardExp())
+                .map(memberRecordDO ->
+                        Optional.ofNullable(teamTaskMapper.selectById(memberRecordDO.getTeamId()))
+                                .orElse(new TeamTaskDO().setRewardExp(0))
+                                .getRewardExp()
+                )
                 .reduce(0, (sum, e) -> sum + e);
+    }
+
+    @Override
+    public int quitTeam(Long teamId) {
+        Integer result = memberMapper.delete(
+                new QueryWrapper<TeamMemberDO>().eq("user_id", UserContext.get().getUserId())
+                        .eq("team_id", teamId)
+                        .eq("team_role", TaskConst.TeamRole.MEMBER)
+        );
+        if (Optional.ofNullable(result).orElse(0) == 0) {
+            log.error("【退出团队】失败，teamId = [{}], user = [{}]", teamId, UserContext.get());
+        }
+        return result;
     }
 }

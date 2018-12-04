@@ -57,6 +57,9 @@ public class UserDetailVO {
     @ApiModelProperty("关注者数量")
     private Long followerAmount;
 
+    @ApiModelProperty("-1自己；0未关注；1已关注；互相关注")
+    private Integer isFollow;
+
     public UserDetailVO() {
         this.teamAmount = 0;
         this.followingAmount = 0L;

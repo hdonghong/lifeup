@@ -46,6 +46,7 @@ public enum CodeMsgEnum {
     OUT_OF_DATE(500602, "逾期加入团队"),
     TEAM_IS_END(500603, "团队任务已经结束"),
     NOT_SIGN_TIME(500604, "未到签到时间"),
+    INVALID_BEHAVIOR(500605, "越权操作"),
 
     /** 团队成员模块 5007XX */
     NOT_TEAM_MEMBER(500701, "不是团队成员"),

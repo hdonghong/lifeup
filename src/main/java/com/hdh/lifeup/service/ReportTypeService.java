@@ -14,5 +14,6 @@ import java.util.List;
  */
 public interface ReportTypeService extends BaseService<ReportTypeDTO, ReportTypeDO> {
 
+    /** 获取所有的举报类型 */
     List<ReportTypeDTO> listAll();
 }

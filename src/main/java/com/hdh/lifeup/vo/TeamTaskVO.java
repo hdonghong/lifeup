@@ -54,4 +54,7 @@ public class TeamTaskVO implements Serializable {
     @ApiModelProperty(value = "团队开始日期（或者说是截止加入的日期）可选，慢于firstStartTime出现，日期数值上 < 开始签到时间的日期")
     private LocalDate startDate;
 
+    @ApiModelProperty(value = "团队头像")
+    private String teamHead;
+
 }

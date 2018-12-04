@@ -63,7 +63,9 @@ public class TeamMemberController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @DeleteMapping("/members/quit")
-    public ResultVO<?> quitTeam() {
-        return Result.success();
+    public ResultVO<?> quitTeam(@PathVariable Long teamId) {
+        return Result.success(
+                memberService.quitTeam(teamId)
+        );
     }
 }

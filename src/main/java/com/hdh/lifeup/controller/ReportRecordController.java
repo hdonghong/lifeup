@@ -16,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 /**
  * ReportRecordController class<br/>
  *
@@ -40,7 +42,7 @@ public class ReportRecordController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/new")
-    public ResultVO<?> addRecord(@RequestBody ReportRecordDTO reportRecordDTO) {
+    public ResultVO<?> addRecord(@RequestBody @Valid ReportRecordDTO reportRecordDTO) {
         reportRecordService.insert(reportRecordDTO);
         return Result.success();
     }

@@ -25,7 +25,13 @@ public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
      */
     NextSignVO addTeam(TeamTaskVO teamTaskVO);
 
-    PageDTO<TeamTaskDTO> page(PageDTO pageDTO);
+    /**
+     * 社区团队分页
+     * @param pageDTO 分页查询条件
+     * @param teamTitle 模糊团队标题
+     * @return 分页
+     */
+    PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle);
 
     /**
      * 获取成员加入的团队

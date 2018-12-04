@@ -133,7 +133,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         long expire = redisOperator.ttl(UserKey.TOKEN, authenticityToken);
         if (expire < TokenUtil.MIN_EXPIRED) {
             log.info("【通过token获取用户】当前用户Token有效时长expire = [{}], 重设", expire);
-            redisOperator.expire(UserKey.TOKEN, TokenContext.get());
+            redisOperator.expire(UserKey.TOKEN, authenticityToken);
         }
         return userInfoDTO;
     }
@@ -153,6 +153,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         userDetailVO.setFollowerAmount(redisOperator.zcard(UserKey.FOLLOWER, userId));
         // 关注的人的数量
         userDetailVO.setFollowingAmount(redisOperator.zcard(UserKey.FOLLOWING, userId));
+        // 关注的状态
+        userDetailVO.setIsFollow(getFollowStatus(UserContext.get().getUserId(), userId));
+
         return userDetailVO;
     }
 
@@ -309,6 +312,34 @@ public class UserInfoServiceImpl implements UserInfoService {
                       .list(userList)
                       .totalPage((long) Math.ceil((userSize * 1.0) / pageDTO.getSize()))
                       .build();
+    }
+
+    /**
+     * 判断b用户对于a用户而言的身份是否
+     * @param aUserId a用户id
+     * @param bUserId b用户id
+     * @return 身份
+     */
+    private int getFollowStatus(long aUserId, long bUserId) {
+        if (aUserId == bUserId) {
+            return FollowStatus.MYSELF;
+        }
+        // 先判断 b 是否 a关注的人
+        int aFollow = redisOperator.zrank(UserKey.FOLLOWING, aUserId, bUserId) != null ?
+                FollowStatus.FOLLOWING : FollowStatus.NOT_FOLLOW;
+        // 再判断 b 是否 a的粉丝
+        int bFollow = redisOperator.zrank(UserKey.FOLLOWER, aUserId, bUserId) != null ?
+                FollowStatus.FOLLOWING : FollowStatus.NOT_FOLLOW;
+
+        if (FollowStatus.FOLLOWING.equals(aFollow)) {
+            // b 是 a关注的人
+            if (FollowStatus.FOLLOWING.equals(bFollow)) {
+                // b 是否 a的粉丝 -> 互相关注
+                return FollowStatus.INTERACTIVE;
+            }
+            return FollowStatus.FOLLOWING;
+        }
+        return FollowStatus.NOT_FOLLOW;
     }
 
 }

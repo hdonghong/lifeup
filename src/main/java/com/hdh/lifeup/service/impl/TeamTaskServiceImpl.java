@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -101,8 +102,12 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         LocalDateTime firstEndTime = teamTaskVO.getFirstEndTime();
         teamTaskDTO.setFirstStartTime(firstStartTime)
                    .setFirstEndTime(firstEndTime)
-                   .setUserId(UserContext.get().getUserId())
-                   .setTeamHead(UserContext.get().getUserHead());
+                   .setUserId(UserContext.get().getUserId());
+        // 如果用户没有设置团队头像，就把用户头像设置为团队头像
+        if (StringUtils.isEmpty(teamTaskVO.getTeamHead())) {
+            teamTaskDTO.setTeamHead(UserContext.get().getUserHead());
+        }
+
         this.insert(teamTaskDTO);
         Long teamId = teamTaskDTO.getTeamId();
 
@@ -127,11 +132,16 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO) {
+    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle) {
         log.info("pageNo = " + pageDTO.getCurrentPage());
+        QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
+                        .orderByDesc("create_time");
+        if (!StringUtils.isEmpty(teamTitle)) {
+            wrapper = wrapper.like("team_title", "%" + teamTitle + "%");
+        }
         IPage<TeamTaskDO> taskDOPage = teamTaskMapper.selectPage(
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
-                new QueryWrapper<TeamTaskDO>().orderByDesc("create_time")
+                wrapper
         );
         return PageDTO.create(taskDOPage, TeamTaskDTO.class);
     }
@@ -175,7 +185,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setOwner(owner)
                     .setNextStartTime(nextSign.getNextStartTime())
                     .setNextEndTime(nextSign.getNextEndTime())
-                    .setIsMember(memberService.isMember(teamId, UserContext.get().getUserId()));
+                    .setIsMember(memberService.isMember(teamId, UserContext.get().getUserId()))
+                    .setIsOwner(UserContext.get().getUserId().equals(owner.getUserId()) ? 1 : 0);
         return teamDetailVO;
     }
 
@@ -250,6 +261,12 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Transactional(rollbackFor = Exception.class)
     public NextSignVO signIn(Long teamId, ActivityVO activityVO) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
+        // 判断当前用户是否团队成员
+        if (memberService.isMember(teamId, UserContext.get().getUserId()) == 0) {
+            log.error("【团队签到】用户不是团队成员");
+            throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
+        }
+
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
         LocalDateTime nowTime = LocalDateTime.now();
 
@@ -259,7 +276,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
         } else if (nowTime.isAfter(nextSign.getNextEndTime())) {
             // 超过签到时间
-            log.error("【团队签到】学员逾期签到，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
+            log.error("【团队签到】成员逾期签到，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
             throw new GlobalException(CodeMsgEnum.NOT_SIGN_TIME);
 
         } else {
@@ -290,7 +307,14 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public TeamTaskDTO update(TeamTaskDTO dto) {
+    public TeamTaskDTO update(TeamTaskDTO teamTaskDTO) {
+        TeamTaskDTO teamTaskDTOFromDB = getOne(teamTaskDTO.getTeamId());
+        if (UserContext.get().getUserId().equals(teamTaskDTOFromDB.getUserId())) {
+            log.error("【修改团队信息】越权操作，user = [{}], team = [{}], update = [{}]",
+                    UserContext.get(), teamTaskDTOFromDB, teamTaskDTO);
+            throw new GlobalException(CodeMsgEnum.INVALID_BEHAVIOR);
+        }
+        teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
         return null;
     }
 

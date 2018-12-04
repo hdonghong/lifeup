@@ -14,10 +14,10 @@ public class TokenUtil {
     public static final String AUTHENTICITY_TOKEN = "authenticity-token";
 
     /** 有效期 */
-    public static final int EXPIRE_SECONDS = 3600 * 24 * 3;
+    public static final int EXPIRE_SECONDS = 3600 * 24 * 7;
 
     /** 最小有效期，当小于时仍继续访问就为token增加有效时间 */
-    public static final int MIN_EXPIRED = 3600;
+    public static final int MIN_EXPIRED = 3600 * 24;
 
     public static String get() {
         return UUID.randomUUID().toString();
