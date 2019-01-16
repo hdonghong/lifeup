@@ -1,8 +1,9 @@
 package com.hdh.lifeup.controller;
 
+import com.hdh.lifeup.dto.AppVersionDTO;
+import com.hdh.lifeup.service.AppVersionService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.vo.ResultVO;
-import com.hdh.lifeup.vo.VersionVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,16 +22,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/version")
 public class VersionController {
 
-    private VersionVO versionVO;
+    private AppVersionService appVersionService;
 
     @Autowired
-    public VersionController(VersionVO versionVO) {
-        this.versionVO = versionVO;
+    public VersionController(AppVersionService appVersionService) {
+        this.appVersionService = appVersionService;
     }
 
     @ApiOperation(value = "获取最新版本号")
     @GetMapping
-    public ResultVO<VersionVO> getNewVersion() {
-        return Result.success(versionVO);
+    public ResultVO<AppVersionDTO> getLastVersion() {
+        return Result.success(
+                appVersionService.getLastVersion()
+        );
     }
 }
