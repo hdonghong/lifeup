@@ -114,10 +114,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         // 先获取下一次签到的VO
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
 
-        // 创建者作为新成员写入成员表
+        // 创建者作为owner写入成员表
         TeamMemberDTO memberDTO = new TeamMemberDTO()
                                             .setTeamId(teamId)
-                                            .setTeamRole(TeamRole.MEMBER);
+                                            .setTeamRole(TeamRole.OWNER);
         // 创建者默认发布第一条团队成员动态，此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                                             .setTeamId(teamId)
@@ -309,7 +309,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Override
     public TeamTaskDTO update(TeamTaskDTO teamTaskDTO) {
         TeamTaskDTO teamTaskDTOFromDB = getOne(teamTaskDTO.getTeamId());
-        if (UserContext.get().getUserId().equals(teamTaskDTOFromDB.getUserId())) {
+        if (!UserContext.get().getUserId().equals(teamTaskDTOFromDB.getUserId())) {
             log.error("【修改团队信息】越权操作，user = [{}], team = [{}], update = [{}]",
                     UserContext.get(), teamTaskDTOFromDB, teamTaskDTO);
             throw new GlobalException(CodeMsgEnum.INVALID_BEHAVIOR);
