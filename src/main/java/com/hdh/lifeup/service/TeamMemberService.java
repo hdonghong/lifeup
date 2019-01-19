@@ -71,11 +71,11 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
 
     /**
      * 获取多个用户动态列表
-     * @param userIds 用户ids
      * @param pageDTO 查询条件
+     * @param scope 动态范围
      * @return 动态列表
      */
-    PageDTO<RecordDTO> pageUsersRecords(Collection<Long> userIds, PageDTO pageDTO);
+    PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope);
 
     /**
      * 是否团队成员

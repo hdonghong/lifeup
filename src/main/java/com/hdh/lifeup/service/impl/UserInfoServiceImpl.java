@@ -223,13 +223,6 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public PageDTO<RecordDTO> getMoments(@NonNull Long userId, PageDTO pageDTO) {
-        Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
-        userIdSet.add(userId);
-        return memberService.pageUsersRecords(userIdSet, pageDTO);
-    }
-
-    @Override
     @Deprecated // FIXME 极丑的实现
     public PageDTO<UserListVO> getFollowingsRank(Long userId, PageDTO pageDTO) {
         Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);

@@ -61,9 +61,10 @@ public interface UserInfoService extends BaseService<UserInfoDTO, Long> {
      * 获取指定用户id的朋友圈
      * @param userId 用户id
      * @param pageDTO 分页条件
+     * @param scope 动态显示范围
      * @return 动态列表
      */
-    PageDTO<RecordDTO> getMoments(Long userId, PageDTO pageDTO);
+//    PageDTO<RecordDTO> getMoments(Long userId, PageDTO pageDTO, int scope);
 
     /**
      * 获取关注者的属性排行榜

@@ -39,5 +39,14 @@ public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> 
                 "</foreach>" +
             "order by r.create_time desc limit #{page.currentPage}, #{page.size} " +
             "</script>")
-    List<RecordDTO> getUsersRecords(@Param("userIds") Collection<Long> userIds, @Param("page") PageDTO pageDTO);
+    List<RecordDTO> getRecordsByUserIds(@Param("userIds") Collection<Long> userIds, @Param("page") PageDTO pageDTO);
+
+
+    /** 获取所有人可见的动态数据 */
+    @Select("select r.*, u.nickname, u.user_head from team_member_record r, user_info u " +
+            "where r.user_id = u.user_id " +
+            "and r.activity_icon <> 2 " +
+            "and r.activity_scope = 3 " +
+            "order by r.create_time desc limit #{page.currentPage}, #{page.size} ")
+    List<RecordDTO> getRecords(@Param("page") PageDTO pageDTO);
 }

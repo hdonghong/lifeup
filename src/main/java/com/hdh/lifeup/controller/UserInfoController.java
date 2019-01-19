@@ -3,6 +3,7 @@ package com.hdh.lifeup.controller;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.config.QiniuConfig;
+import com.hdh.lifeup.constant.TaskConst;
 import com.hdh.lifeup.dto.PageDTO;
 import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.TeamTaskDTO;
@@ -191,14 +192,19 @@ public class UserInfoController {
     }
 
     @ApiLimiting
-    @ApiOperation(value = "获取我的朋友圈")
+    @ApiOperation(value = "获取我的朋友圈scope=2 或 所有人的scope=3")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
-    @GetMapping(value = {"/moments"})
-    public ResultVO<PageDTO<RecordDTO>> getMoments(PageDTO pageDTO) {
+    @GetMapping(value = {"/moments", "/moments/{scope}"})
+    public ResultVO<PageDTO<RecordDTO>> getMoments(PageDTO pageDTO,
+                                                   @PathVariable(value = "scope", required = false) Integer scope) {
+        // 限定只能是朋友圈 或者 所有人
+        if (!TaskConst.ActivityScope.ALL.equals(scope)) {
+            scope = TaskConst.ActivityScope.MYFOLLOWERS;
+        }
         return Result.success(
-                userInfoService.getMoments(UserContext.get().getUserId(), pageDTO)
+                teamMemberService.getMoments(pageDTO, scope)
         );
     }
 }

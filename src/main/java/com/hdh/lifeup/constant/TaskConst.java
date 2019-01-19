@@ -33,4 +33,15 @@ public class TaskConst {
         public static final Integer GIVE_UP = 3;
     }
 
+    /** 动态的显示范围 */
+    public static class ActivityScope {
+
+        /** 所有人都可以看到 */
+        public static final Integer ALL = 3;
+        /** 只有关注了我的人才能看到 */
+        public static final Integer MYFOLLOWERS = 2;
+        /** 只有自己能看到 */
+        public static final Integer SECRET = 1;
+    }
+
 }

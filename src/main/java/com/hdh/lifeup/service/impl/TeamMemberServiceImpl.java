@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.constant.TaskConst;
 import com.hdh.lifeup.domain.TeamMemberDO;
 import com.hdh.lifeup.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.domain.TeamTaskDO;
@@ -36,6 +35,7 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
+import static com.hdh.lifeup.constant.TaskConst.*;
 import static com.hdh.lifeup.constant.UserConst.FollowStatus;
 
 /**
@@ -124,7 +124,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     public void addMemberRecord(TeamMemberRecordDTO teamMemberRecordDTO) {
         Long memberUserId = UserContext.get().getUserId();
         // 用户退出团队后 重新加入不再发加入的动态。
-        if (TaskConst.ActivityIcon.IC_JOIN.equals(teamMemberRecordDTO.getActivityIcon())) {
+        if (ActivityIcon.IC_JOIN.equals(teamMemberRecordDTO.getActivityIcon())) {
             Integer count = memberRecordMapper.selectCount(
                     new QueryWrapper<TeamMemberRecordDO>()
                             .eq("user_id", memberUserId)
@@ -227,15 +227,32 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     }
 
     @Override
-    public PageDTO<RecordDTO> pageUsersRecords(@NonNull Collection<Long> userIds, PageDTO pageDTO) {
-        Integer count = memberRecordMapper.selectCount(
-                new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIds)
-        );
+    public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope) {
         Long currentPage = pageDTO.getCurrentPage();
+        Integer count;
         List<RecordDTO> recordList = Lists.newArrayList();
-        if (Optional.ofNullable(count).orElse(0) > 0) {
-            pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-            recordList = memberRecordMapper.getUsersRecords(userIds, pageDTO);
+        // 如果是指定在圈子内
+        if (ActivityScope.MYFOLLOWERS.equals(scope)) {
+            Long userId = UserContext.get().getUserId();
+            Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
+            userIdSet.add(userId);
+            count = memberRecordMapper.selectCount(
+                    new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIdSet)
+            );
+
+            if (Optional.ofNullable(count).orElse(0) > 0) {
+                pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
+                recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO);
+            }
+        } else {
+            // 否则认为指定在所有人
+            count = memberRecordMapper.selectCount(
+                    new QueryWrapper<TeamMemberRecordDO>().ne("activity_icon", ActivityIcon.IC_JOIN)
+            );
+            if (Optional.ofNullable(count).orElse(0) > 0) {
+                pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
+                recordList = memberRecordMapper.getRecords(pageDTO);
+            }
         }
         return PageDTO.<RecordDTO>builder()
                       .currentPage(currentPage)
@@ -296,7 +313,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         Integer result = memberMapper.delete(
                 new QueryWrapper<TeamMemberDO>().eq("user_id", UserContext.get().getUserId())
                         .eq("team_id", teamId)
-                        .eq("team_role", TaskConst.TeamRole.MEMBER)
+                        .eq("team_role", TeamRole.MEMBER)
         );
         if (Optional.ofNullable(result).orElse(0) == 0) {
             log.error("【退出团队】失败，teamId = [{}], user = [{}]", teamId, UserContext.get());

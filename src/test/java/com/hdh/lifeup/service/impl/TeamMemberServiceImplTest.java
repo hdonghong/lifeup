@@ -25,8 +25,8 @@ public class TeamMemberServiceImplTest {
     public void pageUsersRecords() throws Exception {
         PageDTO<Object> pageDTO = PageDTO.builder().size(10L).totalPage(1L).currentPage(1L).build();
         List<Long> coll = Lists.newArrayList(1033007682448465921L, 1033280752341962754L, 1040252416820748289L);
-        PageDTO<RecordDTO> page = teamMemberService.pageUsersRecords(coll, pageDTO);
-        System.out.println(page);
+//        PageDTO<RecordDTO> page = teamMemberService.pageUsersRecords(coll, pageDTO);
+//        System.out.println(page);
     }
 
 }
