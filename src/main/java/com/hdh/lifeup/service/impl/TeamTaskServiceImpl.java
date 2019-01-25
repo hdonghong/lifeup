@@ -135,7 +135,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle) {
         log.info("pageNo = " + pageDTO.getCurrentPage());
         QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
-                        .orderByDesc("create_time");
+                        .orderByDesc("create_time")
+                        .ne("team_status", TaskStatus.COMPLETE);
         if (!StringUtils.isEmpty(teamTitle)) {
             wrapper = wrapper.like("team_title", "%" + teamTitle + "%");
         }
