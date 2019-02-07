@@ -199,8 +199,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     private NextSignVO getNextSign(TeamTaskDTO teamTaskDTO) {
-        if (TaskStatus.DOING.equals(teamTaskDTO.getTeamStatus())) {
-            throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
+        // 要求任务未终止
+        if (TaskStatus.COMPLETE.equals(teamTaskDTO.getTeamStatus())) {
+            throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
 
         List<TeamRecordDO> teamRecordDOList = teamRecordMapper.selectList(
@@ -304,6 +305,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public void endTeam(Long teamId) {
         TeamTaskDTO teamTaskDTO = getOne(teamId);
         teamTaskDTO.setTeamStatus(TaskStatus.COMPLETE);
+        teamTaskDTO.setCompleteTime(LocalDateTime.now());
         teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
     }
 
@@ -316,7 +318,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             throw new GlobalException(CodeMsgEnum.INVALID_BEHAVIOR);
         }
         teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
-        return null;
+        return teamTaskDTO;
     }
 
     @Override
