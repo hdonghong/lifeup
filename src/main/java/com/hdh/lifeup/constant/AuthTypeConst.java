@@ -12,5 +12,7 @@ public interface AuthTypeConst {
 
     String QQ = "qq";
 
+    String GOOGLE = "google";
+
     String PHONE = "phone";
 }
