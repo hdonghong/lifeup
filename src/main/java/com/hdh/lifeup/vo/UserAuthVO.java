@@ -39,8 +39,8 @@ public class UserAuthVO implements Serializable {
     private String userHead;
 
     /** 绑定的类型 */
-    @ApiModelProperty(value = "验证的类型，目前限定为qq、phone", example = "qq")
-    @Pattern(regexp = AuthTypeConst.PHONE + "|" + AuthTypeConst.QQ, message = "必须是系统支持的验证类型")
+    @ApiModelProperty(value = "验证的类型，目前限定为qq、phone、google", example = "qq")
+    @Pattern(regexp = AuthTypeConst.PHONE + "|" + AuthTypeConst.QQ + "|" + AuthTypeConst.GOOGLE, message = "必须是系统支持的验证类型")
     @NotEmpty
     private String authType;
 

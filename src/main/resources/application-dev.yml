@@ -7,7 +7,7 @@ spring:
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.jdbc.Driver
     username: root
-    password: toor
+    password: PZWI9jYnqt40pioE
     url: jdbc:mysql://localhost:3306/lifeup?characterEncoding=utf-8&useSSL=false
   jackson:
     time-zone: GMT+8

@@ -9,7 +9,6 @@ import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.domain.UserInfoDO;
 import com.hdh.lifeup.dto.AttributeDTO;
 import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
 import com.hdh.lifeup.dto.UserInfoDTO;
 import com.hdh.lifeup.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
