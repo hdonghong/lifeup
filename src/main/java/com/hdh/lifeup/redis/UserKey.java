@@ -26,4 +26,8 @@ public class UserKey<T> extends BasePrefix<T> {
 			TokenUtil.EXPIRE_SECONDS, "follower", Long.class
 	);
 
+	public static final UserKey<Long> LIKE_ACTIVITY = new UserKey<>(
+			TokenUtil.EXPIRE_SECONDS, "like_activity", Long.class
+	);
+
 }
