@@ -1,20 +1,16 @@
 package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
-import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.dto.ReportTypeDTO;
-import com.hdh.lifeup.dto.TaskDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.dto.ReportTypeDTO;
 import com.hdh.lifeup.service.ReportTypeService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 

@@ -1,12 +1,12 @@
 package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.RecordDTO;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.UserListVO;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.UserListVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.hdh.lifeup.domain.TeamRecordDO;
-import com.hdh.lifeup.vo.NextSignVO;
+import com.hdh.lifeup.model.domain.TeamRecordDO;
+import com.hdh.lifeup.model.vo.NextSignVO;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 

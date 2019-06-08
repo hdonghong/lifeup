@@ -1,14 +1,11 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
-import com.hdh.lifeup.dto.TeamMemberDTO;
-import com.hdh.lifeup.dto.TeamMemberRecordDTO;
-import com.hdh.lifeup.vo.UserListVO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.RecordDTO;
+import com.hdh.lifeup.model.dto.TeamMemberDTO;
+import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
+import com.hdh.lifeup.model.vo.UserListVO;
 import lombok.NonNull;
-
-import java.util.Collection;
 
 /**
  * TeamMemberService interface<br/>
@@ -16,7 +13,7 @@ import java.util.Collection;
  * @author hdonghong
  * @since 2018/09/11
  */
-public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
+public interface TeamMemberService {
 
     /**
      * 获取团队某个成员
@@ -25,6 +22,8 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @return 成员
      */
     TeamMemberDTO getOne(@NonNull Long teamId, @NonNull Long userId);
+
+    TeamMemberDTO insert(TeamMemberDTO teamMemberDTO);
 
     /**
      * 统计团队成员数量
@@ -113,4 +112,6 @@ public interface TeamMemberService extends BaseService<TeamMemberDTO, Long> {
      * @return 1退出成功；0失败
      */
     int quitTeam(Long teamId);
+
+    TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId);
 }

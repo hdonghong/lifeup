@@ -2,11 +2,11 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.dto.TaskDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.dto.TaskDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.service.TaskService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -40,7 +40,8 @@ public class TaskController {
     })
     @PostMapping("/new")
     public ResultVO<?> addTask(@RequestBody TaskDTO taskDTO) {
-        return Result.success(taskService.insert(taskDTO));
+        taskService.insert(taskDTO);
+        return Result.success(taskDTO);
     }
 
     @ApiLimiting

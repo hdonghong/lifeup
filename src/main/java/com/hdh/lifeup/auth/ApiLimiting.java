@@ -17,7 +17,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ApiLimiting {
 
     /** 规定时间内该账号最多可访问的指定接口的次数 */
-    int maxAccess() default 200;
+    int maxAccess() default 20;
 
     /** 规定时间 */
     int seconds() default 10;

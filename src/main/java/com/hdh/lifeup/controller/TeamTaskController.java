@@ -1,15 +1,12 @@
 package com.hdh.lifeup.controller;
 
-import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.config.QiniuConfig;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.vo.*;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.util.UploadUtil;
-import com.hdh.lifeup.vo.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -17,7 +14,6 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,12 +29,10 @@ import java.util.List;
 public class TeamTaskController {
 
     private TeamTaskService teamTaskService;
-    private QiniuConfig qiniuConfig;
 
     @Autowired
-    public TeamTaskController(TeamTaskService teamTaskService, QiniuConfig qiniuConfig) {
+    public TeamTaskController(TeamTaskService teamTaskService) {
         this.teamTaskService = teamTaskService;
-        this.qiniuConfig = qiniuConfig;
     }
 
     @ApiLimiting

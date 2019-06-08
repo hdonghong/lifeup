@@ -17,11 +17,11 @@ public abstract class BasePrefix<T> implements KeyPrefix<T> {
 	 * -1代表永不过期
 	 * @param prefix 前缀
 	 */
-	public BasePrefix(String prefix, Class<T> valueClass) {
+	protected BasePrefix(String prefix, Class<T> valueClass) {
 		this(-1, prefix, valueClass);
 	}
 	
-	public BasePrefix(int expireSeconds, String prefix, Class<T> valueClass) {
+	protected BasePrefix(int expireSeconds, String prefix, Class<T> valueClass) {
 		this.expireSeconds = expireSeconds;
 		this.prefix = prefix;
 		this.valueClass = valueClass;

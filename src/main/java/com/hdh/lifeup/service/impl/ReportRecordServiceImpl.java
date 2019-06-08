@@ -2,9 +2,9 @@ package com.hdh.lifeup.service.impl;
 
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.domain.ReportRecordDO;
-import com.hdh.lifeup.dto.ReportRecordDTO;
-import com.hdh.lifeup.mapper.ReportRecordMapper;
+import com.hdh.lifeup.model.domain.ReportRecordDO;
+import com.hdh.lifeup.model.dto.ReportRecordDTO;
+import com.hdh.lifeup.dao.ReportRecordMapper;
 import com.hdh.lifeup.service.ReportRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,30 +26,11 @@ public class ReportRecordServiceImpl implements ReportRecordService {
     }
 
     @Override
-    public ReportRecordDTO getOne(ReportRecordDO reportRecordDO) {
-        return null;
-    }
-
-    @Override
-    public ReportRecordDTO insert(ReportRecordDTO reportRecordDTO) {
+    public boolean insert(ReportRecordDTO reportRecordDTO) {
         Preconditions.checkNotNull(reportRecordDTO, "【新增举报记录】reportRecordDTO不能为空");
         reportRecordDTO.setReportUserId(UserContext.get().getUserId());
         reportRecordMapper.insert(reportRecordDTO.toDO(ReportRecordDO.class));
-        return reportRecordDTO;
+        return true;
     }
 
-    @Override
-    public ReportRecordDTO update(ReportRecordDTO reportRecordDTO) {
-        return null;
-    }
-
-    @Override
-    public ReportRecordDTO deleteLogically(ReportRecordDO reportRecordDO) {
-        return null;
-    }
-
-    @Override
-    public ReportRecordDTO delete(ReportRecordDO reportRecordDO) {
-        return null;
-    }
 }

@@ -1,8 +1,7 @@
 package com.hdh.lifeup.service.impl;
 
 import com.google.common.collect.Lists;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
+import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.service.TeamMemberService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,8 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
-
-import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest

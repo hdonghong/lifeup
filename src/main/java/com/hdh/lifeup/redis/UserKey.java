@@ -1,8 +1,7 @@
 package com.hdh.lifeup.redis;
 
-import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.util.TokenUtil;
-import com.hdh.lifeup.vo.UserListVO;
 
 /**
  * @author hdonghong
@@ -19,15 +18,15 @@ public class UserKey<T> extends BasePrefix<T> {
 	);
 
 	public static final UserKey<Long> FOLLOWING = new UserKey<>(
-			TokenUtil.EXPIRE_SECONDS, "following", Long.class
+			TokenUtil.EXPIRE_SECONDS,"following", Long.class
 	);
 
 	public static final UserKey<Long> FOLLOWER = new UserKey<>(
 			TokenUtil.EXPIRE_SECONDS, "follower", Long.class
 	);
 
-	public static final UserKey<Long> LIKE_ACTIVITY = new UserKey<>(
-			TokenUtil.EXPIRE_SECONDS, "like_activity", Long.class
+	public static final UserKey<Long> LIKE_COUNT = new UserKey<>(
+			TokenUtil.EXPIRE_SECONDS, "like_count", Long.class
 	);
 
 }

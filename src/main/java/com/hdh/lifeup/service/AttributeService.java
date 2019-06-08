@@ -1,7 +1,7 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.dto.AttributeDTO;
+import com.hdh.lifeup.model.dto.AttributeDTO;
+import lombok.NonNull;
 
 /**
  * AttributeService interface<br/>
@@ -9,7 +9,9 @@ import com.hdh.lifeup.dto.AttributeDTO;
  * @author hdonghong
  * @since 2018/08/25
  */
-public interface AttributeService extends BaseService<AttributeDTO, Long> {
+public interface AttributeService {
+
+    AttributeDTO insert(@NonNull AttributeDTO attributeDTO);
 
     /**
      * 通过userid查看自己人物详细属性
@@ -17,4 +19,6 @@ public interface AttributeService extends BaseService<AttributeDTO, Long> {
      * @return 属性
      */
     AttributeDTO getByUserId(Long userId);
+
+    AttributeDTO update(@NonNull AttributeDTO attributeDTO);
 }

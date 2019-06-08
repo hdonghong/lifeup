@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * MybatisPlusConfig class<br/>
- * remark: @MapperScan("com.baomidou.springboot.mapper*")//这个注解用于类上，作用相当于下面的@Bean MapperScannerConfigurer，2者配置1份即可
+ * remark: @MapperScan("com.baomidou.springboot.dao*")//这个注解用于类上，作用相当于下面的@Bean MapperScannerConfigurer，2者配置1份即可
  * @author hdonghong
  * @since 2018/08/13
  */
@@ -29,13 +29,13 @@ public class MybatisPlusConfig {
 
     /**
      * 相当于顶部的：
-     * {@code @MapperScan("com.baomidou.springboot.mapper*")}
+     * {@code @MapperScan("com.baomidou.springboot.dao*")}
      * 这里可以扩展，比如使用配置文件来配置扫描Mapper的路径
      */
     @Bean
     public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer scannerConfigurer = new MapperScannerConfigurer();
-        scannerConfigurer.setBasePackage("com.hdh.lifeup.mapper");
+        scannerConfigurer.setBasePackage("com.hdh.lifeup.dao");
         return scannerConfigurer;
     }
 

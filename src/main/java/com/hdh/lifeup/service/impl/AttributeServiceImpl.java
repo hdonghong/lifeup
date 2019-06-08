@@ -3,11 +3,11 @@ package com.hdh.lifeup.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.domain.AttributeDO;
-import com.hdh.lifeup.dto.AttributeDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.domain.AttributeDO;
+import com.hdh.lifeup.model.dto.AttributeDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.mapper.AttributeMapper;
+import com.hdh.lifeup.dao.AttributeMapper;
 import com.hdh.lifeup.service.AttributeService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -34,10 +34,7 @@ public class AttributeServiceImpl implements AttributeService {
         this.attributeMapper = attributeMapper;
     }
 
-    @Override
-    public AttributeDTO getOne(Long aLong) {
-        return null;
-    }
+
 
     @Override
     public AttributeDTO insert(@NonNull AttributeDTO attributeDTO) {
@@ -65,16 +62,6 @@ public class AttributeServiceImpl implements AttributeService {
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         return attributeDTO;
-    }
-
-    @Override
-    public AttributeDTO deleteLogically(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public AttributeDTO delete(Long aLong) {
-        return null;
     }
 
     @Override

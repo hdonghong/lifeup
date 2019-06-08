@@ -3,7 +3,7 @@ package com.hdh.lifeup.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 
 import java.util.ArrayList;

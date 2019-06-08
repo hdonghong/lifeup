@@ -1,7 +1,7 @@
 package com.hdh.lifeup.base;
 
-import com.hdh.lifeup.domain.UserInfoDO;
-import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.model.domain.UserInfoDO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
 import org.junit.Test;
 
 public class BaseDTOTest {

@@ -5,7 +5,7 @@ import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.config.QiniuConfig;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.util.UploadUtil;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

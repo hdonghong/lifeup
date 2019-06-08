@@ -1,5 +1,7 @@
 package com.hdh.lifeup.service;
 
+import com.hdh.lifeup.redis.KeyPrefix;
+
 /**
  * LikeService interface<br/>
  *
@@ -8,5 +10,13 @@ package com.hdh.lifeup.service;
  */
 public interface LikeService {
 
-    void doLike(Long userId, Long memberRecordId);
+    int doLike(Long userId, Long memberRecordId);
+
+    int undoLike(Long userId, Long memberRecordId);
+
+    int getUserLikeCount(Long userId);
+
+    int getRecordLikeCount(Long memberRecordId);
+
+    <T> int isLike(KeyPrefix<T> keyPrefix, long sourceId, long userId);
 }

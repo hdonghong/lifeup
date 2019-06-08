@@ -1,12 +1,12 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.TeamTaskDTO;
-import com.hdh.lifeup.vo.ActivityVO;
-import com.hdh.lifeup.vo.NextSignVO;
-import com.hdh.lifeup.vo.TeamDetailVO;
-import com.hdh.lifeup.vo.TeamTaskVO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.vo.ActivityVO;
+import com.hdh.lifeup.model.vo.NextSignVO;
+import com.hdh.lifeup.model.vo.TeamDetailVO;
+import com.hdh.lifeup.model.vo.TeamTaskVO;
+import lombok.NonNull;
 
 import java.util.List;
 
@@ -16,7 +16,14 @@ import java.util.List;
  * @author hdonghong
  * @since 2018/09/02
  */
-public interface TeamTaskService extends BaseService<TeamTaskDTO, Long> {
+public interface TeamTaskService {
+
+
+    TeamTaskDTO getOne(Long teamId);
+
+    TeamTaskDTO insert(@NonNull TeamTaskDTO teamTaskDTO);
+
+    TeamTaskDTO update(TeamTaskDTO teamTaskDTO);
 
     /**
      * 新增团队

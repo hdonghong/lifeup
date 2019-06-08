@@ -1,8 +1,8 @@
 package com.hdh.lifeup.exception;
 
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = GlobalException.class)
     public ResultVO<?> handlerGlobalException(GlobalException e) {
-        log.error("【系统预知异常】e = [{}]", e);
+        log.error("【系统预知异常】e = [{}]", e.toString());
         return Result.error((e.getCodeMsgEnum()));
     }
 

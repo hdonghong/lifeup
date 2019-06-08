@@ -1,9 +1,9 @@
 package com.hdh.lifeup.controller;
 
-import com.hdh.lifeup.dto.AppVersionDTO;
+import com.hdh.lifeup.model.dto.AppVersionDTO;
 import com.hdh.lifeup.service.AppVersionService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

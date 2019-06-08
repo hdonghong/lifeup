@@ -6,22 +6,25 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.domain.TeamMemberDO;
-import com.hdh.lifeup.domain.TeamMemberRecordDO;
-import com.hdh.lifeup.domain.TeamTaskDO;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
-import com.hdh.lifeup.dto.TeamMemberDTO;
-import com.hdh.lifeup.dto.TeamMemberRecordDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.dao.TeamMemberMapper;
+import com.hdh.lifeup.dao.TeamMemberRecordMapper;
+import com.hdh.lifeup.dao.TeamTaskMapper;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.mapper.TeamMemberMapper;
-import com.hdh.lifeup.mapper.TeamMemberRecordMapper;
-import com.hdh.lifeup.mapper.TeamTaskMapper;
+import com.hdh.lifeup.model.domain.TeamMemberDO;
+import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
+import com.hdh.lifeup.model.domain.TeamTaskDO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.RecordDTO;
+import com.hdh.lifeup.model.dto.TeamMemberDTO;
+import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.vo.UserListVO;
+import com.hdh.lifeup.redis.LikeKey;
+import com.hdh.lifeup.redis.MemberRecordKey;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
+import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.TeamMemberService;
-import com.hdh.lifeup.vo.UserListVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,8 +38,8 @@ import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 
-import static com.hdh.lifeup.constant.TaskConst.*;
-import static com.hdh.lifeup.constant.UserConst.FollowStatus;
+import static com.hdh.lifeup.model.constant.TaskConst.*;
+import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
 
 /**
  * TeamMemberServiceImpl class<br/>
@@ -48,22 +51,21 @@ import static com.hdh.lifeup.constant.UserConst.FollowStatus;
 @Service
 public class TeamMemberServiceImpl implements TeamMemberService {
 
+    @Autowired
     private TeamMemberMapper memberMapper;
+
+    @Autowired
     private TeamMemberRecordMapper memberRecordMapper;
+
+    @Autowired
     private RedisOperator redisOperator;
+
     // FIXME
+    @Autowired
     private TeamTaskMapper teamTaskMapper;
 
     @Autowired
-    public TeamMemberServiceImpl(TeamMemberMapper memberMapper,
-                                 TeamMemberRecordMapper memberRecordMapper,
-                                 RedisOperator redisOperator,
-                                 TeamTaskMapper teamTaskMapper) {
-        this.memberMapper = memberMapper;
-        this.memberRecordMapper = memberRecordMapper;
-        this.redisOperator = redisOperator;
-        this.teamTaskMapper = teamTaskMapper;
-    }
+    private LikeService likeService;
 
     @Override
     public TeamMemberDTO getOne(@NonNull Long teamId, @NonNull Long userId) {
@@ -74,14 +76,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         TeamMemberDTO teamMemberDTO = BaseDTO.from(teamMemberDO, TeamMemberDTO.class);
         if (teamMemberDTO == null) {
             log.error("【获取团队某个成员】不存在的成员，teamId = [{}], userId = [{}]", teamId, userId);
-            throw new GlobalException(CodeMsgEnum.NOT_TEAM_MEMBER);
+            throw new GlobalException(CodeMsgEnum.MEMBER_NOT_IN_TEAM);
         }
         return teamMemberDTO;
-    }
-
-    @Override
-    public TeamMemberDTO getOne(Long aLong) {
-        return null;
     }
 
     @Override
@@ -94,21 +91,6 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         return teamMemberDTO;
-    }
-
-    @Override
-    public TeamMemberDTO update(TeamMemberDTO dto) {
-        return null;
-    }
-
-    @Override
-    public TeamMemberDTO deleteLogically(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public TeamMemberDTO delete(Long aLong) {
-        return null;
     }
 
     @Override
@@ -194,21 +176,35 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Override
     public PageDTO<RecordDTO> pageMemberRecords(Long teamId, PageDTO pageDTO) {
-        // FIXME 没有limit
         Integer count = memberRecordMapper.selectCount(
                 new QueryWrapper<TeamMemberRecordDO>().eq("team_id", teamId)
         );
+        long totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
         Long currentPage = pageDTO.getCurrentPage();
+
         List<RecordDTO> recordList = Lists.newArrayList();
-        if (Optional.ofNullable(count).orElse(0) > 0) {
+        if (totalPage > currentPage) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
             recordList = memberRecordMapper.getMemberRecords(teamId, pageDTO);
+            Long userId = UserContext.get().getUserId();
+            assembleRecordList(recordList, userId);
         }
+
         return PageDTO.<RecordDTO>builder()
                 .currentPage(currentPage)
                 .list(recordList)
-                .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
+                .totalPage(totalPage)
                 .build();
+    }
+
+    private void assembleRecordList(List<RecordDTO> recordList, Long userId) {
+        recordList.forEach(recordDTO -> {
+            Long memberRecordId = recordDTO.getMemberRecordId();
+            int isLike = likeService.isLike(LikeKey.ACTIVITY, memberRecordId, userId);
+            int likeCount = likeService.getRecordLikeCount(memberRecordId);
+            recordDTO.setIsLike(isLike)
+                    .setLikeCount(likeCount);
+        });
     }
 
     @Override
@@ -221,7 +217,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
                 new QueryWrapper<TeamMemberRecordDO>()
                         .eq("user_id", userId)
-                        .orderByDesc("create_time")
+                        .orderByDesc("member_record_id")
         );
         return PageDTO.createFreely(userRecordsPage, RecordDTO.class);
     }
@@ -230,17 +226,18 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope) {
         Long currentPage = pageDTO.getCurrentPage();
         Integer count;
+        long totalPage;
+        Long userId = UserContext.get().getUserId();
         List<RecordDTO> recordList = Lists.newArrayList();
         // 如果是指定在圈子内
         if (ActivityScope.MYFOLLOWERS.equals(scope)) {
-            Long userId = UserContext.get().getUserId();
             Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
             userIdSet.add(userId);
             count = memberRecordMapper.selectCount(
                     new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIdSet)
             );
-
-            if (Optional.ofNullable(count).orElse(0) > 0) {
+            totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
+            if (totalPage > currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
                 recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO);
             }
@@ -249,11 +246,13 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             count = memberRecordMapper.selectCount(
                     new QueryWrapper<TeamMemberRecordDO>().ne("activity_icon", ActivityIcon.IC_JOIN)
             );
-            if (Optional.ofNullable(count).orElse(0) > 0) {
+            totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
+            if (totalPage > currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
                 recordList = memberRecordMapper.getRecords(pageDTO);
             }
         }
+        assembleRecordList(recordList, userId);
         return PageDTO.<RecordDTO>builder()
                       .currentPage(currentPage)
                       .list(recordList)
@@ -319,5 +318,23 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             log.error("【退出团队】失败，teamId = [{}], user = [{}]", teamId, UserContext.get());
         }
         return result;
+    }
+
+    @Override
+    public TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId) {
+        TeamMemberRecordDTO teamMemberRecordDTO = redisOperator.get(MemberRecordKey.ID, memberRecordId);
+        if (teamMemberRecordDTO != null) {
+            return teamMemberRecordDTO;
+        }
+
+        TeamMemberRecordDO memberRecordDO = memberRecordMapper.selectById(memberRecordId);
+        if (memberRecordDO == null) {
+            log.error("【获取成员记录】不存在，memberRecordId = [{}]", memberRecordId);
+            throw new GlobalException(CodeMsgEnum.MEMBER_RECORD_NOT_EXIT);
+        }
+        teamMemberRecordDTO = BaseDTO.from(memberRecordDO, TeamMemberRecordDTO.class);
+        redisOperator.set(MemberRecordKey.ID, memberRecordId, teamMemberRecordDTO);
+
+        return teamMemberRecordDTO;
     }
 }

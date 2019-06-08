@@ -1,7 +1,7 @@
 package com.hdh.lifeup.util;
 
-import com.hdh.lifeup.enums.CodeMsgEnum;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.vo.ResultVO;
 
 /**
  * Result class<br/>

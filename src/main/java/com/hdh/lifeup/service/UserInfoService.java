@@ -1,11 +1,10 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.RecordDTO;
-import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.vo.UserDetailVO;
-import com.hdh.lifeup.vo.UserListVO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.vo.UserDetailVO;
+import com.hdh.lifeup.model.vo.UserListVO;
+import lombok.NonNull;
 
 /**
  * UserInfoService interface<br/>
@@ -13,7 +12,13 @@ import com.hdh.lifeup.vo.UserListVO;
  * @author hdonghong
  * @since 2018/08/14
  */
-public interface UserInfoService extends BaseService<UserInfoDTO, Long> {
+public interface UserInfoService {
+
+    UserInfoDTO getOne(@NonNull Long userId);
+
+    UserInfoDTO insert(@NonNull UserInfoDTO userInfoDTO);
+
+    UserInfoDTO update(@NonNull UserInfoDTO userInfoDTO);
 
     /**
      * 缓存取，缓存存，通过token获取user

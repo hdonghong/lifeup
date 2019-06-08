@@ -1,6 +1,6 @@
 package com.hdh.lifeup.exception;
 
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import lombok.Getter;
 
 /**

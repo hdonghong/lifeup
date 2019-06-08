@@ -1,7 +1,7 @@
 package com.hdh.lifeup.service.impl;
 
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.dto.UserInfoDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.service.UserInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;

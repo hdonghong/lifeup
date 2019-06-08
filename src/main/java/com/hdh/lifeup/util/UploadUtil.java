@@ -1,20 +1,15 @@
 package com.hdh.lifeup.util;
 
 import com.hdh.lifeup.config.QiniuConfig;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
-import com.qiniu.common.QiniuException;
 import com.qiniu.common.Zone;
 import com.qiniu.storage.Configuration;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.util.Auth;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
  * @author		hdonghong

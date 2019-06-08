@@ -3,20 +3,20 @@ package com.hdh.lifeup.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import com.hdh.lifeup.constant.AuthTypeConst;
-import com.hdh.lifeup.domain.UserAuthDO;
-import com.hdh.lifeup.dto.UserAuthDTO;
-import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.constant.AuthTypeConst;
+import com.hdh.lifeup.model.domain.UserAuthDO;
+import com.hdh.lifeup.model.dto.UserAuthDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.mapper.UserAuthMapper;
+import com.hdh.lifeup.dao.UserAuthMapper;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.UserAuthService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
-import com.hdh.lifeup.vo.UserAuthVO;
+import com.hdh.lifeup.model.vo.UserAuthVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -50,11 +50,6 @@ public class UserAuthServiceImpl implements UserAuthService {
     }
 
     @Override
-    public UserAuthDTO getOne(Long aLong) {
-        return null;
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public UserAuthDTO insert(UserAuthDTO userAuthDTO) {
         Preconditions.checkNotNull(userAuthDTO, "【新增用户鉴权记录】UserAuthDTO类不能为空");
@@ -79,20 +74,6 @@ public class UserAuthServiceImpl implements UserAuthService {
         return userAuthDTO;
     }
 
-    @Override
-    public UserAuthDTO update(UserAuthDTO dto) {
-        return null;
-    }
-
-    @Override
-    public UserAuthDTO deleteLogically(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public UserAuthDTO delete(Long aLong) {
-        return null;
-    }
 
     @Override
     @Transactional(rollbackFor = Exception.class)

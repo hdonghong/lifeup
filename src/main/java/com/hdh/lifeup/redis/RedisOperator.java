@@ -89,6 +89,12 @@ public class RedisOperator {
         return Optional.ofNullable(count).orElse(0L);
     }
 
+    public long decr(@NonNull KeyPrefix keyPrefix, @NonNull Object key) {
+        String realKey = getRealKey(keyPrefix, key);
+        Long count = redisTemplate.opsForValue().increment(realKey, -1L);
+        return Optional.ofNullable(count).orElse(0L);
+    }
+
     /**
      * 类型redis 中的mset
      * @param keyAndValues 要求传参格式为,(k1, v1, k2, v2, ... kn, vn)
@@ -213,6 +219,19 @@ public class RedisOperator {
         Set<String> members = redisTemplate.opsForSet().members(realKey);
         return members != null ?
                 members.stream().map(member -> JsonUtil.jsonToObject(member, keyPrefix.getValueClass())).collect(Collectors.toSet()) : Sets.newHashSet();
+    }
+
+    /**
+     * 获取set集合元素数量，不存在时返回0
+     * @param keyPrefix
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> long scard(@NonNull KeyPrefix<T> keyPrefix, @NonNull Object key) {
+        String realKey = getRealKey(keyPrefix, key);
+        Long membersCount = redisTemplate.opsForSet().size(realKey);
+        return Optional.ofNullable(membersCount).orElse(0L);
     }
 
     // zset

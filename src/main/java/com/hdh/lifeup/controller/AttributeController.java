@@ -2,10 +2,10 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.dto.AttributeDTO;
+import com.hdh.lifeup.model.dto.AttributeDTO;
 import com.hdh.lifeup.service.AttributeService;
 import com.hdh.lifeup.util.Result;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;

@@ -7,20 +7,20 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.domain.TeamRecordDO;
-import com.hdh.lifeup.domain.TeamTaskDO;
-import com.hdh.lifeup.dto.*;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.dao.TeamRecordMapper;
+import com.hdh.lifeup.dao.TeamTaskMapper;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.mapper.TeamRecordMapper;
-import com.hdh.lifeup.mapper.TeamTaskMapper;
+import com.hdh.lifeup.model.domain.TeamRecordDO;
+import com.hdh.lifeup.model.domain.TeamTaskDO;
+import com.hdh.lifeup.model.dto.*;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.vo.ActivityVO;
+import com.hdh.lifeup.model.vo.NextSignVO;
+import com.hdh.lifeup.model.vo.TeamDetailVO;
+import com.hdh.lifeup.model.vo.TeamTaskVO;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
-import com.hdh.lifeup.vo.ActivityVO;
-import com.hdh.lifeup.vo.NextSignVO;
-import com.hdh.lifeup.vo.TeamDetailVO;
-import com.hdh.lifeup.vo.TeamTaskVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.hdh.lifeup.constant.TaskConst.*;
+import static com.hdh.lifeup.model.constant.TaskConst.*;
 
 /**
  * TeamTaskServiceImpl class<br/>
@@ -135,7 +135,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle) {
         log.info("pageNo = " + pageDTO.getCurrentPage());
         QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
-                        .orderByDesc("create_time")
+                        .orderByDesc("team_id")
                         .ne("team_status", TaskStatus.COMPLETE);
         if (!StringUtils.isEmpty(teamTitle)) {
             wrapper = wrapper.like("team_title", "%" + teamTitle + "%");
@@ -207,7 +207,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         List<TeamRecordDO> teamRecordDOList = teamRecordMapper.selectList(
                 new QueryWrapper<TeamRecordDO>().eq("team_id", teamTaskDTO.getTeamId())
                                                 .gt("next_end_time", LocalDateTime.now())
-                                                .orderByAsc("create_time")
+                                                .orderByAsc("team_record_id")
         );
 
         // 如果没有下一次的签到信息，就直接生成后返回
@@ -274,12 +274,12 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
         if (nowTime.isBefore(nextSign.getNextStartTime())) {
             // 未到签到时间
-            throw new GlobalException(CodeMsgEnum.NOT_SIGN_TIME);
+            throw new GlobalException(CodeMsgEnum.TEAM_NOT_SIGN_TIME);
 
         } else if (nowTime.isAfter(nextSign.getNextEndTime())) {
             // 超过签到时间
             log.error("【团队签到】成员逾期签到，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
-            throw new GlobalException(CodeMsgEnum.NOT_SIGN_TIME);
+            throw new GlobalException(CodeMsgEnum.TEAM_NOT_SIGN_TIME);
 
         } else {
             // 可以签到
@@ -315,20 +315,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         if (!UserContext.get().getUserId().equals(teamTaskDTOFromDB.getUserId())) {
             log.error("【修改团队信息】越权操作，user = [{}], team = [{}], update = [{}]",
                     UserContext.get(), teamTaskDTOFromDB, teamTaskDTO);
-            throw new GlobalException(CodeMsgEnum.INVALID_BEHAVIOR);
+            throw new GlobalException(CodeMsgEnum.TEAM_INVALID_BEHAVIOR);
         }
         teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
         return teamTaskDTO;
-    }
-
-    @Override
-    public TeamTaskDTO deleteLogically(Long aLong) {
-        return null;
-    }
-
-    @Override
-    public TeamTaskDTO delete(Long aLong) {
-        return null;
     }
 
     /**

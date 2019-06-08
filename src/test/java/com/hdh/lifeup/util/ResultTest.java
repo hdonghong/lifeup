@@ -1,13 +1,11 @@
 package com.hdh.lifeup.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.hdh.lifeup.enums.CodeMsgEnum;
-import com.hdh.lifeup.vo.ResultVO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.vo.ResultVO;
 import org.junit.Test;
 
 import java.util.HashMap;
-
-import static org.junit.Assert.*;
 
 public class ResultTest {
 

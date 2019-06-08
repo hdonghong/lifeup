@@ -1,8 +1,8 @@
 package com.hdh.lifeup.auth;
 
 import com.google.common.collect.Maps;
-import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.redis.ApiKey;
 import com.hdh.lifeup.redis.RedisOperator;

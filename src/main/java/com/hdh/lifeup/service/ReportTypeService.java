@@ -1,8 +1,6 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.domain.ReportTypeDO;
-import com.hdh.lifeup.dto.ReportTypeDTO;
+import com.hdh.lifeup.model.dto.ReportTypeDTO;
 
 import java.util.List;
 
@@ -12,7 +10,7 @@ import java.util.List;
  * @author hdonghong
  * @since 2018/10/21
  */
-public interface ReportTypeService extends BaseService<ReportTypeDTO, ReportTypeDO> {
+public interface ReportTypeService {
 
     /** 获取所有的举报类型 */
     List<ReportTypeDTO> listAll();

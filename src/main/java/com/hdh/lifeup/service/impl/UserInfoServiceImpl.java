@@ -6,13 +6,15 @@ import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.TokenContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.domain.UserInfoDO;
-import com.hdh.lifeup.dto.AttributeDTO;
-import com.hdh.lifeup.dto.PageDTO;
-import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.enums.CodeMsgEnum;
+import com.hdh.lifeup.dao.UserInfoMapper;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.mapper.UserInfoMapper;
+import com.hdh.lifeup.model.domain.UserInfoDO;
+import com.hdh.lifeup.model.dto.AttributeDTO;
+import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.vo.UserDetailVO;
+import com.hdh.lifeup.model.vo.UserListVO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.AttributeService;
@@ -20,8 +22,6 @@ import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
-import com.hdh.lifeup.vo.UserDetailVO;
-import com.hdh.lifeup.vo.UserListVO;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -29,14 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.hdh.lifeup.constant.UserConst.FollowStatus;
+import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
 
 /**
  * UserInfoServiceImpl class<br/>
@@ -103,20 +102,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         redisOperator.setex(UserKey.TOKEN, TokenContext.get(), cachedUserInfoDTO);
         return cachedUserInfoDTO;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public UserInfoDTO deleteLogically(
-            @NotNull(message = "【删除用户】用户id不能为空") Long userId) {
-        return null;
-    }
-
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public UserInfoDTO delete(
-            @NotNull(message = "【删除用户】用户id不能为空") Long userId) {
-        return null;
     }
 
     @Override
@@ -248,7 +233,6 @@ public class UserInfoServiceImpl implements UserInfoService {
             userListVO.setPoint(attribute);
         });
         userList.sort((o1, o2) -> o2.getPoint() - o1.getPoint());
-//        userList.sort(Comparator.comparingInt(UserListVO::getPoint));
         for (int i = 0, len = userList.size(); i < len; i++) {
             userList.get(i).setRank(i + 1);
         }

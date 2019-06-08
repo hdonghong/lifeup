@@ -1,9 +1,8 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.base.BaseService;
-import com.hdh.lifeup.dto.UserAuthDTO;
-import com.hdh.lifeup.dto.UserInfoDTO;
-import com.hdh.lifeup.vo.UserAuthVO;
+import com.hdh.lifeup.model.dto.UserAuthDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.vo.UserAuthVO;
 import lombok.NonNull;
 
 /**
@@ -12,7 +11,9 @@ import lombok.NonNull;
  * @author hdonghong
  * @since 2018/08/22
  */
-public interface UserAuthService extends BaseService<UserAuthDTO, Long> {
+public interface UserAuthService {
+
+    UserAuthDTO insert(UserAuthDTO userAuthDTO);
 
     /**
      * 第三方登录，取DB，都没有就插入，最后存到Redis，返回token
