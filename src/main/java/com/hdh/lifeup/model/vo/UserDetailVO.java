@@ -60,6 +60,9 @@ public class UserDetailVO {
     @ApiModelProperty("-1自己；0未关注；1已关注；互相关注")
     private Integer isFollow;
 
+    @ApiModelProperty("获赞的数量")
+    private Integer likeCount;
+
     public UserDetailVO() {
         this.teamAmount = 0;
         this.followingAmount = 0L;

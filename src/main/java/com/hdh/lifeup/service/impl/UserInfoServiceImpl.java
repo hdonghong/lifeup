@@ -18,6 +18,7 @@ import com.hdh.lifeup.model.vo.UserListVO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.AttributeService;
+import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.PasswordUtil;
@@ -51,6 +52,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private UserInfoMapper userInfoMapper;
     private AttributeService attributeService;
     private TeamMemberService memberService;
+    @Autowired
+    private LikeService likeService;
 
     @Autowired
     public UserInfoServiceImpl(RedisOperator redisOperator,
@@ -139,6 +142,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         userDetailVO.setFollowingAmount(redisOperator.zcard(UserKey.FOLLOWING, userId));
         // 关注的状态
         userDetailVO.setIsFollow(getFollowStatus(UserContext.get().getUserId(), userId));
+        // 获赞数量
+        userDetailVO.setLikeCount(likeService.getUserLikeCount(userId));
 
         return userDetailVO;
     }
