@@ -7,6 +7,8 @@ import com.hdh.lifeup.exception.AsyncException;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.domain.LikeMemberRecordDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
+import com.hdh.lifeup.redis.RedisOperator;
+import com.hdh.lifeup.redis.UserKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -31,6 +33,9 @@ public class AsyncTaskService {
 
     @Autowired
     private LikeCountUserMapper likeCountUserMapper;
+
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Async("taskExecutor")
     public void doLike(Long userId, TeamMemberRecordDTO memberRecordDTO){
@@ -61,6 +66,13 @@ public class AsyncTaskService {
             return;
         }
         likeCountUserMapper.incr(userId, -1);
+    }
+
+    @Async("taskExecutor")
+    public void exchangeLike(Long userId, int count) {
+//        redisOperator.decrby(UserKey.LIKE_COUNT, userId, count);
+        redisOperator.incrby(UserKey.LIKE_COUNT_EXCHANGED, userId, count);
+        likeCountUserMapper.incr(userId, -count);
     }
 
 

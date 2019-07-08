@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.model.domain.TeamRecordDO;
+import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.vo.NextSignVO;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
@@ -116,5 +119,13 @@ public class OtherTest {
 
         System.out.println(list.subList(3, 3 + size));
         // 4, 5, 6
+    }
+
+    @Test
+    public void testMemberRecordDTO() {
+        TeamMemberRecordDO memberRecordDO = new TeamMemberRecordDO()
+                .setActivityImages("[\"http://lifeup.hdonghong.top/images/activities/289a7a87-ab0a-4b80-9daf-d45f4f20cefe.jpg\"]");
+        TeamMemberRecordDTO from = BaseDTO.from(memberRecordDO, TeamMemberRecordDTO.class);
+        System.out.println(from);
     }
 }

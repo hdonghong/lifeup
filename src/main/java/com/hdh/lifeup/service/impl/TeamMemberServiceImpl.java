@@ -183,7 +183,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         Long currentPage = pageDTO.getCurrentPage();
 
         List<RecordDTO> recordList = Lists.newArrayList();
-        if (totalPage > currentPage) {
+        if (totalPage >= currentPage) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
             recordList = memberRecordMapper.getMemberRecords(teamId, pageDTO);
             Long userId = UserContext.get().getUserId();
@@ -237,7 +237,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                     new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIdSet)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
-            if (totalPage > currentPage) {
+            if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
                 recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO);
             }
@@ -247,7 +247,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                     new QueryWrapper<TeamMemberRecordDO>().ne("activity_icon", ActivityIcon.IC_JOIN)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
-            if (totalPage > currentPage) {
+            if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
                 recordList = memberRecordMapper.getRecords(pageDTO);
             }

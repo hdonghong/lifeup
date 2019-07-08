@@ -29,4 +29,8 @@ public class UserKey<T> extends BasePrefix<T> {
 			TokenUtil.EXPIRE_SECONDS, "like_count", Long.class
 	);
 
+	public static final UserKey<Long> LIKE_COUNT_EXCHANGED = new UserKey<>(
+			TokenUtil.EXPIRE_SECONDS, "like_count_exchanged", Long.class
+	);
+
 }

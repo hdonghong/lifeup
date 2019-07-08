@@ -13,7 +13,7 @@ import lombok.experimental.Accessors;
  * @author hdonghong
  * @since 2019/06/08
  */
-@TableName("`like_member_record`")
+@TableName("`like_count_user`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)

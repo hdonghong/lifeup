@@ -2,6 +2,7 @@ package com.hdh.lifeup.service.impl;
 
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.service.TeamMemberService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,6 +15,13 @@ import java.util.List;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class TeamMemberServiceImplTest {
+
+    @Test
+    public void getOneMemberRecord() throws Exception {
+
+        TeamMemberRecordDTO oneMemberRecord = teamMemberService.getOneMemberRecord(1L);
+        System.out.println(oneMemberRecord);
+    }
 
     @Autowired
     private TeamMemberService teamMemberService;

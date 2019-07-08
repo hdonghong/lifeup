@@ -16,4 +16,5 @@ import lombok.experimental.Accessors;
 public class LikeVO {
 
     private Integer likeCount;
+    private Integer exchangedLikeCount;
 }

@@ -3,6 +3,8 @@ package com.hdh.lifeup.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.hdh.lifeup.config.JacksonSerializerConfig;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
 
@@ -18,7 +20,7 @@ import java.util.List;
 public class JsonUtil {
 
     /** 定义jackson对象 */
-    private static final ObjectMapper MAPPER = new ObjectMapper();
+    private static final ObjectMapper MAPPER = new JacksonSerializerConfig().objectMapper();
 
     /**
      * 将对象转换成json字符串。
@@ -56,6 +58,9 @@ public class JsonUtil {
      * @return 对象list
      */
     public static <T> List<T> jsonToList(String jsonData, Class<T> valueType) {
+        if (jsonData == null) {
+            return Lists.newArrayList();
+        }
         JavaType javaType = MAPPER.getTypeFactory().constructParametricType(List.class, valueType);
         try {
             return MAPPER.readValue(jsonData, javaType);

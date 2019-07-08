@@ -54,6 +54,7 @@ public enum CodeMsgEnum {
 
     /** 点赞 */
     LIKE_ERROR(500801, "点赞操作失败"),
+    LIKE_NOT_ENOUGH(500802, "点赞数不足"),
     ;
 
     private int code;

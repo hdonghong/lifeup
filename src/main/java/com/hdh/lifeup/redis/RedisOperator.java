@@ -89,9 +89,21 @@ public class RedisOperator {
         return Optional.ofNullable(count).orElse(0L);
     }
 
+    public long incrby(@NonNull KeyPrefix keyPrefix, @NonNull Object key, int value) {
+        String realKey = getRealKey(keyPrefix, key);
+        Long count = redisTemplate.opsForValue().increment(realKey, value);
+        return Optional.ofNullable(count).orElse(0L);
+    }
+
     public long decr(@NonNull KeyPrefix keyPrefix, @NonNull Object key) {
         String realKey = getRealKey(keyPrefix, key);
         Long count = redisTemplate.opsForValue().increment(realKey, -1L);
+        return Optional.ofNullable(count).orElse(0L);
+    }
+
+    public long decrby(@NonNull KeyPrefix keyPrefix, @NonNull Object key, int value) {
+        String realKey = getRealKey(keyPrefix, key);
+        Long count = redisTemplate.opsForValue().increment(realKey, -value);
         return Optional.ofNullable(count).orElse(0L);
     }
 

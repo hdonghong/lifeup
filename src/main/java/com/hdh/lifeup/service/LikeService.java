@@ -16,7 +16,11 @@ public interface LikeService {
 
     int getUserLikeCount(Long userId);
 
+    int getUserExchangedLikeCount(Long userId);
+
     int getRecordLikeCount(Long memberRecordId);
 
     <T> int isLike(KeyPrefix<T> keyPrefix, long sourceId, long userId);
+
+    int exchangeLike(Long userId, Integer count);
 }
