@@ -125,6 +125,18 @@ public class UserInfoController {
     }
 
     @ApiLimiting
+    @ApiOperation(value = "用户删除动态")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "memberRecordId", paramType = "path", dataType = "Long"),
+    })
+    @DeleteMapping(value = {"/activities/{memberRecordId}"})
+    public ResultVO delActivity(@PathVariable Long memberRecordId) {
+        teamMemberService.delUserRecord(memberRecordId, UserContext.get().getUserId());
+        return Result.success();
+    }
+
+    @ApiLimiting
     @ApiOperation(value = "获取指定用户加入的团队列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),

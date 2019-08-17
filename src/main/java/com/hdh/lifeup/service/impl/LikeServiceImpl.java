@@ -119,6 +119,6 @@ public class LikeServiceImpl implements LikeService {
         int currCount = userLikeCount - exchangedLikeCount;
         count = Math.min(count, currCount);
         asyncTaskService.exchangeLike(userId, count);
-        return exchangedLikeCount + count;
+        return count;
     }
 }

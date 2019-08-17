@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Api(description = "点赞模块")
 @RestController
-@RequestMapping(value = "/likes", headers = {"Referer=http://hdonghong.top"})
+@RequestMapping(value = "/likes", headers = {"Referer=lifeup.D2D0706D81E7DB115451B33841A8BF09"})
 public class LikeController {
 
     @Autowired
@@ -76,9 +76,10 @@ public class LikeController {
             throw new GlobalException(CodeMsgEnum.PARAMETER_ERROR);
         }
         Long userId = UserContext.get().getUserId();
-        int exchangedLikeCount = likeService.exchangeLike(userId, count);
+        // 本次实际兑换的个数
+        int currExchangedLikeCount = likeService.exchangeLike(userId, count);
         LikeVO likeVO = new LikeVO()
-                .setExchangedLikeCount(exchangedLikeCount);
+                .setExchangedLikeCount(currExchangedLikeCount);
         return Result.success(likeVO);
     }
 

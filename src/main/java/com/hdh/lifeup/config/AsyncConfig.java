@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -36,7 +37,7 @@ public class AsyncConfig implements AsyncConfigurer {
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         // tasks*taskTime = (100 ~ 200) * 0.1
-        executor.setCorePoolSize(10);
+        executor.setCorePoolSize(5);
         // (max(tasks)- queueCapacity)/(1/taskTime) = (200 - 100) / (1/0.1)
         executor.setMaxPoolSize(20);
         // (coreSizePool/taskTime)*responseTime = 10 / 0.1 * 1
@@ -64,4 +65,13 @@ public class AsyncConfig implements AsyncConfigurer {
         return new AsyncExceptionHandler();
     }
 
+    public void test() {
+        ThreadPoolTaskExecutor executor = (ThreadPoolTaskExecutor) taskExecutor();
+        executor.execute(() -> {
+
+        });
+        Future<Integer> submit = executor.submit(() -> {
+            return 1;
+        });
+    }
 }

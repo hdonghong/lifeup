@@ -37,6 +37,7 @@ import java.time.LocalTime;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.hdh.lifeup.model.constant.TaskConst.*;
 import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
@@ -219,7 +220,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                         .eq("user_id", userId)
                         .orderByDesc("member_record_id")
         );
-        return PageDTO.createFreely(userRecordsPage, RecordDTO.class);
+        PageDTO<RecordDTO> recordPage = PageDTO.createFreely(userRecordsPage, RecordDTO.class);
+        assembleRecordList(recordPage.getList(), UserContext.get().getUserId());
+        return recordPage;
     }
 
     @Override
@@ -292,12 +295,15 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     public int getAttributeWeekly(Long userId) {
         TemporalField fieldISO = WeekFields.of(Locale.CHINA).dayOfWeek();
         LocalDateTime monday = LocalDateTime.of(LocalDate.now().with(fieldISO, 1), LocalTime.MIN);
-        LocalDateTime sunday = LocalDateTime.of(LocalDate.now().with(fieldISO, 7), LocalTime.MAX);
+//        LocalDateTime sunday = LocalDateTime.of(LocalDate.now().with(fieldISO, 7), LocalTime.create(23, 59, 59, 0));
         List<TeamMemberRecordDO> memberRecordDOList = memberRecordMapper.selectList(
                 new QueryWrapper<TeamMemberRecordDO>().eq("user_id", userId)
 //                                                      .gt("create_time", monday)
-//                                                      .lt("create_time", sunday)
+//                                                      .lt("create_time", LocalDateTime.now().withNano(0))
         );
+        List<Long> memberRecordIdList = memberRecordDOList.stream().map(TeamMemberRecordDO::getTeamId).collect(Collectors.toList());
+        return teamTaskMapper.selectBatchIds(memberRecordIdList).stream().map(TeamTaskDO::getRewardExp).reduce(0, (sum, e) -> sum + e);
+        /*
         return memberRecordDOList.stream()
                 .map(memberRecordDO ->
                         Optional.ofNullable(teamTaskMapper.selectById(memberRecordDO.getTeamId()))
@@ -305,6 +311,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                                 .getRewardExp()
                 )
                 .reduce(0, (sum, e) -> sum + e);
+                */
     }
 
     @Override
@@ -336,5 +343,18 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         redisOperator.set(MemberRecordKey.ID, memberRecordId, teamMemberRecordDTO);
 
         return teamMemberRecordDTO;
+    }
+
+    @Override
+    public void delUserRecord(Long memberRecordId, Long userId) {
+        Integer ret = memberRecordMapper.delete(
+                new QueryWrapper<TeamMemberRecordDO>()
+                .eq("member_record_id", memberRecordId)
+                .eq("user_id", userId)
+        );
+        if (!Objects.equals(ret, 1)) {
+            log.error("【删除动态】不存在的动态，memberRecordId = [{}], userId = [{}]", memberRecordId, userId);
+            throw new GlobalException(CodeMsgEnum.MEMBER_RECORD_NOT_EXIT);
+        }
     }
 }

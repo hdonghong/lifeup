@@ -114,4 +114,6 @@ public interface TeamMemberService {
     int quitTeam(Long teamId);
 
     TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId);
+
+    void delUserRecord(Long memberRecordId, Long userId);
 }
