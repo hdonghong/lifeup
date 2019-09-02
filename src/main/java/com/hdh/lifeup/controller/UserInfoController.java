@@ -16,6 +16,7 @@ import com.hdh.lifeup.util.UploadUtil;
 import com.hdh.lifeup.model.vo.ResultVO;
 import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
+import com.hdh.lifeup.util.sensitive.SensitiveFilter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -86,6 +87,8 @@ public class UserInfoController {
     @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @PutMapping("/profile")
     public ResultVO<UserInfoDTO> updateProfile(@RequestBody UserInfoDTO userInfoDTO) {
+        userInfoDTO.setNickname(SensitiveFilter.filter(userInfoDTO.getNickname()));
+
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);
     }

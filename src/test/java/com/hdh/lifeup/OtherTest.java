@@ -9,6 +9,7 @@ import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.model.domain.TeamRecordDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.vo.NextSignVO;
+import com.hdh.lifeup.util.sensitive.SensitiveFilter;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 
@@ -127,5 +128,24 @@ public class OtherTest {
                 .setActivityImages("[\"http://lifeup.hdonghong.top/images/activities/289a7a87-ab0a-4b80-9daf-d45f4f20cefe.jpg\"]");
         TeamMemberRecordDTO from = BaseDTO.from(memberRecordDO, TeamMemberRecordDTO.class);
         System.out.println(from);
+    }
+
+    @Test
+    public void testSensitive() {
+        // 使用默认单例（加载默认敏感词库）
+        SensitiveFilter filter = SensitiveFilter.DEFAULT;
+        // 向过滤器增加一个词
+        filter.put("婚礼上唱春天在哪里");
+
+        // 待过滤的句子
+        String sentence = "然后，市长在婚礼上手冲唱春天在哪里。";
+        // 进行过滤
+        String filted = filter.filter(null, '*');
+
+        // 如果未过滤，则返回输入的String引用
+        if(!sentence.equals(filted)){
+            // 句子中有敏感词
+            System.out.println(filted);
+        }
     }
 }

@@ -7,6 +7,7 @@ import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.vo.*;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.util.Result;
+import com.hdh.lifeup.util.sensitive.SensitiveFilter;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -42,6 +43,8 @@ public class TeamTaskController {
     })
     @PostMapping("/new")
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
+        teamTaskVO.setTeamTitle(SensitiveFilter.filter(teamTaskVO.getTeamTitle()))
+                .setTeamDesc(SensitiveFilter.filter(teamTaskVO.getTeamDesc()));
         return Result.success(
                 teamTaskService.addTeam(teamTaskVO)
         );
@@ -118,6 +121,8 @@ public class TeamTaskController {
     @PostMapping("/{teamId}/sign")
     public ResultVO<NextSignVO> sizgnIn(
             @PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
+        activityVO.setActivity(SensitiveFilter.filter(activityVO.getActivity()));
+
         return Result.success(
                 teamTaskService.signIn(teamId, activityVO)
         );
@@ -141,6 +146,9 @@ public class TeamTaskController {
     })
     @PutMapping("/{teamId}")
     public ResultVO<?> editTeam(@RequestBody TeamEditVO teamEditVO) {
+        teamEditVO.setTeamTitle(SensitiveFilter.filter(teamEditVO.getTeamTitle()))
+                .setTeamDesc(SensitiveFilter.filter(teamEditVO.getTeamDesc()));
+
         TeamTaskDTO teamTaskDTO = new TeamTaskDTO();
         BeanUtils.copyProperties(teamEditVO, teamTaskDTO);
         teamTaskService.update(teamTaskDTO);
