@@ -301,8 +301,11 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 //                                                      .gt("create_time", monday)
 //                                                      .lt("create_time", LocalDateTime.now().withNano(0))
         );
-        List<Long> memberRecordIdList = memberRecordDOList.stream().map(TeamMemberRecordDO::getTeamId).collect(Collectors.toList());
-        return teamTaskMapper.selectBatchIds(memberRecordIdList).stream().map(TeamTaskDO::getRewardExp).reduce(0, (sum, e) -> sum + e);
+        List<Long> teamIdList = memberRecordDOList.stream().map(TeamMemberRecordDO::getTeamId).collect(Collectors.toList());
+        if (teamIdList.size() == 0) {
+            return 0;
+        }
+        return teamTaskMapper.selectBatchIds(teamIdList).stream().map(TeamTaskDO::getRewardExp).reduce(0, (sum, e) -> sum + e);
         /*
         return memberRecordDOList.stream()
                 .map(memberRecordDO ->
