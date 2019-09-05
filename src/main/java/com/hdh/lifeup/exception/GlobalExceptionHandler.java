@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = NullPointerException.class)
     public ResultVO<String> handlerNullPointerException(NullPointerException e) {
-        log.error("【系统内部异常】stacktrace = [{}]", e.toString());
+        log.error("【空指针异常】stacktrace = [{}]", e.toString());
         e.printStackTrace();
         return Result.error(CodeMsgEnum.PARAMETER_NULL);
     }
@@ -72,6 +72,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     public ResultVO<String> handlerInnerException(Exception e) {
         log.error("【系统内部异常】stacktrace = [{}]", e.toString());
+        e.printStackTrace();
         ResultVO<String> errorResult = Result.error(CodeMsgEnum.SERVER_ERROR);
         if (HttpRequestMethodNotSupportedException.class.isInstance(e)) {
             errorResult.appendArgs(HttpRequestMethodNotSupportedException.class.getName());

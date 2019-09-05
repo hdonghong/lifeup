@@ -16,7 +16,7 @@ import java.util.NavigableSet;
  * @author ZhangXiaoye
  * @date 2017年1月5日 下午4:18:38
  */
-public class SensitiveFilter implements Serializable{
+public class SensitiveFilter implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,9 @@ public class SensitiveFilter implements Serializable{
 	 */
 	public static final SensitiveFilter DEFAULT = new SensitiveFilter(
 			new BufferedReader(new InputStreamReader(
-					ClassLoader.getSystemResourceAsStream("sensi_words.txt")
+//					ClassLoader.getSystemResourceAsStream("sensi_words.txt")
+					Thread.currentThread().getContextClassLoader().getResourceAsStream("sensi_words.txt")
+//					new ClassPathResource("sensi_words.txt").getInputStream()
 					, StandardCharsets.UTF_8)));
 	
 	/**
@@ -34,7 +36,7 @@ public class SensitiveFilter implements Serializable{
 	 * 提高不命中时hash指向null的概率，
 	 * 加快访问速度。
 	 */
-	static final int DEFAULT_INITIAL_CAPACITY = 131072;
+	private static final int DEFAULT_INITIAL_CAPACITY = 131072;
 	
 	/**
 	 * 类似HashMap的桶，比较稀疏。
@@ -142,7 +144,7 @@ public class SensitiveFilter implements Serializable{
 	 * @param replace 敏感词的替换字符
 	 * @return 过滤后的句子 
 	 * @author ZhangXiaoye
-	 * @date 2017年1月5日 下午4:16:31
+	 * @since 2017年1月5日 下午4:16:31
 	 */
 	public String filter(String sentence, char replace){
 		if (sentence == null || sentence.length() < 1) {
