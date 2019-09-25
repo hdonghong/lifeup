@@ -215,7 +215,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 .setTeamTitle(teamTaskDTO.getTeamTitle())
                 .setRewardAttrs(teamTaskDTO.getRewardAttrs())
                 .setRewardExp(teamTaskDTO.getRewardExp())
-                .setTeamFreq(teamTaskDTO.getTeamFreq());
+                .setTeamFreq(teamTaskDTO.getTeamFreq())
+                .setCoin(teamTaskDTO.getCoin())
+                .setCoinVariable(teamTaskDTO.getCoinVariable());
 
         if (CollectionUtils.isEmpty(teamRecordDOList)) {
             BeanUtils.copyProperties(this.addTeamRecord(teamTaskDTO, 1), nextSignVO);
@@ -233,6 +235,25 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
         BeanUtils.copyProperties(teamRecordSrc, nextSignVO);
         return nextSignVO;
+    }
+
+    @Override
+    public List<NextSignVO> getAllNextSigns(Long userId, List<Long> teamIdList) {
+        if (CollectionUtils.isEmpty(teamIdList)) {
+            teamIdList = memberService.getTeamIdsByUserId(userId);
+        }
+        List<NextSignVO> signVOList = Lists.newArrayList();
+        teamIdList.forEach(teamId -> {
+            try {
+                NextSignVO nextSign = getNextSign(teamId);
+                signVOList.add(nextSign);
+
+            } catch (Exception e) {
+                log.info("【获取签到信息列表】userId = [{}], teamId = [{}], e = [{}]",
+                        userId, teamId, e);
+            }
+        });
+        return signVOList;
     }
 
     @Override
@@ -296,10 +317,6 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         return this.getNextSign(teamTaskDTO);
     }
 
-    @Override
-    public List<NextSignVO> getAllNextSigns(Long memberId) {
-        return null;
-    }
 
     @Override
     public void endTeam(Long teamId) {

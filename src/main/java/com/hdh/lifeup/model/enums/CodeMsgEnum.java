@@ -47,6 +47,7 @@ public enum CodeMsgEnum {
     TEAM_IS_END(500603, "团队任务已经结束"),
     TEAM_NOT_SIGN_TIME(500604, "未到签到时间"),
     TEAM_INVALID_BEHAVIOR(500605, "越权操作"),
+    TEAM_INVALID_COIN(500606, "金额越界"),
 
     /** 团队成员模块 5007XX */
     MEMBER_NOT_IN_TEAM(500701, "不是团队成员"),

@@ -57,4 +57,12 @@ public class TeamTaskVO implements Serializable {
     @ApiModelProperty(value = "团队头像")
     private String teamHead;
 
+    /** 金币 取值区间[0, 99]*/
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coin = 0;
+
+    /** 金币随机量 取值区间[0, 99]*/
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coinVariable = 0;
+
 }

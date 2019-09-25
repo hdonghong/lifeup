@@ -360,4 +360,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             throw new GlobalException(CodeMsgEnum.MEMBER_RECORD_NOT_EXIT);
         }
     }
+
+    @Override
+    public List<Long> getTeamIdsByUserId(Long userId) {
+        return memberMapper.getTeamIdsByUserId(userId);
+    }
 }

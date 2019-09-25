@@ -1,9 +1,11 @@
 package com.hdh.lifeup.controller;
 
+import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.model.vo.*;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.util.Result;
@@ -45,6 +47,11 @@ public class TeamTaskController {
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
         teamTaskVO.setTeamTitle(SensitiveFilter.filter(teamTaskVO.getTeamTitle()))
                 .setTeamDesc(SensitiveFilter.filter(teamTaskVO.getTeamDesc()));
+        // 规定金币值的范围[0, 99]
+        if (teamTaskVO.getCoin() < 0 || teamTaskVO.getCoinVariable() < 0
+                || teamTaskVO.getCoin() + teamTaskVO.getCoinVariable() > 99) {
+            return Result.error(CodeMsgEnum.TEAM_INVALID_COIN);
+        }
         return Result.success(
                 teamTaskService.addTeam(teamTaskVO)
         );
@@ -76,15 +83,15 @@ public class TeamTaskController {
     }
 
     @ApiLimiting
-    @ApiOperation(value = "获取用户所有下一次要签到的信息")
+    @ApiOperation(value = "获取用户所有/指定的下一次要签到的信息")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
-            @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
     })
     @GetMapping("/next_signs")
-    public ResultVO<List<NextSignVO>> getAllNextSigns() {
+    public ResultVO<List<NextSignVO>> getAllNextSigns(Long[] teamIdArr) {
+        List<Long> teamIdList = Lists.newArrayList(teamIdArr);
         return Result.success(
-                teamTaskService.getAllNextSigns(UserContext.get().getUserId())
+                teamTaskService.getAllNextSigns(UserContext.get().getUserId(), teamIdList)
         );
     }
 
@@ -106,7 +113,7 @@ public class TeamTaskController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/{teamId}")
-    public ResultVO<?> joinTeam(@PathVariable Long teamId) {
+    public ResultVO<NextSignVO> joinTeam(@PathVariable Long teamId) {
         return Result.success(
                 teamTaskService.joinTeam(teamId)
         );
@@ -148,7 +155,11 @@ public class TeamTaskController {
     public ResultVO<?> editTeam(@RequestBody TeamEditVO teamEditVO) {
         teamEditVO.setTeamTitle(SensitiveFilter.filter(teamEditVO.getTeamTitle()))
                 .setTeamDesc(SensitiveFilter.filter(teamEditVO.getTeamDesc()));
-
+        // 规定金币值的范围[0, 99]
+        if (teamEditVO.getCoin() < 0 || teamEditVO.getCoinVariable() < 0
+                || teamEditVO.getCoin() + teamEditVO.getCoinVariable() > 99) {
+            return Result.error(CodeMsgEnum.TEAM_INVALID_COIN);
+        }
         TeamTaskDTO teamTaskDTO = new TeamTaskDTO();
         BeanUtils.copyProperties(teamEditVO, teamTaskDTO);
         teamTaskService.update(teamTaskDTO);

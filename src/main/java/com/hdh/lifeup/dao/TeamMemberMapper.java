@@ -28,4 +28,7 @@ public interface TeamMemberMapper extends SuperMapper<TeamMemberDO> {
             "and m.team_id = #{teamId} " +
             "order by m.create_time desc limit #{page.currentPage}, #{page.size} ")
     List<UserListVO> getMembers(@Param("teamId") Long teamId, @Param("page") PageDTO pageDTO);
+
+    @Select("select team_id from team_member where user_id = #{userId}")
+    List<Long> getTeamIdsByUserId(@Param("userId") Long userId);
 }

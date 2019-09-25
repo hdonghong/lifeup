@@ -44,4 +44,11 @@ public class NextSignVO implements Serializable {
 
     @ApiModelProperty("下一次结束签到的时间")
     private LocalDateTime nextEndTime;
+
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coin = 0;
+
+    /** 金币随机量 取值区间[0, 99]*/
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coinVariable = 0;
 }

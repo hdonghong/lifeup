@@ -79,10 +79,10 @@ public interface TeamTaskService {
 
     /**
      * 获取成员所有下一次要签到的团队信息
-     * @param memberId 成员id
+     * @param userId 成员id
      * @return 所有下一次要签到的团队信息
      */
-    List<NextSignVO> getAllNextSigns(Long memberId);
+    List<NextSignVO> getAllNextSigns(Long userId, List<Long> teamIdList);
 
     /**
      * 终结团队

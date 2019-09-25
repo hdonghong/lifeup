@@ -7,6 +7,8 @@ import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import lombok.NonNull;
 
+import java.util.List;
+
 /**
  * TeamMemberService interface<br/>
  *
@@ -116,4 +118,6 @@ public interface TeamMemberService {
     TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId);
 
     void delUserRecord(Long memberRecordId, Long userId);
+
+    List<Long> getTeamIdsByUserId(Long userId);
 }

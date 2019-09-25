@@ -56,6 +56,12 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
 
     private Long userId;
 
+    /** 金币 取值区间[0, 99]*/
+    private Integer coin = 0;
+
+    /** 金币随机量 取值区间[0, 99]*/
+    private Integer coinVariable = 0;
+
     private LocalDateTime createTime;
 
     @Override

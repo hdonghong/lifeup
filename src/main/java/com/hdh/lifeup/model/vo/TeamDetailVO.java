@@ -67,4 +67,11 @@ public class TeamDetailVO {
 
     @ApiModelProperty("1创建者 0不是")
     private Integer isOwner;
+
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coin = 0;
+
+    /** 金币随机量 取值区间[0, 99]*/
+    @ApiModelProperty(value = "金币 取值区间[0, 99]")
+    private Integer coinVariable = 0;
 }
