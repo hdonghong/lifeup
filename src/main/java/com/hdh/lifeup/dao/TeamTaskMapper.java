@@ -26,5 +26,5 @@ public interface TeamTaskMapper extends SuperMapper<TeamTaskDO> {
             "and m.user_id = #{userId} " +
             "and t.is_del = 0 " +
             "order by m.create_time desc limit #{page.currentPage}, #{page.size} ")
-    List<TeamTaskDO> getUserTeams(@Param("userId") Long userId, @Param("page") PageDTO pageDTO);
+    List<TeamTaskDO> getUserTeams(@Param("userId") Long userId, @Param("page") PageDTO pageDTO, Integer teamStatus);
 }

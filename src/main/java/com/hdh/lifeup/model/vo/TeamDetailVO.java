@@ -53,7 +53,7 @@ public class TeamDetailVO {
     @ApiModelProperty("团队完成的时间，未完成时不会传给前端")
     private LocalDateTime completeTime;
 
-    @ApiModelProperty("团队状态，0未开始；1进行中；2完成；3放弃")
+    @ApiModelProperty("团队状态，0进行中；2完成；3放弃")
     private Integer teamStatus;
 
     @ApiModelProperty("团队的拥有者")

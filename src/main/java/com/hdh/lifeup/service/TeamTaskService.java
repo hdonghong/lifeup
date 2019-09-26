@@ -46,7 +46,7 @@ public interface TeamTaskService {
      * @param pageDTO 条件
      * @return 团队列表
      */
-    PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO);
+    PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO, Integer teamStatus);
 
     /**
      * 获取团队详情

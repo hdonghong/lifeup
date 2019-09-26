@@ -83,7 +83,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public TeamTaskDTO insert(@NonNull TeamTaskDTO teamTaskDTO) {
         TeamTaskDO teamTaskDO = teamTaskDTO.toDO(TeamTaskDO.class);
         Integer result = teamTaskMapper.insert(teamTaskDO);
-        if (!Objects.equals(1, result)) {
+        if (!Objects.equals(1   , result)) {
             log.error("【TeamTaskServiceImpl.insert】插入新teamTask记录失败，teamTaskDTO = [{}]", teamTaskDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
@@ -148,17 +148,17 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO) {
+    public PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO, Integer teamStatus) {
         if (userId == null) {
             userId = UserContext.get().getUserId();
         }
         Long currentPage = pageDTO.getCurrentPage();
-        // FIXME 没有limit
+        // FIXME count时没有带查询条件
         int count = memberService.countUserTeams(userId);
         List<TeamTaskDO> teamTaskDOList = Lists.newArrayList();
         if (count > 0) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-            teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO);
+            teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO, teamStatus);
         }
         return PageDTO.<TeamTaskDTO>builder()
                 .currentPage(currentPage)

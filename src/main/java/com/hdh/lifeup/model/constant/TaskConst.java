@@ -27,8 +27,7 @@ public class TaskConst {
 
     public static class TaskStatus {
 
-        public static final Integer PREPARING = 0;
-        public static final Integer DOING = 1;
+        public static final Integer DOING = 0;
         public static final Integer COMPLETE = 2;
         public static final Integer GIVE_UP = 3;
     }

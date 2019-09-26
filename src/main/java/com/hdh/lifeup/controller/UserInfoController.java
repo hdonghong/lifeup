@@ -147,10 +147,12 @@ public class UserInfoController {
     })
     @GetMapping(value = {"/teams", "/{userId}/teams"})
     public ResultVO<PageDTO<TeamTaskDTO>> getTeams(
-            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO) {
-
+            @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO, Integer teamStatus) {
+        if (teamStatus == null) {
+            teamStatus = TaskConst.TaskStatus.DOING;
+        }
         return Result.success(
-                teamTaskService.pageUserTeams(userId, pageDTO)
+                teamTaskService.pageUserTeams(userId, pageDTO, teamStatus)
         );
     }
 

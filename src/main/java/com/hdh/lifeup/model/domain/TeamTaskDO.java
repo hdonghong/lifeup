@@ -50,7 +50,7 @@ public class TeamTaskDO extends BaseDO {
     /** 结束签到的时间，必须开始后才能签到，与startTime在同一天，不填写的话默认为当天23.59.59点 */
     private LocalDateTime firstEndTime;
 
-    /** 团队状态，0未开始；1进行中；2完成；3放弃 */
+    /** 团队状态，0进行中；2完成；3放弃 */
     private Integer teamStatus;
 
     private LocalDateTime completeTime;
