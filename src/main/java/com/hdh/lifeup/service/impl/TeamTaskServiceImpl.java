@@ -320,10 +320,19 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
     @Override
     public void endTeam(Long teamId) {
-        TeamTaskDTO teamTaskDTO = getOne(teamId);
-        teamTaskDTO.setTeamStatus(TaskStatus.COMPLETE);
-        teamTaskDTO.setCompleteTime(LocalDateTime.now());
-        teamTaskMapper.updateById(teamTaskDTO.toDO(TeamTaskDO.class));
+        Long currUserId = UserContext.get().getUserId();
+        TeamTaskDO teamTaskDO = teamTaskMapper.selectOne(
+                new QueryWrapper<TeamTaskDO>()
+                        .eq("team_id", teamId)
+                        .eq("user_id", currUserId)
+        );
+        if (teamTaskDO == null) {
+            throw new GlobalException(CodeMsgEnum.TEAM_INVALID_BEHAVIOR);
+        }
+
+        teamTaskDO.setTeamStatus(TaskStatus.COMPLETE);
+        teamTaskDO.setCompleteTime(LocalDateTime.now());
+        teamTaskMapper.updateById(teamTaskDO);
     }
 
     @Override

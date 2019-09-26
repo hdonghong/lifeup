@@ -115,9 +115,22 @@ public interface TeamMemberService {
      */
     int quitTeam(Long teamId);
 
+    /**
+     * 获取制定的1条动态详情
+     * @param memberRecordId
+     * @return
+     */
     TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId);
 
+    /**
+     * 删除用户发表的动态 TODO
+     * @param memberRecordId
+     * @param userId
+     */
     void delUserRecord(Long memberRecordId, Long userId);
 
+    /**
+     * 获取指定user参与的团队id
+     */
     List<Long> getTeamIdsByUserId(Long userId);
 }
