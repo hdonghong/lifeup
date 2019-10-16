@@ -87,7 +87,7 @@ public interface TeamMemberService {
     int isMember(Long teamId, Long userId);
 
     /**
-     * 是否签到了
+     * 判断用户是否签到了
      * @param teamRecordId 团队签到记录id
      * @param userId 成员id
      * @return 1是 0否

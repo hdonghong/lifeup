@@ -81,6 +81,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public TeamTaskDTO insert(@NonNull TeamTaskDTO teamTaskDTO) {
+        // 截止加入时间如果没写，就默认是无限期（2118年11月21日才截止）
+        if (teamTaskDTO.getStartDate() == null) {
+            teamTaskDTO.setStartDate(LocalDate.of(2118, 11, 21));
+        }
         TeamTaskDO teamTaskDO = teamTaskDTO.toDO(TeamTaskDO.class);
         Integer result = teamTaskMapper.insert(teamTaskDO);
         if (!Objects.equals(1   , result)) {
@@ -95,6 +99,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Transactional(rollbackFor = Exception.class)
     public NextSignVO addTeam(@NonNull TeamTaskVO teamTaskVO) {
         TeamTaskDTO teamTaskDTO = new TeamTaskDTO();
+        teamTaskDTO.setTeamStatus(TaskStatus.DOING);
         BeanUtils.copyProperties(teamTaskVO, teamTaskDTO, "firstStartTime", "firstEndTime");
 
         // 存主团队表
@@ -199,8 +204,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     private NextSignVO getNextSign(TeamTaskDTO teamTaskDTO) {
-        // 要求任务未终止
-        if (TaskStatus.COMPLETE.equals(teamTaskDTO.getTeamStatus())) {
+        // 要求任务进行中
+        if (!TaskStatus.DOING.equals(teamTaskDTO.getTeamStatus())) {
             throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
 
@@ -211,13 +216,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         );
 
         // 如果没有下一次的签到信息，就直接生成后返回
-        NextSignVO nextSignVO = new NextSignVO()
-                .setTeamTitle(teamTaskDTO.getTeamTitle())
-                .setRewardAttrs(teamTaskDTO.getRewardAttrs())
-                .setRewardExp(teamTaskDTO.getRewardExp())
-                .setTeamFreq(teamTaskDTO.getTeamFreq())
-                .setCoin(teamTaskDTO.getCoin())
-                .setCoinVariable(teamTaskDTO.getCoinVariable());
+        NextSignVO nextSignVO = new NextSignVO();
+        BeanUtils.copyProperties(teamTaskDTO, nextSignVO);
 
         if (CollectionUtils.isEmpty(teamRecordDOList)) {
             BeanUtils.copyProperties(this.addTeamRecord(teamTaskDTO, 1), nextSignVO);
