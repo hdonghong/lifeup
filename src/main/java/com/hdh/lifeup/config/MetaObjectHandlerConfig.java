@@ -12,11 +12,11 @@ public class MetaObjectHandlerConfig extends MetaObjectHandler {
 
   @Override
   public void insertFill(MetaObject metaObject) {
-    System.out.println("插入方法实体填充");
+    System.out.println("insert");
   }
 
   @Override
   public void updateFill(MetaObject metaObject) {
-    System.out.println("更新方法实体填充");
+    System.out.println("update");
   }
 }

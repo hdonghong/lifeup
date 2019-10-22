@@ -22,12 +22,14 @@ public class QiniuConfig {
 
     public static final String AVATAR_URI = "images/avatars/";
     public static final String ACTIVITY_URI = "images/activities/";
+    public static final String FEEDBACK_URI = "images/feedback/";
     public static final String UNKNOWNS_URI = "images/unknowns/";
 
     public static String getImageURI(String imageCategory) {
         switch (imageCategory) {
             case "avatar" : return AVATAR_URI;
             case "activity" : return ACTIVITY_URI;
+            case "feedback" : return FEEDBACK_URI;
             default:return UNKNOWNS_URI;
         }
     }

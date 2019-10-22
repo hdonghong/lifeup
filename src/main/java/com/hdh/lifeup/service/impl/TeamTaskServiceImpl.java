@@ -85,6 +85,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         if (teamTaskDTO.getStartDate() == null) {
             teamTaskDTO.setStartDate(LocalDate.of(2118, 11, 21));
         }
+        if (teamTaskDTO.getFirstStartTime() == null) {
+            teamTaskDTO.setFirstStartTime(LocalDateTime.now());
+        }
         TeamTaskDO teamTaskDO = teamTaskDTO.toDO(TeamTaskDO.class);
         Integer result = teamTaskMapper.insert(teamTaskDO);
         if (!Objects.equals(1   , result)) {
@@ -372,6 +375,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 0 : (long) Math.ceil((period * 1.0) / teamFreq) * teamFreq + teamFreq * (n - 1);
         LocalDateTime nextStartTime = firstStartTime.plusDays(nextSignPeriod);
         LocalDateTime nextEndTime = teamTaskDTO.getFirstEndTime().plusDays(nextSignPeriod);
+        if (period < 0) {
+            // 应对开始日期在当前日期之后
+            nextStartTime = teamTaskDTO.getFirstStartTime();
+            nextEndTime = teamTaskDTO.getFirstEndTime();
+        }
         // 如果新生成的下一次签到结束时间 小于 当前时间（也就是说新生成的团队动态就已经是结束的），则需要再加一个 频率值
         if (nextEndTime.isBefore(nowTime)) {
             nextStartTime = nextStartTime.plusDays(teamFreq);

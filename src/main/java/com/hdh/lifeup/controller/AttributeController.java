@@ -34,9 +34,12 @@ public class AttributeController {
     @ApiLimiting
     @ApiOperation(value = "查询指定人物属性", notes = "自己的人物，详细属性，包括经验")
     @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
-    @GetMapping("/attribute")
-    public ResultVO<AttributeDTO> getAttribute() {
-        AttributeDTO attributeDTO = attributeService.getByUserId(UserContext.get().getUserId());
+    @GetMapping(value = {"/attribute", "/{userId}/attribute"})
+    public ResultVO<AttributeDTO> getAttribute(@PathVariable(value = "userId", required = false) Long userId) {
+        if (userId == null) {
+            userId = UserContext.get().getUserId();
+        }
+        AttributeDTO attributeDTO = attributeService.getByUserId(userId);
         return Result.success(attributeDTO);
     }
 

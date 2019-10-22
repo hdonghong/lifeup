@@ -128,7 +128,8 @@ public class TeamTaskController {
     @PostMapping("/{teamId}/sign")
     public ResultVO<NextSignVO> sizgnIn(
             @PathVariable Long teamId, @RequestBody ActivityVO activityVO) {
-        activityVO.setActivity(SensitiveFilter.filter(activityVO.getActivity()));
+        // 动态暂时不过滤敏感词
+//        activityVO.setActivity(SensitiveFilter.filter(activityVO.getActivity()));
 
         return Result.success(
                 teamTaskService.signIn(teamId, activityVO)
