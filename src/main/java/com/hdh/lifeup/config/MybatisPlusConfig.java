@@ -40,9 +40,9 @@ public class MybatisPlusConfig {
     }
 
     /**
-     * 性能分析拦截器，不建议生产使用
+     * 性能分析拦截器，不建议生产使用，sql打印
      */
-    //@Bean
+//    @Bean
     public PerformanceInterceptor performanceInterceptor(){
         return new PerformanceInterceptor();
     }

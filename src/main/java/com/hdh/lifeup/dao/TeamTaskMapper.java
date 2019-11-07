@@ -24,7 +24,14 @@ public interface TeamTaskMapper extends SuperMapper<TeamTaskDO> {
      */
     @Select("select t.* from team_task t, team_member m where t.team_id = m.team_id " +
             "and m.user_id = #{userId} " +
+            "and t.team_status = #{teamStatus} " +
             "and t.is_del = 0 " +
             "order by m.create_time desc limit #{page.currentPage}, #{page.size} ")
-    List<TeamTaskDO> getUserTeams(@Param("userId") Long userId, @Param("page") PageDTO pageDTO, Integer teamStatus);
+    List<TeamTaskDO> getUserTeams(@Param("userId") Long userId, @Param("page") PageDTO pageDTO, @Param("teamStatus") Integer teamStatus);
+
+    @Select("select count(1) from team_task t, team_member m where t.team_id = m.team_id " +
+            "and m.user_id = #{userId} " +
+            "and t.team_status = #{teamStatus} " +
+            "and t.is_del = 0 ")
+    int countUserTeamsWithStatus(@Param("userId") Long userId, @Param("teamStatus") Integer teamStatus);
 }

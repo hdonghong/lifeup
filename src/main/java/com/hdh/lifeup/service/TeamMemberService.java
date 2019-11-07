@@ -56,7 +56,7 @@ public interface TeamMemberService {
     PageDTO<UserListVO> pageMembers(Long teamId, PageDTO pageDTO);
 
     /**
-     * 获取指定成员动态列表
+     * 获取指定团队动态列表
      * @param teamId 团队id
      * @param pageDTO 查询条件
      * @return 动态列表
@@ -74,9 +74,10 @@ public interface TeamMemberService {
      * 获取多个用户动态列表
      * @param pageDTO 查询条件
      * @param scope 动态范围
+     * @param filter 过滤条件，0无；1过滤默认发的
      * @return 动态列表
      */
-    PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope);
+    PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter);
 
     /**
      * 是否团队成员
@@ -101,6 +102,14 @@ public interface TeamMemberService {
      * @return 团队数量
      */
     int countUserTeams(Long userId);
+
+    /**
+     * 计数指定团队状态下用户加入的团队
+     * @param userId
+     * @param teamStatus
+     * @return
+     */
+    int countUserTeamsWithStatus(Long userId, Integer teamStatus);
 
     /** 排行榜的临时实现：获取用户的经验值
      * @param userId 用户id

@@ -143,7 +143,8 @@ public class UserInfoController {
     @ApiOperation(value = "获取指定用户加入的团队列表")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
-            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long"),
+            @ApiImplicitParam(name = "userId", paramType = "path", dataType = "Long", example = "0进行中；2已完成；"),
+            @ApiImplicitParam(name = "teamStatus", dataType = "int"),
     })
     @GetMapping(value = {"/teams", "/{userId}/teams"})
     public ResultVO<PageDTO<TeamTaskDTO>> getTeams(
@@ -208,6 +209,13 @@ public class UserInfoController {
         );
     }
 
+    /**
+     *
+     * @param pageDTO
+     * @param scope
+     * @param filter 过滤一些圈子，
+     * @return
+     */
     @ApiLimiting
     @ApiOperation(value = "获取我的朋友圈scope=2 或 所有人的scope=3")
     @ApiImplicitParams({
@@ -215,13 +223,14 @@ public class UserInfoController {
     })
     @GetMapping(value = {"/moments", "/moments/{scope}"})
     public ResultVO<PageDTO<RecordDTO>> getMoments(PageDTO pageDTO,
-                                                   @PathVariable(value = "scope", required = false) Integer scope) {
+                                                   @PathVariable(value = "scope", required = false) Integer scope,
+                                                   @RequestParam(defaultValue = "0", required = false) Integer filter) {
         // 限定只能是朋友圈 或者 所有人
         if (!TaskConst.ActivityScope.ALL.equals(scope)) {
             scope = TaskConst.ActivityScope.MYFOLLOWERS;
         }
         return Result.success(
-                teamMemberService.getMoments(pageDTO, scope)
+                teamMemberService.getMoments(pageDTO, scope, filter)
         );
     }
 }

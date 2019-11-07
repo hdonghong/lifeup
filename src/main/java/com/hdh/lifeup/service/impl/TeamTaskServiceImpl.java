@@ -371,6 +371,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             // 如果是不重复的团队任务，并且已经过了签到日期或者有了完成时间，则提示已经结束
             throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
+        // 处理不重复的任务
+        if (teamFreq == 0 && n != 1) {
+            throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
+        }
         long nextSignPeriod = (teamFreq == 0) ?
                 0 : (long) Math.ceil((period * 1.0) / teamFreq) * teamFreq + teamFreq * (n - 1);
         LocalDateTime nextStartTime = firstStartTime.plusDays(nextSignPeriod);

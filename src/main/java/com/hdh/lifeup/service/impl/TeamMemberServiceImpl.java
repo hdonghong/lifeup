@@ -226,7 +226,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     }
 
     @Override
-    public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope) {
+    public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter) {
         Long currentPage = pageDTO.getCurrentPage();
         Integer count;
         long totalPage;
@@ -242,7 +242,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-                recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO);
+                recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO, filter);
             }
         } else {
             // 否则认为指定在所有人
@@ -252,7 +252,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-                recordList = memberRecordMapper.getRecords(pageDTO);
+                recordList = memberRecordMapper.getRecords(pageDTO, filter);
             }
         }
         assembleRecordList(recordList, userId);
@@ -287,6 +287,15 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 new QueryWrapper<TeamMemberDO>().eq("user_id", userId)
         );
         return Optional.ofNullable(countResult).orElse(0);
+    }
+
+    @Override
+    public int countUserTeamsWithStatus(Long userId, Integer teamStatus) {
+        if (teamStatus == null) {
+            return countUserTeams(userId);
+        }
+
+        return teamTaskMapper.countUserTeamsWithStatus(userId, teamStatus);
     }
 
 

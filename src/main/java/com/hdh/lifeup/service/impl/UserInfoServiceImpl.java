@@ -8,6 +8,7 @@ import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.dao.UserInfoMapper;
 import com.hdh.lifeup.exception.GlobalException;
+import com.hdh.lifeup.model.constant.TaskConst;
 import com.hdh.lifeup.model.domain.UserInfoDO;
 import com.hdh.lifeup.model.dto.AttributeDTO;
 import com.hdh.lifeup.model.dto.PageDTO;
@@ -133,9 +134,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 
         UserDetailVO userDetailVO = new UserDetailVO();
         BeanUtils.copyProperties(userInfoDTO, userDetailVO);
-        // 加入的团队数量
+        // 加入的团队数量（进行中的）
         userId = userInfoDTO.getUserId();
-        userDetailVO.setTeamAmount(memberService.countUserTeams(userId));
+        userDetailVO.setTeamAmount(memberService.countUserTeamsWithStatus(userId, TaskConst.TaskStatus.DOING));
+//        userDetailVO.setTeamAmount(memberService.countUserTeams(userId));
         // 粉丝数量
         userDetailVO.setFollowerAmount(redisOperator.zcard(UserKey.FOLLOWER, userId));
         // 关注的人的数量
