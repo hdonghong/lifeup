@@ -10,6 +10,7 @@ import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.dao.TeamRecordMapper;
 import com.hdh.lifeup.dao.TeamTaskMapper;
 import com.hdh.lifeup.exception.GlobalException;
+import com.hdh.lifeup.exception.SingleTaskException;
 import com.hdh.lifeup.model.domain.TeamRecordDO;
 import com.hdh.lifeup.model.domain.TeamTaskDO;
 import com.hdh.lifeup.model.dto.*;
@@ -212,9 +213,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
 
+        LocalDateTime nowTime = LocalDateTime.now();
         List<TeamRecordDO> teamRecordDOList = teamRecordMapper.selectList(
                 new QueryWrapper<TeamRecordDO>().eq("team_id", teamTaskDTO.getTeamId())
-                                                .gt("next_end_time", LocalDateTime.now())
+                                                .gt("next_end_time", nowTime)
                                                 .orderByAsc("team_record_id")
         );
 
@@ -227,15 +229,44 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             return nextSignVO;
         }
 
-        // 假设还没有签到最近一次的
-        TeamRecordDO teamRecordSrc = teamRecordDOList.get(0);
-        int result = memberService.hasSignedIn(teamRecordSrc.getTeamRecordId(), UserContext.get().getUserId());
-        // 判断是否已经签到了，result == 1说明学员已经签到了最近一次
-        if (result == 1) {
-            // 如果当前已经生成了下下次签到的记录就直接返回，否则生成下下次签到记录
-            teamRecordSrc = (teamRecordDOList.size() == 2) ?
-                    teamRecordDOList.get(1) : this.addTeamRecord(teamTaskDTO, 2);
+
+        // 倒序取距离当前时间最近一次的签到信息，签到开始时间早于当前时间的
+        TeamRecordDO teamRecordSrc = null;
+        int i;
+        for (i = teamRecordDOList.size() - 1; i >= 0; i--) {
+            TeamRecordDO teamRecordDO = teamRecordDOList.get(i);
+            if (teamRecordDO.getNextStartTime().isBefore(nowTime)) {
+                teamRecordSrc = teamRecordDO;
+                break;
+            }
         }
+        // 如果没有就取最近一次签到信息，签到开始时间晚于当前时间的
+        if (teamRecordSrc == null) {
+            teamRecordSrc = teamRecordDOList.get(0);
+            BeanUtils.copyProperties(teamRecordSrc, nextSignVO);
+            return nextSignVO;
+        }
+
+        // 判断是否已经签到了，result == 1说明学员已经签到了最近一次
+        int result = memberService.hasSignedIn(teamRecordSrc.getTeamRecordId(), UserContext.get().getUserId());
+        if (result == 1) {
+            // 已经签到了则需要取下一次签到信息，直接取 / 新增 取决于当前数据库是否已经生成
+            teamRecordSrc = i < teamRecordDOList.size() - 1 ?
+                    teamRecordDOList.get(i + 1) : this.addTeamRecord(teamTaskDTO, 2);
+        }
+
+        // 这种做法会导致在某个时段内一直只有两条。比如firstStartTime:11-21; firstEndTime:11-31; freq:1;
+        // 用户在11-25日加入时，可以连续签到 11-21~11-31 和 11-22~12-1，但是之后会一直拿不到签到信息，需要等到过了11-31后才能拿到；
+        // 因为此时 teamRecordDOList 的 size 才小于 2  ↓↓↓↓↓
+        // 如果当前已经生成了下下次签到的记录就直接返回，否则生成下下次签到记录
+        // 假设还没有签到最近一次的
+//        TeamRecordDO teamRecordSrc = teamRecordDOList.get(0);
+//        int result = memberService.hasSignedIn(teamRecordSrc.getTeamRecordId(), UserContext.get().getUserId());
+//        // 判断是否已经签到了，result == 1说明学员已经签到了最近一次
+//        if (result == 1) {
+//             teamRecordSrc = (teamRecordDOList.size() == 2) ?
+//                    teamRecordDOList.get(1) : this.addTeamRecord(teamTaskDTO, 2);
+//        }
         BeanUtils.copyProperties(teamRecordSrc, nextSignVO);
         return nextSignVO;
     }
@@ -284,7 +315,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = Exception.class, noRollbackFor = SingleTaskException.class)
     public NextSignVO signIn(Long teamId, ActivityVO activityVO) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
         // 判断当前用户是否团队成员
@@ -315,6 +346,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setActivityImages(activityVO.getActivityImages())
                     .setActivityIcon(ActivityIcon.IC_SIGN);
             memberService.addMemberRecord(memberRecordDTO);
+            // 单次任务在这次签到完成后就直接完成了，没有下一次
+            if (teamTaskDTO.getTeamFreq() == 0) {
+                throw new SingleTaskException(CodeMsgEnum.TEAM_IS_END);
+            }
         }
 
         return this.getNextSign(teamTaskDTO);

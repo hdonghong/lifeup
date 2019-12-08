@@ -28,7 +28,7 @@ public class GlobalExceptionHandler {
      * @param e 异常
      * @return 通用result
      */
-    @ExceptionHandler(value = GlobalException.class)
+    @ExceptionHandler(value = { GlobalException.class, SingleTaskException.class})
     public ResultVO<?> handlerGlobalException(GlobalException e) {
         log.error("【系统预知异常】e = [{}]", e.toString());
         return Result.error((e.getCodeMsgEnum()));
