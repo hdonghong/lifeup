@@ -28,3 +28,4 @@ hs_err_pid*
 /target/
 /.idea/
 application-prod.yml
+application-dev.yml

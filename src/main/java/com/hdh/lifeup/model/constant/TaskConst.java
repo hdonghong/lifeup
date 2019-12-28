@@ -23,6 +23,7 @@ public class TaskConst {
         public static final Integer IC_NEW = 0;
         public static final Integer IC_JOIN = 1;
         public static final Integer IC_SIGN = 2;
+        public static final Integer IC_GIVE_UP = 3;
     }
 
     public static class TaskStatus {
@@ -43,4 +44,10 @@ public class TaskConst {
         public static final Integer SECRET = 1;
     }
 
+    /** 排序规则 */
+    public static class RankRule {
+
+        /** 团队活跃度优先 */
+        public static final Integer TEAM_RANK_FIRST = 1;
+    }
 }

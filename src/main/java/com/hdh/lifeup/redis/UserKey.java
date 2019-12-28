@@ -32,5 +32,8 @@ public class UserKey<T> extends BasePrefix<T> {
 	public static final UserKey<Long> LIKE_COUNT_EXCHANGED = new UserKey<>(
 			TokenUtil.EXPIRE_SECONDS, "like_count_exchanged", Long.class
 	);
+	public static final UserKey<Long> ATTRIBUTE_WEEK = new UserKey<>(
+			3600 * 12, "attribute_week", Long.class
+	);
 
 }

@@ -63,6 +63,9 @@ public class TeamTaskDO extends BaseDO {
     /** 金币随机量 取值区间[0, 99]*/
     private Integer coinVariable = 0;
 
+    /** 团队活跃度 */
+    private Integer teamRank;
+
     @TableLogic
     private Integer isDel;
 

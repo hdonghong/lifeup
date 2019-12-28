@@ -31,4 +31,13 @@ public interface TeamMemberMapper extends SuperMapper<TeamMemberDO> {
 
     @Select("select team_id from team_member where user_id = #{userId}")
     List<Long> getTeamIdsByUserId(@Param("userId") Long userId);
+
+    /**
+     * 查看用户过去30天参与的团队数
+     * @param userId
+     * @return
+     */
+    @Select("select count(1) from team_member where user_id = #{userId} " +
+            "and DATE_SUB(CURDATE(), INTERVAL 30 DAY) < create_time")
+    int countUserLast30DaysTeams(@Param("userId") Long userId);
 }

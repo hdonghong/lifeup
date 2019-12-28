@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.plugins.PerformanceInterceptor;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * MybatisPlusConfig class<br/>
@@ -42,7 +43,8 @@ public class MybatisPlusConfig {
     /**
      * 性能分析拦截器，不建议生产使用，sql打印
      */
-//    @Bean
+    @Bean
+    @Profile("dev")
     public PerformanceInterceptor performanceInterceptor(){
         return new PerformanceInterceptor();
     }

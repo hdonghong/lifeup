@@ -111,6 +111,20 @@ public interface TeamMemberService {
      */
     int countUserTeamsWithStatus(Long userId, Integer teamStatus);
 
+    /**
+     * 查看用户过去30天参与的团队数
+     * @param userId
+     * @return
+     */
+    int countUserLast30DaysTeams(Long userId);
+
+    /**
+     * 查看用户过去30天发表的动态数
+     * @param userId
+     * @return
+     */
+    int countUserLast30DaysRecords(Long userId);
+
     /** 排行榜的临时实现：获取用户的经验值
      * @param userId 用户id
      * @return 用户的总经验值
@@ -125,7 +139,7 @@ public interface TeamMemberService {
     int quitTeam(Long teamId);
 
     /**
-     * 获取制定的1条动态详情
+     * 获取指定的1条动态详情
      * @param memberRecordId
      * @return
      */

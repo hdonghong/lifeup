@@ -1,21 +1,20 @@
 package com.hdh.lifeup.service;
 
-import java.util.Objects;
-import com.hdh.lifeup.dao.LikeCountUserMapper;
-import com.hdh.lifeup.dao.LikeMemberRecordMapper;
-import com.hdh.lifeup.exception.AsyncException;
+import com.hdh.lifeup.dao.*;
+import com.hdh.lifeup.model.constant.TaskConst.*;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.domain.LikeMemberRecordDO;
+import com.hdh.lifeup.model.vo.TeamActivityRankVO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
+import java.util.Objects;
 
 /**
  * AsyncTaskService class<br/>
@@ -27,7 +26,6 @@ import java.util.concurrent.Future;
 @Component
 public class AsyncTaskService {
 
-
     @Autowired
     private LikeMemberRecordMapper likeMemberRecordMapper;
 
@@ -37,6 +35,18 @@ public class AsyncTaskService {
     @Autowired
     private RedisOperator redisOperator;
 
+    @Autowired
+    private TeamTaskService teamTaskService;
+
+    @Autowired
+    @Lazy
+    private TeamMemberService teamMemberService;
+
+    /**
+     * 点赞
+     * @param userId
+     * @param memberRecordDTO
+     */
     @Async("taskExecutor")
     public void doLike(Long userId, TeamMemberRecordDTO memberRecordDTO){
         LikeMemberRecordDO likeMemberRecordDO = new LikeMemberRecordDO()
@@ -57,6 +67,11 @@ public class AsyncTaskService {
         }
     }
 
+    /**
+     * 取消点赞
+     * @param userId
+     * @param memberRecordDTO
+     */
     @Async("taskExecutor")
     public void undoLike(Long userId, TeamMemberRecordDTO memberRecordDTO) {
         Integer result = likeMemberRecordMapper.deleteById(memberRecordDTO.getMemberRecordId());
@@ -68,6 +83,11 @@ public class AsyncTaskService {
         likeCountUserMapper.incr(userId, -1);
     }
 
+    /**
+     * 点赞量兑换
+     * @param userId
+     * @param count
+     */
     @Async("taskExecutor")
     public void exchangeLike(Long userId, int count) {
 //        redisOperator.decrby(UserKey.LIKE_COUNT, userId, count);
@@ -75,16 +95,37 @@ public class AsyncTaskService {
         likeCountUserMapper.incr(userId, -count);
     }
 
-
+    /**
+     * 更新团队活跃度排序值
+     * @param teamId
+     * @param userId
+     * @param activityIcon
+     */
     @Async("taskExecutor")
-    public void doTaskFour(Future<?> future) throws AsyncException {
-        try {
-            System.err.println("future = " + future.get());
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
+    public void updateTeamRank(Long teamId, Long userId, Integer activityIcon) {
+        TeamActivityRankVO teamActivityRankVO = new TeamActivityRankVO();
+        if (ActivityIcon.IC_NEW.equals(activityIcon)) {
+            // 查创建者过去30天参与团队数
+            int ownerTeamCount = teamMemberService.countUserLast30DaysTeams(userId);
+
+            // 查创建者过去30天发表总动态数
+            int ownerActivityCount = teamMemberService.countUserLast30DaysRecords(userId);
+
+            teamActivityRankVO.setActivityCount(1)
+                    .setTeamMemberCount(1)
+                    .setOwnerTeamCount(ownerTeamCount)
+                    .setOwnerActivityCount(ownerActivityCount);
+        } else if (ActivityIcon.IC_JOIN.equals(activityIcon)) {
+            teamActivityRankVO.setActivityCount(1)
+                    .setTeamMemberCount(1);
+
+        } else if (ActivityIcon.IC_SIGN.equals(activityIcon)) {
+            teamActivityRankVO.setActivityCount(1);
+
+        } else {
+            return;
         }
+        teamTaskService.incrTeamRank(teamId, teamActivityRankVO.getTeamRank());
     }
 
 }

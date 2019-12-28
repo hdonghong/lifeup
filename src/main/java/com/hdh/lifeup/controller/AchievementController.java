@@ -2,7 +2,10 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.model.ao.UserAchievementAO;
 import com.hdh.lifeup.model.dto.PageDTO;
+import com.hdh.lifeup.model.dto.UserAchievementDTO;
+import com.hdh.lifeup.service.UserAchievementService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.model.vo.ResultVO;
@@ -10,10 +13,13 @@ import com.hdh.lifeup.model.vo.UserListVO;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * AchievementController class<br/>
@@ -25,12 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/achieve")
 public class AchievementController {
 
+    @Resource
     private UserInfoService userInfoService;
 
-    @Autowired
-    public AchievementController(UserInfoService userInfoService) {
-        this.userInfoService = userInfoService;
-    }
+    @Resource
+    private UserAchievementService userAchievementService;
 
     @ApiLimiting
     @ApiOperation(value = "获取关注者的周属性排行榜")
@@ -42,5 +47,39 @@ public class AchievementController {
         return Result.success(
                 userInfoService.getFollowingsRank(UserContext.get().getUserId(), pageDTO)
         );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "同步成就记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @PostMapping("/sync")
+    public ResultVO<Void> syncAchievement(@RequestBody List<UserAchievementAO> userAchievementAOList) {
+        Long userId = UserContext.get().getUserId();
+        userAchievementAOList.forEach(userAchievementAO -> {
+            userAchievementAO.setUserId(userId);
+            userAchievementService.sync(userAchievementAO);
+        });
+        return Result.success();
+    }
+
+
+    @ApiLimiting
+    @ApiOperation(value = "获取用户的成就记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @GetMapping
+    public ResultVO<List<UserAchievementAO>> listAchievements(
+            @RequestParam(value = "hasComplete", defaultValue = "1", required = false) Integer hasComplete) {
+        List<UserAchievementDTO> userAchievementDTOList = userAchievementService.listAchievements(
+                UserContext.get().getUserId(), hasComplete);
+        List<UserAchievementAO> achievementAOList = userAchievementDTOList.stream().map(userAchievementDTO -> {
+            UserAchievementAO userAchievementAO = new UserAchievementAO();
+            BeanUtils.copyProperties(userAchievementDTO, userAchievementAO);
+            return userAchievementAO;
+        }).collect(Collectors.toList());
+        return Result.success(achievementAOList);
     }
 }

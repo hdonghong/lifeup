@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -49,23 +50,20 @@ import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
 @Service
 public class UserInfoServiceImpl implements UserInfoService {
 
+    @Resource
     private RedisOperator redisOperator;
-    private UserInfoMapper userInfoMapper;
-    private AttributeService attributeService;
-    private TeamMemberService memberService;
-    @Autowired
-    private LikeService likeService;
 
-    @Autowired
-    public UserInfoServiceImpl(RedisOperator redisOperator,
-                               UserInfoMapper userInfoMapper,
-                               AttributeService attributeService,
-                               TeamMemberService memberService) {
-        this.redisOperator = redisOperator;
-        this.userInfoMapper = userInfoMapper;
-        this.attributeService = attributeService;
-        this.memberService = memberService;
-    }
+    @Resource
+    private UserInfoMapper userInfoMapper;
+
+    @Resource
+    private AttributeService attributeService;
+
+    @Resource
+    private TeamMemberService memberService;
+
+    @Resource
+    private LikeService likeService;
 
     @Override
     public UserInfoDTO getOne(@NonNull Long userId) {

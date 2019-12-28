@@ -63,6 +63,9 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     /** 金币随机量 取值区间[0, 99]*/
     private Integer coinVariable = 0;
 
+    /** 团队活跃度 */
+    private Integer teamRank;
+
     private LocalDateTime createTime;
 
     @Override

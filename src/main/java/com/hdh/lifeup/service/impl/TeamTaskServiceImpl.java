@@ -33,6 +33,7 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -141,11 +142,19 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle) {
-        log.info("pageNo = " + pageDTO.getCurrentPage());
+    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle, Integer rankRule, Boolean startDateFilter) {
+//        log.info("pageNo = " + pageDTO.getCurrentPage());
         QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
-                        .orderByDesc("team_id")
-                        .ne("team_status", TaskStatus.COMPLETE);
+                .ne("team_status", TaskStatus.COMPLETE);
+        // 判断是否过滤掉超过截止时间的团队，默认是过滤
+        if (startDateFilter == null || startDateFilter) {
+            wrapper.gt("start_date", new Date());
+        }
+        // 处理团队排序规则
+        if (RankRule.TEAM_RANK_FIRST.equals(rankRule)) {
+            wrapper.orderByDesc("team_rank");
+        }
+        wrapper.orderByDesc("team_id");
         if (!StringUtils.isEmpty(teamTitle)) {
             wrapper = wrapper.like("team_title", "%" + teamTitle + "%");
         }
@@ -157,7 +166,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO, Integer teamStatus) {
+    public PageDTO<TeamTaskDTO> pageUserTeams(Long userId, PageDTO pageDTO, Integer teamStatus, Boolean isOwner) {
         if (userId == null) {
             userId = UserContext.get().getUserId();
         }
@@ -167,7 +176,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         List<TeamTaskDO> teamTaskDOList = Lists.newArrayList();
         if (count > 0) {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-            teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO, teamStatus);
+            teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO, teamStatus, isOwner);
         }
         return PageDTO.<TeamTaskDTO>builder()
                 .currentPage(currentPage)
@@ -314,9 +323,23 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         return nextSign;
     }
 
+
     @Override
     @Transactional(rollbackFor = Exception.class, noRollbackFor = SingleTaskException.class)
     public NextSignVO signIn(Long teamId, ActivityVO activityVO) {
+        return this.signIn(teamId, activityVO, ActivityIcon.IC_SIGN);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, noRollbackFor = SingleTaskException.class)
+    public NextSignVO giveUp(Long teamId) {
+        ActivityVO activityVO = new ActivityVO();
+        activityVO.setActivity("");
+        return this.signIn(teamId, activityVO, ActivityIcon.IC_GIVE_UP);
+    }
+
+
+    private NextSignVO signIn(Long teamId, ActivityVO activityVO, int activityIcon) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
         // 判断当前用户是否团队成员
         if (memberService.isMember(teamId, UserContext.get().getUserId()) == 0) {
@@ -333,7 +356,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
         } else if (nowTime.isAfter(nextSign.getNextEndTime())) {
             // 超过签到时间
-            log.error("【团队签到】成员逾期签到，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
+            log.error("【团队签到】成员逾期操作，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
             throw new GlobalException(CodeMsgEnum.TEAM_NOT_SIGN_TIME);
 
         } else {
@@ -344,7 +367,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setTeamRecordId(nextSign.getTeamRecordId())
                     .setUserActivity(activityVO.getActivity())
                     .setActivityImages(activityVO.getActivityImages())
-                    .setActivityIcon(ActivityIcon.IC_SIGN);
+                    .setActivityIcon(activityIcon);
             memberService.addMemberRecord(memberRecordDTO);
             // 单次任务在这次签到完成后就直接完成了，没有下一次
             if (teamTaskDTO.getTeamFreq() == 0) {
@@ -355,8 +378,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         return this.getNextSign(teamTaskDTO);
     }
 
-
-    @Override
+   @Override
     public void endTeam(Long teamId) {
         Long currUserId = UserContext.get().getUserId();
         TeamTaskDO teamTaskDO = teamTaskMapper.selectOne(
@@ -371,6 +393,23 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         teamTaskDO.setTeamStatus(TaskStatus.COMPLETE);
         teamTaskDO.setCompleteTime(LocalDateTime.now());
         teamTaskMapper.updateById(teamTaskDO);
+    }
+
+    @Override
+    public List<TeamTaskDTO> getAllActiveTeams() {
+        List<TeamTaskDO> teamTaskDOList = teamTaskMapper.selectList(
+                new QueryWrapper<TeamTaskDO>()
+                        .ne("team_rank", 0)
+        );
+
+        return teamTaskDOList.stream()
+                .map(teamTaskDO -> TeamTaskDTO.from(teamTaskDO, TeamTaskDTO.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public int incrTeamRank(Long teamId, int e) {
+        return teamTaskMapper.incrTeamRank(teamId, e);
     }
 
     @Override

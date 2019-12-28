@@ -23,6 +23,7 @@ import com.hdh.lifeup.redis.LikeKey;
 import com.hdh.lifeup.redis.MemberRecordKey;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
+import com.hdh.lifeup.service.AsyncTaskService;
 import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.TeamMemberService;
 import lombok.NonNull;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -67,6 +69,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Autowired
     private LikeService likeService;
+
+    @Resource
+    private AsyncTaskService asyncTaskService;
 
     @Override
     public TeamMemberDTO getOne(@NonNull Long teamId, @NonNull Long userId) {
@@ -123,6 +128,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             log.error("【团队成员发布动态】新增失败, teamMemberRecordDTO = [{}]", teamMemberRecordDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
+        // 异步更新团队活跃度
+        asyncTaskService.updateTeamRank(
+                teamMemberRecordDTO.getTeamId(), teamMemberRecordDTO.getUserId(), teamMemberRecordDTO.getActivityIcon());
     }
 
     @Override
@@ -218,6 +226,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
                 new QueryWrapper<TeamMemberRecordDO>()
                         .eq("user_id", userId)
+                        .ne("activity_icon", ActivityIcon.IC_GIVE_UP)
                         .orderByDesc("member_record_id")
         );
         PageDTO<RecordDTO> recordPage = PageDTO.createFreely(userRecordsPage, RecordDTO.class);
@@ -237,7 +246,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             Set<Long> userIdSet = redisOperator.zrange(UserKey.FOLLOWING, userId, 0, -1);
             userIdSet.add(userId);
             count = memberRecordMapper.selectCount(
-                    new QueryWrapper<TeamMemberRecordDO>().in("user_id", userIdSet)
+                    new QueryWrapper<TeamMemberRecordDO>()
+                            .in("user_id", userIdSet)
+                            .ne("activity_icon", ActivityIcon.IC_GIVE_UP)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
@@ -247,7 +258,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         } else {
             // 否则认为指定在所有人
             count = memberRecordMapper.selectCount(
-                    new QueryWrapper<TeamMemberRecordDO>().ne("activity_icon", ActivityIcon.IC_JOIN)
+                    new QueryWrapper<TeamMemberRecordDO>()
+                            .ne("activity_icon", ActivityIcon.IC_JOIN)
+                            .ne("activity_icon", ActivityIcon.IC_GIVE_UP)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
@@ -298,10 +311,24 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         return teamTaskMapper.countUserTeamsWithStatus(userId, teamStatus);
     }
 
+    @Override
+    public int countUserLast30DaysTeams(Long userId) {
+        return memberMapper.countUserLast30DaysTeams(userId);
+    }
+
+    @Override
+    public int countUserLast30DaysRecords(Long userId) {
+        return memberRecordMapper.countUserLast30DaysRecords(userId);
+    }
+
 
     @Override
     @Deprecated // FIXME 极丑的实现
     public int getAttributeWeekly(Long userId) {
+        Long attributeWeek = redisOperator.get(UserKey.ATTRIBUTE_WEEK, userId);
+        if (attributeWeek != null) {
+            return attributeWeek.intValue();
+        }
         TemporalField fieldISO = WeekFields.of(Locale.CHINA).dayOfWeek();
         LocalDateTime monday = LocalDateTime.of(LocalDate.now().with(fieldISO, 1), LocalTime.MIN);
 //        LocalDateTime sunday = LocalDateTime.of(LocalDate.now().with(fieldISO, 7), LocalTime.create(23, 59, 59, 0));
@@ -314,16 +341,11 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         if (teamIdList.size() == 0) {
             return 0;
         }
-        return teamTaskMapper.selectBatchIds(teamIdList).stream().map(TeamTaskDO::getRewardExp).reduce(0, (sum, e) -> sum + e);
-        /*
-        return memberRecordDOList.stream()
-                .map(memberRecordDO ->
-                        Optional.ofNullable(teamTaskMapper.selectById(memberRecordDO.getTeamId()))
-                                .orElse(new TeamTaskDO().setRewardExp(0))
-                                .getRewardExp()
-                )
+        Integer expSum = teamTaskMapper.selectBatchIds(teamIdList)
+                .stream().map(TeamTaskDO::getRewardExp)
                 .reduce(0, (sum, e) -> sum + e);
-                */
+        redisOperator.setex(UserKey.ATTRIBUTE_WEEK, userId, expSum);
+        return expSum;
     }
 
     @Override

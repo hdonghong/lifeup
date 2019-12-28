@@ -45,7 +45,7 @@ public enum CodeMsgEnum {
     TEAM_NOT_EXIST(500601, "团队不存在"),
     TEAM_OUT_OF_DATE(500602, "逾期加入团队"),
     TEAM_IS_END(500603, "团队任务已经结束"),
-    TEAM_NOT_SIGN_TIME(500604, "未到签到时间"),
+    TEAM_NOT_SIGN_TIME(500604, "当前不是签到时间"),
     TEAM_INVALID_BEHAVIOR(500605, "越权操作"),
     TEAM_INVALID_COIN(500606, "金额越界"),
 

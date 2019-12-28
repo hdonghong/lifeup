@@ -101,9 +101,11 @@ public class TeamTaskController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping
-    public ResultVO<PageDTO<TeamTaskDTO>> getPage(PageDTO pageDTO, String teamTitle) {
+    public ResultVO<PageDTO<TeamTaskDTO>> getPage(
+            PageDTO pageDTO, String teamTitle, Integer teamRank,
+            @RequestParam(defaultValue = "true", required = false) Boolean startDateFilter) {
         return Result.success(
-                teamTaskService.page(pageDTO, teamTitle)
+                teamTaskService.page(pageDTO, teamTitle, teamRank, startDateFilter)
         );
     }
 
@@ -133,6 +135,19 @@ public class TeamTaskController {
 
         return Result.success(
                 teamTaskService.signIn(teamId, activityVO)
+        );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "放弃当前")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "teamId", required = true, paramType = "path", dataType = "long"),
+    })
+    @PostMapping("/{teamId}/giveUp")
+    public ResultVO<NextSignVO> giveUp(@PathVariable Long teamId) {
+        return Result.success(
+                teamTaskService.giveUp(teamId)
         );
     }
 
