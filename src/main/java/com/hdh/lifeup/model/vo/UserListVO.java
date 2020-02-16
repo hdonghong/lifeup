@@ -39,4 +39,5 @@ public class UserListVO {
 
     private Integer rank;
 
+    // TODO 用户所在时区、用户所在时区创建时间
 }

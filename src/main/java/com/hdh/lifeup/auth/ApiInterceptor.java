@@ -45,6 +45,12 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (HandlerMethod.class.isInstance(handler)) {
+            // 获取用户当前所在时区
+            String localTimeZone = request.getHeader("local-time-zone-gmt");
+            if (!StringUtils.isEmpty(localTimeZone)) {
+                TimeZoneContext.set(localTimeZone);
+            }
+
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             ApiLimiting apiLimiting = handlerMethod.getMethodAnnotation(ApiLimiting.class);
             // 没有使用鉴权限流注解，直接放行

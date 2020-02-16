@@ -30,4 +30,14 @@ public class TeamMemberDTO extends BaseDTO<TeamMemberDO> {
     private String teamRole;
 
     private LocalDateTime createTime;
+
+    /**
+     * 当地时区
+     */
+    private String localTimeZone;
+
+    /**
+     * 当地时间
+     */
+    private LocalDateTime localCreateTime;
 }

@@ -96,16 +96,18 @@ public class TeamTaskController {
     }
 
     @ApiLimiting
-    @ApiOperation(value = "获取团队列表分页")
+    @ApiOperation(value = "获取团队列表分页；createSource取值:1国内；2海外")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+            @ApiImplicitParam(name = "createSource", required = false, paramType = "", dataType = "int", example = "来源，1国内；2海外"),
     })
     @GetMapping
     public ResultVO<PageDTO<TeamTaskDTO>> getPage(
             PageDTO pageDTO, String teamTitle, Integer teamRank,
-            @RequestParam(defaultValue = "true", required = false) Boolean startDateFilter) {
+            @RequestParam(defaultValue = "true", required = false) Boolean startDateFilter,
+            @RequestParam(defaultValue = "1", required = false) Integer createSource) {
         return Result.success(
-                teamTaskService.page(pageDTO, teamTitle, teamRank, startDateFilter)
+                teamTaskService.page(pageDTO, teamTitle, teamRank, startDateFilter, createSource)
         );
     }
 

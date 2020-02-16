@@ -74,4 +74,11 @@ public class TeamDetailVO {
     /** 金币随机量 取值区间[0, 99]*/
     @ApiModelProperty(value = "金币 取值区间[0, 99]")
     private Integer coinVariable = 0;
+
+
+    /**
+     * 创建者当地时区
+     */
+    @ApiModelProperty(value = "创建者当地时区, 取值从 -12 到 +12")
+    private String localTimeZone;
 }

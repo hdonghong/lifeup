@@ -3,6 +3,7 @@ package com.hdh.lifeup.model.domain;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDO;
+import com.hdh.lifeup.model.constant.TaskConst;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -42,5 +43,20 @@ public class TeamMemberRecordDO extends BaseDO {
 
     private LocalDateTime createTime;
 
+    /**
+     * 团队团建来源 ： 国内/海外
+     * @see TaskConst.CreateSource
+     */
+    private Integer createSource;
+
+    /**
+     * 创建者当地时区
+     */
+    private String localTimeZone;
+
+    /**
+     * 当地时间
+     */
+    private LocalDateTime localCreateTime;
 
 }

@@ -49,6 +49,17 @@ public class RecordDTO implements Serializable {
     /** 点赞数量 */
     private Integer likeCount;
 
+
+    /**
+     * 当地时区
+     */
+    private String localTimeZone;
+
+    /**
+     * 当地时间
+     */
+    private LocalDateTime localCreateTime;
+
     public void setActivityImages(String activityImages) {
         this.activityImages = activityImages == null ?
                 new ArrayList<>() : JsonUtil.jsonToList(activityImages, String.class);

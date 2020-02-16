@@ -115,7 +115,7 @@ public class LikeServiceImpl implements LikeService {
         if (userLikeCount < exchangedLikeCount) {
             log.error("【点赞兑换】userId = [{}], userLikeCount = [{}], exchangedLikeCount = [{}]",
                     userId, userLikeCount, count);
-            throw new GlobalException(CodeMsgEnum.LIKE_NOT_ENOUGH);
+            throw new GlobalException(CodeMsgEnum.LIKE_COUNT_NOT_ENOUGH);
         }
         // 赞数不足则取剩余的全部去兑换
         int currCount = userLikeCount - exchangedLikeCount;

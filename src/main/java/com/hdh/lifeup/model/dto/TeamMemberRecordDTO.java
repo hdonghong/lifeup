@@ -2,6 +2,7 @@ package com.hdh.lifeup.model.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.model.constant.TaskConst;
 import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
@@ -43,6 +44,22 @@ public class TeamMemberRecordDTO extends BaseDTO<TeamMemberRecordDO> {
     private List<String> activityImages;
 
     private LocalDateTime createTime;
+
+    /**
+     * 团队团建来源 ： 国内/海外
+     * @see TaskConst.CreateSource
+     */
+    private Integer createSource;
+
+    /**
+     * 当地时区
+     */
+    private String localTimeZone;
+
+    /**
+     * 当地时间
+     */
+    private LocalDateTime localCreateTime;
 
     @Override
     public TeamMemberRecordDO toDO(Class<TeamMemberRecordDO> doClass) {

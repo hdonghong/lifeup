@@ -235,7 +235,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     }
 
     @Override
-    public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter) {
+    public PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter, int createSource) {
         Long currentPage = pageDTO.getCurrentPage();
         Integer count;
         long totalPage;
@@ -249,11 +249,12 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                     new QueryWrapper<TeamMemberRecordDO>()
                             .in("user_id", userIdSet)
                             .ne("activity_icon", ActivityIcon.IC_GIVE_UP)
+                            .eq("create_source", createSource)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-                recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO, filter);
+                recordList = memberRecordMapper.getRecordsByUserIds(userIdSet, pageDTO, filter, createSource);
             }
         } else {
             // 否则认为指定在所有人
@@ -261,11 +262,12 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                     new QueryWrapper<TeamMemberRecordDO>()
                             .ne("activity_icon", ActivityIcon.IC_JOIN)
                             .ne("activity_icon", ActivityIcon.IC_GIVE_UP)
+                            .eq("create_source", createSource)
             );
             totalPage = (long) Math.ceil((count * 1.0) / pageDTO.getSize());
             if (totalPage >= currentPage) {
                 pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
-                recordList = memberRecordMapper.getRecords(pageDTO, filter);
+                recordList = memberRecordMapper.getRecords(pageDTO, filter, createSource);
             }
         }
         assembleRecordList(recordList, userId);

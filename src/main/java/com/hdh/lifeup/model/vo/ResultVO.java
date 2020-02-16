@@ -25,12 +25,18 @@ public class ResultVO<T> implements Serializable {
     /** 提示信息 */
     private String msg;
 
+    /**
+     * 国际化信息
+     */
+    private String globalMsg;
+
     /** 具体内容 */
     private T data;
 
     private ResultVO(CodeMsgEnum codeMsgEnum, T data) {
         this.code = codeMsgEnum.getCode();
         this.msg = codeMsgEnum.getMsg();
+        this.globalMsg = codeMsgEnum.getGlobalMsg();
         this.data = data;
     }
 

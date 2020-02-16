@@ -50,4 +50,22 @@ public class TaskConst {
         /** 团队活跃度优先 */
         public static final Integer TEAM_RANK_FIRST = 1;
     }
+
+    /**
+     * 团队创建来源
+     */
+    public static class CreateSource {
+
+        /**
+         * 国内，默认
+         */
+        public static final Integer CHINA = 1;
+
+        /**
+         * 海外
+         */
+        public static final Integer OVERSEAS = 2;
+    }
+
+    public static final String TIME_ZONE_GMT8 = "+8";
 }

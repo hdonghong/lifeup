@@ -27,7 +27,6 @@ import com.hdh.lifeup.util.TokenUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -154,7 +153,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         // 当前用户是跟随者
         UserInfoDTO follower = UserContext.get();
         if (follower.getUserId().equals(userId)) {
-            throw new GlobalException(CodeMsgEnum.FORBIT_FOLLOW_YOURSELF);
+            throw new GlobalException(CodeMsgEnum.FORBID_FOLLOW_YOURSELF);
         }
         // 判断userId指向的用户是否存在
         this.getOne(userId);
@@ -178,7 +177,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         // 当前用户是跟随者
         UserInfoDTO follower = UserContext.get();
         if (follower.getUserId().equals(userId)) {
-            throw new GlobalException(CodeMsgEnum.FORBIT_FOLLOW_YOURSELF);
+            throw new GlobalException(CodeMsgEnum.FORBID_FOLLOW_YOURSELF);
         }
         // 判断userId指向的用户是否存在
         this.getOne(userId);

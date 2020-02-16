@@ -1,6 +1,7 @@
 package com.hdh.lifeup.model.dto;
 
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.model.constant.TaskConst;
 import com.hdh.lifeup.model.domain.TeamTaskDO;
 import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
@@ -67,6 +68,23 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     private Integer teamRank;
 
     private LocalDateTime createTime;
+
+
+    /**
+     * 团队团建来源 ： 国内/海外
+     * @see TaskConst.CreateSource
+     */
+    private Integer createSource;
+
+    /**
+     * 创建者当地时区
+     */
+    private String localTimeZone;
+
+    /**
+     * 当地时间
+     */
+    private LocalDateTime localCreateTime;
 
     @Override
     public TeamTaskDO toDO(Class<TeamTaskDO> doClass) {

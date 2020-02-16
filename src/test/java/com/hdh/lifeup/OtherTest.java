@@ -9,15 +9,17 @@ import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.model.domain.TeamRecordDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.vo.NextSignVO;
+import com.hdh.lifeup.util.LocalDateTimeUtil;
 import com.hdh.lifeup.util.sensitive.SensitiveFilter;
+import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.time.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.Comparator.naturalOrder;
 
 /**
  * OtherTest class<br/>
@@ -147,5 +149,30 @@ public class OtherTest {
             // 句子中有敏感词
             System.out.println(filted);
         }
+    }
+
+    @Test
+    public void testZoneId() {
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println(now);
+
+        now = LocalDateTime.now(ZoneId.of("Asia/Shanghai"));
+        System.out.println(now);
+
+        System.out.println();
+
+        for (int i = -12, j = 1; i <= 12; i++, j++) {
+            LocalDateTime now1 = LocalDateTime.now(ZoneId.of(i >= 0 ? "+" + i : "" + i));
+            System.out.println(i + ": " + now1);
+        }
+
+        System.out.println(LocalDateTimeUtil.now("GMT+13"));
+    }
+
+    @Test
+    public void testIsBefore() {
+        LocalDateTime nextEndTime = LocalDateTime.of(2020, 02, 16, 23, 59, 59);
+        LocalDateTime now = LocalDateTime.of(2020, 02, 16, 4, 37, 8);
+        System.out.println(nextEndTime.isBefore(now));
     }
 }

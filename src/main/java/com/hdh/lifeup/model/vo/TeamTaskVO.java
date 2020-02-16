@@ -1,5 +1,6 @@
 package com.hdh.lifeup.model.vo;
 
+import com.hdh.lifeup.model.constant.TaskConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -65,4 +66,10 @@ public class TeamTaskVO implements Serializable {
     @ApiModelProperty(value = "金币 取值区间[0, 99]")
     private Integer coinVariable = 0;
 
+    /**
+     * 团队团建来源 ： 国内/海外
+     * @see TaskConst.CreateSource
+     */
+    @ApiModelProperty(value = "国内:1；海外2")
+    private Integer createSource;
 }

@@ -40,9 +40,11 @@ public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> 
                 "</foreach>" +
             "AND r.activity_icon != 3 " +
             "<if test='filter == 1'> AND (r.user_activity != '' OR r.activity_images IS NOT NULL) </if>" +
+            "AND r.create_source = #{createSource} " +
             "order by r.create_time desc limit #{page.currentPage}, #{page.size} " +
             "</script>")
-    List<RecordDTO> getRecordsByUserIds(@Param("userIds") Collection<Long> userIds, @Param("page") PageDTO pageDTO, @Param("filter") int filter);
+    List<RecordDTO> getRecordsByUserIds(@Param("userIds") Collection<Long> userIds, @Param("page") PageDTO pageDTO, @Param("filter") int filter,
+                                        @Param("createSource") int createSource);
 
 
     /** 获取所有人可见的动态数据 */
@@ -53,9 +55,10 @@ public interface TeamMemberRecordMapper extends SuperMapper<TeamMemberRecordDO> 
             "AND r.activity_icon != 3 " +
             "AND r.activity_scope = 3 " +
             "<if test='filter == 1'> AND (r.user_activity != '' OR r.activity_images) IS NOT NULL </if>" +
+            "AND r.create_source = #{createSource} " +
             "ORDER BY r.create_time DESC LIMIT #{page.currentPage}, #{page.size} " +
             "</script>")
-    List<RecordDTO> getRecords(@Param("page") PageDTO pageDTO, @Param("filter") int filter);
+    List<RecordDTO> getRecords(@Param("page") PageDTO pageDTO, @Param("filter") int filter, @Param("createSource") int createSource);
 
     /**
      * 查看用户过去30天发表的动态数

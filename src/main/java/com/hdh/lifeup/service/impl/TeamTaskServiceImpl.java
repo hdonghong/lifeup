@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.hdh.lifeup.auth.TimeZoneContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.dao.TeamRecordMapper;
@@ -22,6 +23,7 @@ import com.hdh.lifeup.model.vo.TeamTaskVO;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
+import com.hdh.lifeup.util.LocalDateTimeUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -33,6 +35,8 @@ import org.springframework.util.StringUtils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -87,8 +91,12 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         if (teamTaskDTO.getStartDate() == null) {
             teamTaskDTO.setStartDate(LocalDate.of(2118, 11, 21));
         }
+        // 根据时区获取时间
+        LocalDateTime localNow = LocalDateTimeUtil.now(TimeZoneContext.get());
+        teamTaskDTO.setLocalTimeZone(TimeZoneContext.get());
+        teamTaskDTO.setLocalCreateTime(localNow);
         if (teamTaskDTO.getFirstStartTime() == null) {
-            teamTaskDTO.setFirstStartTime(LocalDateTime.now());
+            teamTaskDTO.setFirstStartTime(localNow);
         }
         TeamTaskDO teamTaskDO = teamTaskDTO.toDO(TeamTaskDO.class);
         Integer result = teamTaskMapper.insert(teamTaskDO);
@@ -117,7 +125,6 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         if (StringUtils.isEmpty(teamTaskVO.getTeamHead())) {
             teamTaskDTO.setTeamHead(UserContext.get().getUserHead());
         }
-
         this.insert(teamTaskDTO);
         Long teamId = teamTaskDTO.getTeamId();
 
@@ -125,16 +132,22 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
 
         // 创建者作为owner写入成员表
-        TeamMemberDTO memberDTO = new TeamMemberDTO()
-                                            .setTeamId(teamId)
-                                            .setTeamRole(TeamRole.OWNER);
+        String localTimeZone = TimeZoneContext.get();
+        LocalDateTime localNow = LocalDateTimeUtil.now(localTimeZone);
+        TeamMemberDTO memberDTO = new TeamMemberDTO().setTeamId(teamId)
+                .setTeamRole(TeamRole.OWNER)
+                .setLocalTimeZone(localTimeZone)
+                .setLocalCreateTime(localNow);
         // 创建者默认发布第一条团队成员动态，此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                                             .setTeamId(teamId)
                                             .setTeamTitle(teamTaskDTO.getTeamTitle())
                                             .setTeamRecordId(teamId)
                                             .setUserActivity("创建了团队「" +  teamTaskVO.getTeamTitle() +"」")
-                                            .setActivityIcon(ActivityIcon.IC_NEW);
+                                            .setActivityIcon(ActivityIcon.IC_NEW)
+                                            .setCreateSource(teamTaskDTO.getCreateSource())
+                                            .setLocalTimeZone(localTimeZone)
+                                            .setLocalCreateTime(localNow);
         memberService.addMember(memberDTO, memberRecordDTO);
 
         return nextSign;
@@ -142,14 +155,21 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle, Integer rankRule, Boolean startDateFilter) {
+    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle, Integer rankRule, Boolean startDateFilter, Integer createSource) {
 //        log.info("pageNo = " + pageDTO.getCurrentPage());
         QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
                 .ne("team_status", TaskStatus.COMPLETE);
         // 判断是否过滤掉超过截止时间的团队，默认是过滤
+        LocalDateTime localNow = LocalDateTimeUtil.now(TimeZoneContext.get());
+        ZonedDateTime zdt = localNow.atZone(ZoneId.of(TimeZoneContext.get()));
+        Date date = Date.from(zdt.toInstant());
         if (startDateFilter == null || startDateFilter) {
-            wrapper.gt("start_date", new Date());
+            wrapper.gt("start_date", date);
         }
+        if (createSource == null) {
+            createSource = CreateSource.CHINA;
+        }
+        wrapper.eq("create_source", createSource);
         // 处理团队排序规则
         if (RankRule.TEAM_RANK_FIRST.equals(rankRule)) {
             wrapper.orderByDesc("team_rank");
@@ -221,8 +241,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         if (!TaskStatus.DOING.equals(teamTaskDTO.getTeamStatus())) {
             throw new GlobalException(CodeMsgEnum.TEAM_IS_END);
         }
-
-        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDateTime nowTime = LocalDateTimeUtil.now(TimeZoneContext.get());
         List<TeamRecordDO> teamRecordDOList = teamRecordMapper.selectList(
                 new QueryWrapper<TeamRecordDO>().eq("team_id", teamTaskDTO.getTeamId())
                                                 .gt("next_end_time", nowTime)
@@ -302,23 +321,31 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     @Override
     public NextSignVO joinTeam(Long teamId) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
-        if (LocalDate.now().isAfter(teamTaskDTO.getStartDate())) {
+        String localTimeZone = TimeZoneContext.get();
+        LocalDateTime localNow = LocalDateTimeUtil.now(localTimeZone);
+        if (localNow.toLocalDate().isAfter(teamTaskDTO.getStartDate())) {
             log.error("【加入团队】已超过加入团队的截止日期，startDate() = [{}]", teamTaskDTO.getStartDate());
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
 
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
         // 创建者作为新成员写入成员表
+
         TeamMemberDTO memberDTO = new TeamMemberDTO()
                 .setTeamId(teamId)
-                .setTeamRole(TeamRole.MEMBER);
+                .setTeamRole(TeamRole.MEMBER)
+                .setLocalTimeZone(localTimeZone)
+                .setLocalCreateTime(localNow);
         // 创建者默认发布第一条团队成员动态 此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                 .setTeamId(teamId)
                 .setTeamTitle(teamTaskDTO.getTeamTitle())
                 .setTeamRecordId(teamId)
                 .setUserActivity("欢迎"+ UserContext.get().getNickname() +"加入团队「" +  nextSign.getTeamTitle() +"」")
-                .setActivityIcon(ActivityIcon.IC_JOIN);
+                .setActivityIcon(ActivityIcon.IC_JOIN)
+                .setCreateSource(teamTaskDTO.getCreateSource())
+                .setLocalTimeZone(localTimeZone)
+                .setLocalCreateTime(localNow);
         memberService.addMember(memberDTO, memberRecordDTO);
         return nextSign;
     }
@@ -348,7 +375,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
 
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
-        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDateTime nowTime = LocalDateTimeUtil.now(TimeZoneContext.get());
 
         if (nowTime.isBefore(nextSign.getNextStartTime())) {
             // 未到签到时间
@@ -367,7 +394,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setTeamRecordId(nextSign.getTeamRecordId())
                     .setUserActivity(activityVO.getActivity())
                     .setActivityImages(activityVO.getActivityImages())
-                    .setActivityIcon(activityIcon);
+                    .setActivityIcon(activityIcon)
+                    .setCreateSource(teamTaskDTO.getCreateSource())
+                    .setLocalTimeZone(TimeZoneContext.get())
+                    .setLocalCreateTime(nowTime);
             memberService.addMemberRecord(memberRecordDTO);
             // 单次任务在这次签到完成后就直接完成了，没有下一次
             if (teamTaskDTO.getTeamFreq() == 0) {
@@ -391,7 +421,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
 
         teamTaskDO.setTeamStatus(TaskStatus.COMPLETE);
-        teamTaskDO.setCompleteTime(LocalDateTime.now());
+        teamTaskDO.setCompleteTime(LocalDateTimeUtil.now(teamTaskDO.getLocalTimeZone()));
         teamTaskMapper.updateById(teamTaskDO);
     }
 
@@ -432,7 +462,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
      */
     private TeamRecordDO addTeamRecord(TeamTaskDTO teamTaskDTO, int n) {
         LocalDateTime firstStartTime = teamTaskDTO.getFirstStartTime();
-        LocalDateTime nowTime = LocalDateTime.now();
+        LocalDateTime nowTime = LocalDateTimeUtil.now(TimeZoneContext.get());
 
         // 计算下n次签到的日期时间
         LocalDate firstStartDate = firstStartTime.toLocalDate();

@@ -77,7 +77,7 @@ public interface TeamMemberService {
      * @param filter 过滤条件，0无；1过滤默认发的
      * @return 动态列表
      */
-    PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter);
+    PageDTO<RecordDTO> getMoments(PageDTO pageDTO, int scope, int filter, int createSource);
 
     /**
      * 是否团队成员
@@ -146,7 +146,7 @@ public interface TeamMemberService {
     TeamMemberRecordDTO getOneMemberRecord(Long memberRecordId);
 
     /**
-     * 删除用户发表的动态 TODO
+     * 删除用户发表的动态
      * @param memberRecordId
      * @param userId
      */

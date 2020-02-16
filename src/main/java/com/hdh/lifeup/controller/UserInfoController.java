@@ -225,13 +225,14 @@ public class UserInfoController {
     @GetMapping(value = {"/moments", "/moments/{scope}"})
     public ResultVO<PageDTO<RecordDTO>> getMoments(PageDTO pageDTO,
                                                    @PathVariable(value = "scope", required = false) Integer scope,
-                                                   @RequestParam(defaultValue = "0", required = false) Integer filter) {
+                                                   @RequestParam(defaultValue = "0", required = false) Integer filter,
+                                                   @RequestParam(defaultValue = "1", required = false) Integer createSource) {
         // 限定只能是朋友圈 或者 所有人
         if (!TaskConst.ActivityScope.ALL.equals(scope)) {
             scope = TaskConst.ActivityScope.MYFOLLOWERS;
         }
         return Result.success(
-                teamMemberService.getMoments(pageDTO, scope, filter)
+                teamMemberService.getMoments(pageDTO, scope, filter, createSource)
         );
     }
 }
