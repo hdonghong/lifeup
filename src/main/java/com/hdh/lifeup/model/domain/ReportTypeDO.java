@@ -26,6 +26,8 @@ public class ReportTypeDO extends BaseDO  {
 
     private String typeName;
 
+    private String typeNameEng;
+
     /** '0存在；1删除' */
     @TableLogic
     private Integer isDel;

@@ -25,4 +25,7 @@ public class ReportTypeDTO extends BaseDTO<ReportTypeDO> {
     @ApiModelProperty(value = "举报类型名")
     private String typeName;
 
+    @ApiModelProperty(value = "举报类型英文名")
+    private String typeNameEng;
+
 }

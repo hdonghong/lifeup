@@ -47,9 +47,10 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
         if (HandlerMethod.class.isInstance(handler)) {
             // 获取用户当前所在时区
             String localTimeZone = request.getHeader("local-time-zone-gmt");
-            if (!StringUtils.isEmpty(localTimeZone)) {
-                TimeZoneContext.set(localTimeZone);
+            if (StringUtils.isEmpty(localTimeZone)) {
+                localTimeZone = "+8";
             }
+            TimeZoneContext.set(localTimeZone);
 
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             ApiLimiting apiLimiting = handlerMethod.getMethodAnnotation(ApiLimiting.class);

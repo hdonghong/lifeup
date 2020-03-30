@@ -1,6 +1,8 @@
 package com.hdh.lifeup.controller;
 
+import com.google.common.base.Objects;
 import com.hdh.lifeup.auth.ApiLimiting;
+import com.hdh.lifeup.auth.TimeZoneContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.config.QiniuConfig;
 import com.hdh.lifeup.model.constant.TaskConst;
@@ -24,6 +26,8 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import static com.hdh.lifeup.model.constant.TaskConst.TIME_ZONE_GMT8;
 
 /**
  * UserInfoController class<br/>
@@ -87,7 +91,9 @@ public class UserInfoController {
     @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String")
     @PutMapping("/profile")
     public ResultVO<UserInfoDTO> updateProfile(@RequestBody UserInfoDTO userInfoDTO) {
-        userInfoDTO.setNickname(SensitiveFilter.filter(userInfoDTO.getNickname()));
+        if (Objects.equal(TimeZoneContext.get(), TIME_ZONE_GMT8)) {
+            userInfoDTO.setNickname(SensitiveFilter.filter(userInfoDTO.getNickname()));
+        }
 
         UserInfoDTO updateResult = userInfoService.update(userInfoDTO);
         return Result.success(updateResult);

@@ -1,8 +1,11 @@
 package com.hdh.lifeup.controller;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.ApiLimiting;
+import com.hdh.lifeup.auth.TimeZoneContext;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.model.constant.TaskConst;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
@@ -19,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static com.hdh.lifeup.model.constant.TaskConst.TIME_ZONE_GMT8;
 
 /**
  * TeamTaskController class<br/>
@@ -45,8 +50,11 @@ public class TeamTaskController {
     })
     @PostMapping("/new")
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
-        teamTaskVO.setTeamTitle(SensitiveFilter.filter(teamTaskVO.getTeamTitle()))
-                .setTeamDesc(SensitiveFilter.filter(teamTaskVO.getTeamDesc()));
+        // 非海外的需要过滤
+        if (!Objects.equal(TaskConst.CreateSource.OVERSEAS, teamTaskVO.getCreateSource())) {
+            teamTaskVO.setTeamTitle(SensitiveFilter.filter(teamTaskVO.getTeamTitle()))
+                    .setTeamDesc(SensitiveFilter.filter(teamTaskVO.getTeamDesc()));
+        }
         // 规定金币值的范围[0, 99]
         if (teamTaskVO.getCoin() < 0 || teamTaskVO.getCoinVariable() < 0
                 || teamTaskVO.getCoin() + teamTaskVO.getCoinVariable() > 99) {
@@ -171,8 +179,10 @@ public class TeamTaskController {
     })
     @PutMapping("/{teamId}")
     public ResultVO<?> editTeam(@RequestBody TeamEditVO teamEditVO) {
-        teamEditVO.setTeamTitle(SensitiveFilter.filter(teamEditVO.getTeamTitle()))
-                .setTeamDesc(SensitiveFilter.filter(teamEditVO.getTeamDesc()));
+        if (Objects.equal(TimeZoneContext.get(), TIME_ZONE_GMT8)) {
+            teamEditVO.setTeamTitle(SensitiveFilter.filter(teamEditVO.getTeamTitle()))
+                    .setTeamDesc(SensitiveFilter.filter(teamEditVO.getTeamDesc()));
+        }
         // 规定金币值的范围[0, 99]
         if (teamEditVO.getCoin() < 0 || teamEditVO.getCoinVariable() < 0
                 || teamEditVO.getCoin() + teamEditVO.getCoinVariable() > 99) {
