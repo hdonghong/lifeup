@@ -54,6 +54,8 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
 
     private String pwdSalt;
 
+    private Integer userType;
+
     public static UserInfoDTO fromYbUser(JsonNode userInfoJson) {
         Preconditions.checkNotNull(userInfoJson, "userInfoJson can not be empty!");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
