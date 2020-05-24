@@ -1,6 +1,8 @@
 package com.hdh.lifeup.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.TokenContext;
@@ -18,10 +20,7 @@ import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
-import com.hdh.lifeup.service.AttributeService;
-import com.hdh.lifeup.service.LikeService;
-import com.hdh.lifeup.service.TeamMemberService;
-import com.hdh.lifeup.service.UserInfoService;
+import com.hdh.lifeup.service.*;
 import com.hdh.lifeup.util.PasswordUtil;
 import com.hdh.lifeup.util.TokenUtil;
 import lombok.NonNull;
@@ -36,6 +35,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
 
@@ -60,9 +60,10 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     @Resource
     private TeamMemberService memberService;
-
     @Resource
     private LikeService likeService;
+    @Resource
+    private UserRankService userRankService;
 
     @Override
     public UserInfoDTO getOne(@NonNull Long userId) {
@@ -233,7 +234,8 @@ public class UserInfoServiceImpl implements UserInfoService {
             UserListVO userListVO = new UserListVO();
             userList.add(userListVO);
             BeanUtils.copyProperties(userInfoDO, userListVO);
-            int attribute = memberService.getAttributeWeekly(userInfoDO.getUserId());
+//            int attribute = memberService.getAttributeWeekly(userInfoDO.getUserId());
+            int attribute = userRankService.getRankByUser(userInfoDO.getUserId()).getRankValue().intValue();
             userListVO.setPoint(attribute);
         });
         userList.sort((o1, o2) -> o2.getPoint() - o1.getPoint());
@@ -246,6 +248,17 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .list(userList.subList(fromIndex, toIndex))
                 .totalPage((long) Math.ceil((userSize * 1.0) / pageDTO.getSize()))
                 .build();
+    }
+
+    @Override
+    public List<UserInfoDTO> listUser(int current, int limit) {
+        IPage<UserInfoDO> userInfoDOPage = userInfoMapper.selectPage(
+                new Page<>(current, limit),
+                new QueryWrapper<>()
+        );
+        return userInfoDOPage.getRecords().stream()
+                .map(userInfoDO -> UserInfoDTO.from(userInfoDO, UserInfoDTO.class))
+                .collect(Collectors.toList());
     }
 
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {

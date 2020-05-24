@@ -6,6 +6,8 @@ import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import lombok.NonNull;
 
+import java.util.List;
+
 /**
  * UserInfoService interface<br/>
  *
@@ -78,4 +80,12 @@ public interface UserInfoService {
      * @return 用户列表
      */
     PageDTO<UserListVO> getFollowingsRank(Long userId, PageDTO pageDTO);
+
+    /**
+     * 获取用户列表
+     * @param current 1, ...
+     * @param limit
+     * @return
+     */
+    List<UserInfoDTO> listUser(int current, int limit);
 }

@@ -81,4 +81,11 @@ public class TeamDetailVO {
      */
     @ApiModelProperty(value = "创建者当地时区, 取值从 -12 到 +12")
     private String localTimeZone;
+
+
+    /**
+     * 子任务列表
+     */
+    @ApiModelProperty(value = "子任务列表")
+    private List<String> subTaskList;
 }

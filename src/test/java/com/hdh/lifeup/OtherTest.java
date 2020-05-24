@@ -1,5 +1,6 @@
 package com.hdh.lifeup;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -174,5 +175,11 @@ public class OtherTest {
         LocalDateTime nextEndTime = LocalDateTime.of(2020, 02, 16, 23, 59, 59);
         LocalDateTime now = LocalDateTime.of(2020, 02, 16, 4, 37, 8);
         System.out.println(nextEndTime.isBefore(now));
+    }
+
+    @Test
+    public void testMinus() {
+        LocalDateTime lastTwoWeeksDay = LocalDateTime.now().minusWeeks(2);
+        System.out.println(lastTwoWeeksDay);
     }
 }

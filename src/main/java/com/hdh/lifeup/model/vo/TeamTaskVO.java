@@ -72,4 +72,10 @@ public class TeamTaskVO implements Serializable {
      */
     @ApiModelProperty(value = "国内:1；海外2")
     private Integer createSource;
+
+    /**
+     * 子任务列表
+     */
+    @ApiModelProperty(value = "子任务列表")
+    private List<String> subTaskList;
 }

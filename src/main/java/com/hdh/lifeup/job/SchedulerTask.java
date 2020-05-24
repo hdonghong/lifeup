@@ -1,9 +1,13 @@
 package com.hdh.lifeup.job;
 
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.service.TeamTaskService;
+import com.hdh.lifeup.service.UserInfoService;
+import com.hdh.lifeup.service.UserRankService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -19,6 +23,10 @@ public class SchedulerTask {
 
     @Resource
     private TeamTaskService teamTaskService;
+    @Resource
+    private UserInfoService userInfoService;
+    @Resource
+    private UserRankService userRankService;
 
     /**
      * 团队活跃度缩减机制
@@ -33,4 +41,19 @@ public class SchedulerTask {
         });
     }
 
+    @Scheduled(cron="*0 0 3 * * ?")
+    public void updateUserRank() {
+        int current = 1;
+        int limit = 500;
+
+        while (true) {
+            List<UserInfoDTO> userInfoDTOList = userInfoService.listUser(current, limit);
+            if (CollectionUtils.isEmpty(userInfoDTOList)) {
+                break;
+            }
+            userInfoDTOList.forEach(userInfoDTO ->
+                    userRankService.updateRankValue(userInfoDTO.getUserId()));
+            current++;
+        }
+    }
 }
