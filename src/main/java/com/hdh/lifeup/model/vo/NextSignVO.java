@@ -1,5 +1,6 @@
 package com.hdh.lifeup.model.vo;
 
+import com.hdh.lifeup.model.dto.TeamSubTaskDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -51,4 +52,10 @@ public class NextSignVO implements Serializable {
     /** 金币随机量 取值区间[0, 99]*/
     @ApiModelProperty(value = "金币 取值区间[0, 99]")
     private Integer coinVariable = 0;
+
+    /**
+     * 子任务列表
+     */
+    @ApiModelProperty(value = "子任务列表")
+    private List<TeamSubTaskDTO> subTaskList;
 }

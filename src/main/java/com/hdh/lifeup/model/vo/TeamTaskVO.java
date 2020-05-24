@@ -1,6 +1,7 @@
 package com.hdh.lifeup.model.vo;
 
 import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.dto.TeamSubTaskDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -77,5 +78,5 @@ public class TeamTaskVO implements Serializable {
      * 子任务列表
      */
     @ApiModelProperty(value = "子任务列表")
-    private List<String> subTaskList;
+    private List<TeamSubTaskDTO> subTaskList;
 }

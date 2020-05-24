@@ -11,7 +11,6 @@ import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * TeamTaskDO class<br/>
@@ -88,9 +87,4 @@ public class TeamTaskDO extends BaseDO {
      * 当地时间
      */
     private LocalDateTime localCreateTime;
-
-    /**
-     * 子任务列表
-     */
-    private String subTaskList;
 }

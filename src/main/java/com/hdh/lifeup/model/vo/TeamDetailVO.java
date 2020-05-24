@@ -1,5 +1,6 @@
 package com.hdh.lifeup.model.vo;
 
+import com.hdh.lifeup.model.dto.TeamSubTaskDTO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -87,5 +88,5 @@ public class TeamDetailVO {
      * 子任务列表
      */
     @ApiModelProperty(value = "子任务列表")
-    private List<String> subTaskList;
+    private List<TeamSubTaskDTO > subTaskList;
 }

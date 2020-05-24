@@ -47,6 +47,7 @@ public class SchedulerTask {
         int limit = 500;
 
         while (true) {
+            System.err.println("start updateUserRank");
             List<UserInfoDTO> userInfoDTOList = userInfoService.listUser(current, limit);
             if (CollectionUtils.isEmpty(userInfoDTOList)) {
                 break;

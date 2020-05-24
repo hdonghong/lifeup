@@ -21,6 +21,7 @@ import com.hdh.lifeup.model.vo.NextSignVO;
 import com.hdh.lifeup.model.vo.TeamDetailVO;
 import com.hdh.lifeup.model.vo.TeamTaskVO;
 import com.hdh.lifeup.service.TeamMemberService;
+import com.hdh.lifeup.service.TeamSubTaskService;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.LocalDateTimeUtil;
@@ -33,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -61,6 +63,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     private TeamMemberService memberService;
 
     private UserInfoService userInfoService;
+
+    @Resource
+    private TeamSubTaskService teamSubTaskService;
 
     @Autowired
     public TeamTaskServiceImpl(TeamTaskMapper teamTaskMapper,
@@ -127,6 +132,10 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
         this.insert(teamTaskDTO);
         Long teamId = teamTaskDTO.getTeamId();
+        // 如果有子任务，则保存子任务
+        if (!CollectionUtils.isEmpty(teamTaskVO.getSubTaskList())) {
+            teamSubTaskService.batchInsert(teamId, teamTaskVO.getSubTaskList());
+        }
 
         // 先获取下一次签到的VO
         NextSignVO nextSign = this.getNextSign(teamTaskDTO);
@@ -226,6 +235,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                     .setNextEndTime(nextSign.getNextEndTime())
                     .setIsMember(memberService.isMember(teamId, UserContext.get().getUserId()))
                     .setIsOwner(UserContext.get().getUserId().equals(owner.getUserId()) ? 1 : 0);
+        // 获取子任务
+        List<TeamSubTaskDTO> teamSubTaskDTOList = teamSubTaskService.listByTeamId(teamId);
+        teamDetailVO.setSubTaskList(teamSubTaskDTOList);
         return teamDetailVO;
     }
 
@@ -248,10 +260,13 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                                                 .orderByAsc("team_record_id")
         );
 
-        // 如果没有下一次的签到信息，就直接生成后返回
+        // 装配必要的团队信息
         NextSignVO nextSignVO = new NextSignVO();
         BeanUtils.copyProperties(teamTaskDTO, nextSignVO);
+        List<TeamSubTaskDTO> teamSubTaskDTOList = teamSubTaskService.listByTeamId(teamTaskDTO.getTeamId());
+        nextSignVO.setSubTaskList(teamSubTaskDTOList);
 
+        // 如果没有下一次的签到信息，就直接生成后返回
         if (CollectionUtils.isEmpty(teamRecordDOList)) {
             BeanUtils.copyProperties(this.addTeamRecord(teamTaskDTO, 1), nextSignVO);
             return nextSignVO;

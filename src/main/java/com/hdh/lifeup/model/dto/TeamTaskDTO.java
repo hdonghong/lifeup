@@ -89,18 +89,15 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     /**
      * 子任务列表
      */
-    private List<String> subTaskList;
+    private List<TeamSubTaskDTO> subTaskList;
 
     @Override
     public TeamTaskDO toDO(Class<TeamTaskDO> doClass) {
         try {
             TeamTaskDO taskDO = doClass.newInstance();
-            BeanUtils.copyProperties(this, taskDO, "rewardAttrs", "subTaskList");
+            BeanUtils.copyProperties(this, taskDO, "rewardAttrs");
             if (this.rewardAttrs != null && this.rewardAttrs.size() > 0) {
                 taskDO.setRewardAttrs(JsonUtil.toJson(this.rewardAttrs));
-            }
-            if (this.subTaskList != null && this.subTaskList.size() > 0) {
-                taskDO.setSubTaskList(JsonUtil.toJson(this.subTaskList));
             }
             return taskDO;
         } catch (Exception e) {
@@ -113,9 +110,8 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
     @Override
     public <DTO extends BaseDTO> DTO from(TeamTaskDO aDO) {
         TeamTaskDTO teamDTO = new TeamTaskDTO();
-        BeanUtils.copyProperties(aDO, teamDTO, "rewardAttrs", "subTaskList");
+        BeanUtils.copyProperties(aDO, teamDTO, "rewardAttrs");
         teamDTO.setRewardAttrs(JsonUtil.jsonToList(aDO.getRewardAttrs(), String.class));
-        teamDTO.setRewardAttrs(JsonUtil.jsonToList(aDO.getSubTaskList(), String.class));
         return (DTO) teamDTO;
     }
 }
