@@ -82,4 +82,16 @@ public class AchievementController {
         }).collect(Collectors.toList());
         return Result.success(achievementAOList);
     }
+
+    @ApiLimiting
+    @ApiOperation(value = "删除用户的成就记录")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @DeleteMapping
+    public ResultVO<?> deleteUserAchievement() {
+        Long userId = UserContext.get().getUserId();
+        userAchievementService.deleteByUserId(userId);
+        return Result.success();
+    }
 }

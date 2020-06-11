@@ -182,4 +182,30 @@ public class OtherTest {
         LocalDateTime lastTwoWeeksDay = LocalDateTime.now().minusWeeks(2);
         System.out.println(lastTwoWeeksDay);
     }
+
+    @Test
+    public void testLeetcode() {
+        int[] nums = new int[]{1, 3, 5, 6};
+
+        System.out.println(searchInsert(nums, 7));
+    }
+
+    public int searchInsert(int[] nums, int target) {
+        if (nums.length == 0) {
+            return 0;
+        }
+        int lo = 0;
+        int hi = nums.length - 1;
+        while (lo < hi) {
+            int mid = (lo + hi) >> 1;
+            if (nums[mid] > target) {
+                hi = mid - 1;
+            } else if (nums[mid] < target) {
+                lo = mid + 1;
+            } else {
+                return mid;
+            }
+        }
+        return nums[lo] >= target ? lo : lo + 1;
+    }
 }

@@ -57,4 +57,15 @@ public class UserAchievementServiceImpl implements UserAchievementService {
                 .map(userAchievementDO -> UserAchievementDTO.from(userAchievementDO, UserAchievementDTO.class))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteByUserId(Long userId) {
+        QueryWrapper<UserAchievementDO> achievementQueryWrapper = new QueryWrapper<UserAchievementDO>()
+                .eq("user_id", userId);
+        Integer count = userAchievementMapper.selectCount(achievementQueryWrapper);
+        if (count == null || count == 0) {
+            return;
+        }
+        userAchievementMapper.delete(achievementQueryWrapper);
+    }
 }

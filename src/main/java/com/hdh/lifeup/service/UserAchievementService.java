@@ -17,4 +17,5 @@ public interface UserAchievementService {
 
     List<UserAchievementDTO> listAchievements(Long userId, Integer hasComplete);
 
+    void deleteByUserId(Long userId);
 }
