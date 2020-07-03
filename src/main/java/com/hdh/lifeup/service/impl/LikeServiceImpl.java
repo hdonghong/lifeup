@@ -4,6 +4,7 @@ import com.hdh.lifeup.dao.LikeCountUserMapper;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
+import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.redis.KeyPrefix;
 import com.hdh.lifeup.redis.LikeKey;
@@ -12,6 +13,7 @@ import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.AsyncTaskService;
 import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.TeamMemberService;
+import com.hdh.lifeup.service.TeamTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -39,6 +41,9 @@ public class LikeServiceImpl implements LikeService {
 
     @Autowired
     private LikeCountUserMapper likeCountUserMapper;
+
+    @Autowired
+    private TeamTaskService teamTaskService;
 
     @Override
     public int doLike(Long userId, Long memberRecordId) {
@@ -122,5 +127,41 @@ public class LikeServiceImpl implements LikeService {
         count = Math.min(count, currCount);
         asyncTaskService.exchangeLike(userId, count);
         return count;
+    }
+
+    @Override
+    public int doLikeTeam(Long userId, Long teamId) {
+        TeamTaskDTO teamTaskDTO = teamTaskService.getOne(teamId);
+        // 哪个团队被谁点赞了
+        long result = redisOperator.sadd(LikeKey.TEAM, teamId, userId);
+        if (result == 0) {
+            log.error("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], teamId = [{}]",
+                    userId, teamId);
+            throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
+        }
+
+        // 异步写库
+        asyncTaskService.doLike(userId, teamTaskDTO);
+        return (int) redisOperator.scard(LikeKey.TEAM, teamId);
+    }
+
+    @Override
+    public int undoLikeTeam(Long userId, Long teamId) {
+        TeamTaskDTO teamTaskDTO = teamTaskService.getOne(teamId);
+        long result = redisOperator.srem(LikeKey.TEAM, teamId, userId);
+        if (result == 0) {
+            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], memberRecordId = [{}]",
+                    userId, teamId);
+            throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
+        }
+
+        // 异步写库
+        asyncTaskService.undoLike(userId, teamTaskDTO);
+        return (int) redisOperator.scard(LikeKey.TEAM, teamId);
+    }
+
+    @Override
+    public int getTeamLikeCount(Long teamId) {
+        return (int) redisOperator.scard(LikeKey.TEAM, teamId);
     }
 }

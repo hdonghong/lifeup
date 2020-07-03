@@ -91,6 +91,10 @@ public class TeamTaskDTO extends BaseDTO<TeamTaskDO> {
      */
     private List<TeamSubTaskDTO> subTaskList;
 
+    private Integer likeCount;
+
+    private Integer isLike;
+
     @Override
     public TeamTaskDO toDO(Class<TeamTaskDO> doClass) {
         try {

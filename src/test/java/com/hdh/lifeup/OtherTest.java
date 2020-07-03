@@ -185,27 +185,21 @@ public class OtherTest {
 
     @Test
     public void testLeetcode() {
-        int[] nums = new int[]{1, 3, 5, 6};
 
-        System.out.println(searchInsert(nums, 7));
+        System.out.println(numDecodings("2001"));
     }
 
-    public int searchInsert(int[] nums, int target) {
-        if (nums.length == 0) {
-            return 0;
-        }
-        int lo = 0;
-        int hi = nums.length - 1;
-        while (lo < hi) {
-            int mid = (lo + hi) >> 1;
-            if (nums[mid] > target) {
-                hi = mid - 1;
-            } else if (nums[mid] < target) {
-                lo = mid + 1;
-            } else {
-                return mid;
+    public int numDecodings(String s) {
+        if (s.isEmpty() || s.charAt(0) == '0') return 0;
+        int[] dp = new int[s.length() + 1];
+        dp[0] = 1;
+        for (int i = 1; i < dp.length; ++i) {
+            dp[i] = (s.charAt(i - 1) == '0') ? 0 : dp[i - 1];
+            if (i > 1 &&
+                    (s.charAt(i - 2) == '1' || (s.charAt(i - 2) == '2' && s.charAt(i - 1) <= '6'))) {
+                dp[i] += dp[i - 2];
             }
         }
-        return nums[lo] >= target ? lo : lo + 1;
+        return dp[s.length()];
     }
 }

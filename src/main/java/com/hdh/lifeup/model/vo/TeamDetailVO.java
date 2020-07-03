@@ -89,4 +89,8 @@ public class TeamDetailVO {
      */
     @ApiModelProperty(value = "子任务列表")
     private List<TeamSubTaskDTO > subTaskList;
+
+    private Integer likeCount;
+
+    private Integer isLike;
 }

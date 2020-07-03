@@ -11,30 +11,25 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * TeamSubTaskDO class<br/>
- * 团队子任务
+ * LikeTeamTaskDO class<br/>
+ * 团队点赞
  * @author hdonghong
- * @since 2020/05/18
+ * @since 2020/07/03
  */
-@TableName("`team_sub_task`")
+@TableName("`like_team_task`")
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class TeamSubTaskDO extends BaseDO {
+public class LikeTeamTaskDO extends BaseDO {
 
-    private static final long serialVersionUID = 896134336847401089L;
+    private static final long serialVersionUID = 4154659854514017541L;
 
     @TableId
-    private Long taskId;
+    private Long likeTeamId;
 
     private Long teamId;
 
-    private String taskContent;
-
-    private Integer coinVariable;
-
-    @TableLogic
-    private Integer isDel;
+    private Long userId;
 
     /** '创建时间' */
     private LocalDateTime createTime;

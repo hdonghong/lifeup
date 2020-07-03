@@ -1,8 +1,7 @@
 package com.hdh.lifeup.model.dto;
 
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.model.domain.TeamSubTaskDO;
-import com.hdh.lifeup.model.domain.UserRankDO;
+import com.hdh.lifeup.model.domain.LikeTeamTaskDO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -10,25 +9,23 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 
 /**
- * TeamSubTaskDTO class<br/>
- * 团队子任务
+ * LikeTeamTaskDTO class<br/>
+ * 团队点赞
  * @author hdonghong
- * @since 2020/05/17
+ * @since 2020/07/03
  */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class TeamSubTaskDTO extends BaseDTO<TeamSubTaskDO> {
+public class LikeTeamTaskDTO extends BaseDTO<LikeTeamTaskDO> {
 
-    private static final long serialVersionUID = 2922768667720679703L;
+    private static final long serialVersionUID = 4154659854514017541L;
 
-    private Long taskId;
+    private Long likeTeamId;
 
     private Long teamId;
 
-    private String taskContent;
-
-    private Integer coinVariable;
+    private Long userId;
 
     /** '创建时间' */
     private LocalDateTime createTime;

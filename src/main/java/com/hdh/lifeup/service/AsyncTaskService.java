@@ -1,11 +1,16 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.dao.*;
-import com.hdh.lifeup.model.constant.TaskConst.*;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.hdh.lifeup.dao.LikeCountUserMapper;
+import com.hdh.lifeup.dao.LikeMemberRecordMapper;
+import com.hdh.lifeup.dao.LikeTeamTaskMapper;
+import com.hdh.lifeup.model.constant.TaskConst.ActivityIcon;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.domain.LikeMemberRecordDO;
-import com.hdh.lifeup.model.vo.TeamActivityRankVO;
+import com.hdh.lifeup.model.domain.LikeTeamTaskDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
+import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.vo.TeamActivityRankVO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
 import lombok.extern.slf4j.Slf4j;
@@ -42,8 +47,11 @@ public class AsyncTaskService {
     @Lazy
     private TeamMemberService teamMemberService;
 
+    @Autowired
+    private LikeTeamTaskMapper likeTeamTaskMapper;
+
     /**
-     * 点赞
+     * 点赞动态
      * @param userId
      * @param memberRecordDTO
      */
@@ -68,19 +76,58 @@ public class AsyncTaskService {
     }
 
     /**
-     * 取消点赞
+     * 点赞团队
+     * @param userId
+     * @param teamTaskDTO
+     */
+    @Async("taskExecutor")
+    public void doLike(Long userId, TeamTaskDTO teamTaskDTO){
+        LikeTeamTaskDO likeTeamTaskDO = new LikeTeamTaskDO()
+                .setTeamId(teamTaskDTO.getTeamId())
+                .setUserId(userId);
+        Integer result = likeTeamTaskMapper.insert(likeTeamTaskDO);
+        if (!Objects.equals(result, 1)) {
+            log.error("【doLike】likeTeamTaskMapper.insert failed. userId = [{}], teamTaskDTO = [{}]",
+                    userId, teamTaskDTO);
+            return;
+        }
+    }
+
+    /**
+     * 取消点赞动态
      * @param userId
      * @param memberRecordDTO
      */
     @Async("taskExecutor")
     public void undoLike(Long userId, TeamMemberRecordDTO memberRecordDTO) {
-        Integer result = likeMemberRecordMapper.deleteById(memberRecordDTO.getMemberRecordId());
+        QueryWrapper<LikeMemberRecordDO> queryWrapper = new QueryWrapper<LikeMemberRecordDO>()
+                .eq("member_record_id", memberRecordDTO.getMemberRecordId())
+                .eq("user_id", userId);
+        Integer result = likeMemberRecordMapper.delete(queryWrapper);
         if (!Objects.equals(result, 1)) {
-            log.error("【undoLike】likeMemberRecordMapper.deleteById failed. userId = [{}], memberRecordDTO = [{}]",
+            log.error("【undoLike】likeMemberRecordMapper.delete failed. userId = [{}], memberRecordDTO = [{}]",
                     userId, memberRecordDTO);
             return;
         }
         likeCountUserMapper.incr(userId, -1);
+    }
+
+    /**
+     * 取消点赞动态
+     * @param userId
+     * @param teamTaskDTO
+     */
+    @Async("taskExecutor")
+    public void undoLike(Long userId, TeamTaskDTO teamTaskDTO) {
+        QueryWrapper<LikeTeamTaskDO> queryWrapper = new QueryWrapper<LikeTeamTaskDO>()
+                .eq("team_id", teamTaskDTO.getTeamId())
+                .eq("user_id", userId);
+        Integer result = likeTeamTaskMapper.delete(queryWrapper);
+        if (!Objects.equals(result, 1)) {
+            log.error("【undoLike】likeMemberRecordMapper.deleteById failed. userId = [{}], memberRecordDTO = [{}]",
+                    userId, teamTaskDTO);
+            return;
+        }
     }
 
     /**

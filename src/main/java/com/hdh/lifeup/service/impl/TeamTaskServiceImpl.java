@@ -20,10 +20,8 @@ import com.hdh.lifeup.model.vo.ActivityVO;
 import com.hdh.lifeup.model.vo.NextSignVO;
 import com.hdh.lifeup.model.vo.TeamDetailVO;
 import com.hdh.lifeup.model.vo.TeamTaskVO;
-import com.hdh.lifeup.service.TeamMemberService;
-import com.hdh.lifeup.service.TeamSubTaskService;
-import com.hdh.lifeup.service.TeamTaskService;
-import com.hdh.lifeup.service.UserInfoService;
+import com.hdh.lifeup.redis.LikeKey;
+import com.hdh.lifeup.service.*;
 import com.hdh.lifeup.util.LocalDateTimeUtil;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +64,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
     @Resource
     private TeamSubTaskService teamSubTaskService;
+
+    @Autowired
+    private LikeService likeService;
 
     @Autowired
     public TeamTaskServiceImpl(TeamTaskMapper teamTaskMapper,
@@ -191,7 +192,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 new Page<>(pageDTO.getCurrentPage(), pageDTO.getSize()),
                 wrapper
         );
-        return PageDTO.create(taskDOPage, TeamTaskDTO.class);
+        // 设置点赞
+        PageDTO<TeamTaskDTO> teamPage = PageDTO.create(taskDOPage, TeamTaskDTO.class);
+        List<TeamTaskDTO> teamTaskDTOList = teamPage.getList();
+        assembleTeamList(teamTaskDTOList);
+        return teamPage;
     }
 
     @Override
@@ -207,9 +212,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             pageDTO.setCurrentPage((currentPage - 1) * pageDTO.getSize());
             teamTaskDOList = teamTaskMapper.getUserTeams(userId, pageDTO, teamStatus, isOwner);
         }
+        List<TeamTaskDTO> teamTaskDTOList = teamTaskDOList.stream().map(teamTaskDO -> TeamTaskDTO.from(teamTaskDO, TeamTaskDTO.class)).collect(Collectors.toList());
+        assembleTeamList(teamTaskDTOList);
         return PageDTO.<TeamTaskDTO>builder()
                 .currentPage(currentPage)
-                .list(teamTaskDOList.stream().map(teamTaskDO -> TeamTaskDTO.from(teamTaskDO, TeamTaskDTO.class)).collect(Collectors.toList()))
+                .list(teamTaskDTOList)
                 .totalPage((long) Math.ceil((count * 1.0) / pageDTO.getSize()))
                 .size((long) teamTaskDOList.size())
                 .build();
@@ -238,6 +245,11 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         // 获取子任务
         List<TeamSubTaskDTO> teamSubTaskDTOList = teamSubTaskService.listByTeamId(teamId);
         teamDetailVO.setSubTaskList(teamSubTaskDTOList);
+        // 点赞
+        int isLike = likeService.isLike(LikeKey.TEAM, teamId, UserContext.get().getUserId());
+        int likeCount = likeService.getTeamLikeCount(teamId);
+        teamDetailVO.setIsLike(isLike)
+                .setLikeCount(likeCount);
         return teamDetailVO;
     }
 
@@ -516,5 +528,15 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         teamRecordMapper.insert(nextTeamRecordDO);
 
         return nextTeamRecordDO;
+    }
+
+    private void assembleTeamList(List<TeamTaskDTO> teamTaskDTOList) {
+        teamTaskDTOList.forEach(teamTaskDTO -> {
+            Long teamId = teamTaskDTO.getTeamId();
+            int isLike = likeService.isLike(LikeKey.TEAM, teamId, UserContext.get().getUserId());
+            int likeCount = likeService.getTeamLikeCount(teamId);
+            teamTaskDTO.setIsLike(isLike)
+                    .setLikeCount(likeCount);
+        });
     }
 }

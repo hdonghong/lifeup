@@ -83,4 +83,24 @@ public class LikeController {
         return Result.success(likeVO);
     }
 
+    @ApiOperation(value = "点赞团队", notes = "指定teamId")
+    @ApiLimiting(maxAccess = 10)
+    @PostMapping("/activities/{teamId}")
+    public ResultVO<LikeVO> likeTeam(@PathVariable Long teamId) {
+        Long userId = UserContext.get().getUserId();
+        int count = likeService.doLikeTeam(userId, teamId);
+        LikeVO likeVO = new LikeVO().setLikeCount(count);
+        return Result.success(likeVO);
+    }
+
+
+    @ApiOperation(value = "取消点赞团队", notes = "指定teamId")
+    @ApiLimiting(maxAccess = 10)
+    @DeleteMapping("/activities/{teamId}")
+    public ResultVO<LikeVO> undoLikeTeam(@PathVariable Long teamId) {
+        Long userId = UserContext.get().getUserId();
+        int count = likeService.undoLikeTeam(userId, teamId);
+        LikeVO likeVO = new LikeVO().setLikeCount(count);
+        return Result.success(likeVO);
+    }
 }

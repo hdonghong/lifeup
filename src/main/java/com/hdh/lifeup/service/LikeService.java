@@ -23,4 +23,10 @@ public interface LikeService {
     <T> int isLike(KeyPrefix<T> keyPrefix, long sourceId, long userId);
 
     int exchangeLike(Long userId, Integer count);
+
+    int doLikeTeam(Long userId, Long teamId);
+
+    int undoLikeTeam(Long userId, Long teamId);
+
+    int getTeamLikeCount(Long teamId);
 }

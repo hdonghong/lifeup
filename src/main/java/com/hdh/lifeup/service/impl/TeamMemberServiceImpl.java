@@ -333,11 +333,11 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         }
         TemporalField fieldISO = WeekFields.of(Locale.CHINA).dayOfWeek();
 //        LocalDateTime monday = LocalDateTime.of(LocalDate.now().with(fieldISO, 1), LocalTime.MIN);
-        LocalDateTime lastTwoWeeksDay = LocalDateTime.now().minusWeeks(2);
+        LocalDateTime lastSomeWeeksDay = LocalDateTime.now().minusWeeks(4);
 //        LocalDateTime sunday = LocalDateTime.of(LocalDate.now().with(fieldISO, 7), LocalTime.create(23, 59, 59, 0));
         List<TeamMemberRecordDO> memberRecordDOList = memberRecordMapper.selectList(
                 new QueryWrapper<TeamMemberRecordDO>().eq("user_id", userId)
-                                                      .gt("create_time", lastTwoWeeksDay)
+                                                      .gt("create_time", lastSomeWeeksDay)
                                                       .lt("create_time", LocalDateTime.now().withNano(0))
         );
         List<Long> teamIdList = memberRecordDOList.stream().map(TeamMemberRecordDO::getTeamId).collect(Collectors.toList());
