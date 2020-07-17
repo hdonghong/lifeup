@@ -279,23 +279,12 @@ public class UserInfoServiceImpl implements UserInfoService {
                 new QueryWrapper<UserInfoDO>().in("user_id", userIdList)
         );
         List<UserListVO> userList = Lists.newArrayListWithCapacity(userInfoDOList.size());
+        Long currentUserId = UserContext.get().getUserId();
         userInfoDOList.forEach(userDO -> {
             UserListVO userListVO = new UserListVO();
             BeanUtils.copyProperties(userDO, userListVO);
-            // 判断是否有互相关注
-            int followStatus;
-            // 如果是查我关注的用户是否有关注我
-            if (UserKey.FOLLOWING == userKey) {
-                followStatus = redisOperator.zrank(UserKey.FOLLOWING, userDO.getUserId(), userId) == null ?
-                        FollowStatus.FOLLOWING : FollowStatus.INTERACTIVE;
-            } else if (UserKey.FOLLOWER == userKey) {
-            // 如果是查我是否关注了我的粉丝
-                followStatus = redisOperator.zrank(UserKey.FOLLOWING, userId, userDO.getUserId()) == null ?
-                        FollowStatus.NOT_FOLLOW : FollowStatus.INTERACTIVE;
-            } else {
-            // 限定userKey只能为上面两种之一
-                throw new UnsupportedOperationException("【获取用户ListVO】userKey只能为FOLLOWING或者FOLLOWER");
-            }
+            // 判断用户列表与当前用户的关系
+            int followStatus = getFollowStatus(currentUserId, userDO.getUserId());
             userListVO.setIsFollow(followStatus);
             userList.add(userListVO);
         });

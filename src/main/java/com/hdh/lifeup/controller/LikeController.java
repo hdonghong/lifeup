@@ -85,7 +85,7 @@ public class LikeController {
 
     @ApiOperation(value = "点赞团队", notes = "指定teamId")
     @ApiLimiting(maxAccess = 10)
-    @PostMapping("/activities/{teamId}")
+    @PostMapping("/teams/{teamId}")
     public ResultVO<LikeVO> likeTeam(@PathVariable Long teamId) {
         Long userId = UserContext.get().getUserId();
         int count = likeService.doLikeTeam(userId, teamId);
@@ -96,7 +96,7 @@ public class LikeController {
 
     @ApiOperation(value = "取消点赞团队", notes = "指定teamId")
     @ApiLimiting(maxAccess = 10)
-    @DeleteMapping("/activities/{teamId}")
+    @DeleteMapping("/teams/{teamId}")
     public ResultVO<LikeVO> undoLikeTeam(@PathVariable Long teamId) {
         Long userId = UserContext.get().getUserId();
         int count = likeService.undoLikeTeam(userId, teamId);

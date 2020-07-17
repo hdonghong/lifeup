@@ -28,6 +28,8 @@ public class TeamSubTaskDTO extends BaseDTO<TeamSubTaskDO> {
 
     private String taskContent;
 
+    private Integer coin;
+
     private Integer coinVariable;
 
     /** '创建时间' */

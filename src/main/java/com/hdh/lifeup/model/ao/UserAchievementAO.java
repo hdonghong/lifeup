@@ -13,8 +13,14 @@ import java.time.LocalDateTime;
 @Data
 public class UserAchievementAO {
 
+    /**
+     * 是否已解锁
+     */
     private Integer hasComplete;
 
+    /**
+     * 是否已经领取
+     */
     private Integer hasReceive;
 
     private LocalDateTime completeTime;

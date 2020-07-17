@@ -31,6 +31,8 @@ public class TeamSubTaskDO extends BaseDO {
 
     private String taskContent;
 
+    private Integer coin;
+
     private Integer coinVariable;
 
     @TableLogic
