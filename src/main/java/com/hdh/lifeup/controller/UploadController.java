@@ -50,7 +50,7 @@ public class UploadController {
         if (imageFiles.size() > 0) {
             log.info("开始上传{}张图片", imageFiles.size());
             for (MultipartFile image : imageFiles) {
-                imagePaths.add(UploadUtil.uploadImage(image, QiniuConfig.getImageURI(imageCategory), qiniuConfig));
+                imagePaths.add(UploadUtil.uploadImage(image, QiniuConfig.getImageURI(imageCategory), qiniuConfig) + "-webp");
             }
             log.info("上传图片成功");
         }
