@@ -116,34 +116,19 @@ public class UserAuthController {
         return Result.success(token);
     }
 
-    @ApiOperation(value = " QQ登录")
-    @PostMapping({"/qq/login"})
-    public ResultVO<String> qqLogin(@RequestBody @Valid UserAuthVO userAuthVO) {
+    @ApiOperation(value = " 第三方登录")
+    @PostMapping({"/qq/login", "/google/login", "/weibo/login"})
+    public ResultVO<String> thirdPlatformLogin(@RequestBody @Valid UserAuthVO userAuthVO) {
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         BeanUtils.copyProperties(userAuthVO, userInfoDTO);
-        // 注册类型：目前有手机号、QQ
+        // 注册类型：目前有QQ、Google、Weibo
         userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthVO.getAuthType()));
 
         UserAuthDTO userAuthDTO = new UserAuthDTO();
         // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
-        userAuthDTO.setAuthType(AuthTypeConst.QQ)
-                   .setAuthIdentifier(userAuthVO.getAuthIdentifier());
-
-        return  Result.success(userAuthService.oauthLogin(userAuthDTO, userInfoDTO));
-    }
-
-    @ApiOperation(value = " google登录")
-    @PostMapping({"/google/login"})
-    public ResultVO<String> googleLogin(@RequestBody @Valid UserAuthVO userAuthVO) {
-        UserInfoDTO userInfoDTO = new UserInfoDTO();
-        BeanUtils.copyProperties(userAuthVO, userInfoDTO);
-        // 注册类型：google
-        userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthVO.getAuthType()));
-
-        UserAuthDTO userAuthDTO = new UserAuthDTO();
-        // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
-        userAuthDTO.setAuthType(AuthTypeConst.GOOGLE)
-                   .setAuthIdentifier(userAuthVO.getAuthIdentifier());
+        userAuthDTO.setAuthType(userAuthVO.getAuthType())
+                .setAuthIdentifier(userAuthVO.getAuthIdentifier())
+                .setAccessToken(userAuthVO.getAccessToken());
 
         return  Result.success(userAuthService.oauthLogin(userAuthDTO, userInfoDTO));
     }

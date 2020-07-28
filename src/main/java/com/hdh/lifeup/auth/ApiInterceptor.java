@@ -109,7 +109,7 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
                 headersMap.put("\n\t" + headerName, request.getHeader(headerName));
             }
 
-            log.error("【Api接口拦截】Request Header中没有携带[{}], \nHeaders = [{}]", TokenUtil.AUTHENTICITY_TOKEN, headersMap);
+            log.error("【Api接口拦截】Request Header中没有携带[{}], uri = [{}]\nHeaders = [{}]", TokenUtil.AUTHENTICITY_TOKEN, request.getRequestURI(), headersMap);
             throw new GlobalException(CodeMsgEnum.TOKEN_ABSENT);
         }
         UserInfoDTO user = userInfoService.getByToken(authenticityToken);

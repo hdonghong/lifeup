@@ -14,5 +14,7 @@ public interface AuthTypeConst {
 
     String GOOGLE = "google";
 
+    String WEIBO = "weibo";
+
     String PHONE = "phone";
 }

@@ -1,6 +1,7 @@
 package com.hdh.lifeup.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.hdh.lifeup.model.constant.AuthTypeConst;
@@ -21,10 +22,21 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
+
+import static com.hdh.lifeup.model.enums.CodeMsgEnum.TOKEN_INVALID;
+import static com.hdh.lifeup.model.enums.CodeMsgEnum.UNSUPPORTED_AUTH_TYPE;
 
 /**
  * UserAuthServiceImpl class<br/>
@@ -39,6 +51,10 @@ public class UserAuthServiceImpl implements UserAuthService {
     private RedisOperator redisOperator;
     private UserAuthMapper userAuthMapper;
     private UserInfoService userInfoService;
+    @Autowired
+    private RestTemplateBuilder restTemplateBuilder;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     public UserAuthServiceImpl(RedisOperator redisOperator,
@@ -81,6 +97,9 @@ public class UserAuthServiceImpl implements UserAuthService {
         Preconditions.checkNotNull(userAuthDTO, "【授权登陆】传入的UserAuthDTO为空");
         Preconditions.checkNotNull(userInfoDTO, "【授权登陆】传入的UserInfoDTO为空");
 
+        // 校验accessToken
+        this.thirdPlatformAccessToken(userAuthDTO);
+
         // authType和authIdentifier查user_auth，取userId
         UserAuthDO userAuthDO = userAuthMapper.selectOne(
             new QueryWrapper<UserAuthDO>().eq("auth_type", userAuthDTO.getAuthType())
@@ -91,15 +110,18 @@ public class UserAuthServiceImpl implements UserAuthService {
         UserInfoDTO userInfoResult;
         if (userAuthDO != null) {
             userInfoResult = userInfoService.getOne(userAuthDO.getUserId());
-        } else {
-            // userId 为空 插入userInfoDTO到user_info
-            userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthDTO.getAuthType()));
-            userInfoResult = userInfoService.insert(userInfoDTO);
-
-            // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
-            userAuthDTO.setUserId(userInfoResult.getUserId());
-            insert(userAuthDTO);
+            // 返回token
+            return this.generateToken(userInfoResult);
         }
+
+        // userId 为空 插入userInfoDTO到user_info
+        userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthDTO.getAuthType()));
+        userInfoResult = userInfoService.insert(userInfoDTO);
+
+        // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
+        userAuthDTO.setUserId(userInfoResult.getUserId());
+        insert(userAuthDTO);
+
         // 返回token
         return this.generateToken(userInfoResult);
     }
@@ -173,5 +195,32 @@ public class UserAuthServiceImpl implements UserAuthService {
         String token = TokenUtil.get();
         redisOperator.setex(UserKey.TOKEN, token, userInfoDTO);
         return token;
+    }
+
+    private void thirdPlatformAccessToken(UserAuthDTO authDTO) {
+        if (AuthTypeConst.WEIBO.equals(authDTO.getAuthType())) {
+            String checkPath = "https://api.weibo.com/oauth2/get_token_info?access_token=" + authDTO.getAccessToken();
+            RestTemplate restTemplate = restTemplateBuilder.build();
+            try {
+                ResponseEntity<String> responseEntity = restTemplate.exchange(checkPath, HttpMethod.POST, null, String.class);
+                String appkey = objectMapper.readTree(responseEntity.getBody()).get("appkey").asText();
+                String uid = objectMapper.readTree(responseEntity.getBody()).get("uid").asText();
+                long expireIn = objectMapper.readTree(responseEntity.getBody()).get("expire_in").asLong();
+                if (!Objects.equals("3682612064", appkey) || !Objects.equals(authDTO.getAuthIdentifier(), uid) || expireIn < 0) {
+                    throw new GlobalException(TOKEN_INVALID);
+                }
+                return;
+            } catch (IOException e) {
+            } catch (HttpClientErrorException e) {
+                throw new GlobalException(TOKEN_INVALID);
+            }
+        } else if (AuthTypeConst.QQ.equals(authDTO.getAuthType())) {
+            return;
+        } else if (AuthTypeConst.GOOGLE.equals(authDTO.getAuthType())) {
+            return;
+        } else if (AuthTypeConst.YB.equals(authDTO.getAuthType())) {
+            return;
+        }
+        throw new GlobalException(UNSUPPORTED_AUTH_TYPE);
     }
 }

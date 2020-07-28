@@ -40,12 +40,12 @@ public class UserAuthVO implements Serializable {
 
     /** 绑定的类型 */
     @ApiModelProperty(value = "验证的类型，目前限定为qq、phone、google", example = "qq")
-    @Pattern(regexp = AuthTypeConst.PHONE + "|" + AuthTypeConst.QQ + "|" + AuthTypeConst.GOOGLE, message = "必须是系统支持的验证类型")
+    @Pattern(regexp = AuthTypeConst.PHONE + "|" + AuthTypeConst.QQ + "|" + AuthTypeConst.GOOGLE + "|" + AuthTypeConst.WEIBO, message = "必须是系统支持的验证类型")
     @NotEmpty
     private String authType;
 
-    @ApiModelProperty(name = "accessToken", value = "预留字段，目前只用于传递32位的密码", example = "sddjkgkclsi2k4h1kx9aksd33k1lsk8d")
-    @Length(min = 32, max = 32, message = "必须是32位的字符串")
+    @ApiModelProperty(name = "accessToken", value = "预留字段，目前只用于传递32位的密码，以及微博的", example = "sddjkgkclsi2k4h1kx9aksd33k1lsk8d")
+    @Length(min = 1, max = 64, message = "//必须是32位的字符串")
     private String accessToken;
 
     @ApiModelProperty(value = "第三方授权时给的唯一标识，比如qq的openid", example = "sadasdasasfsdfasd")
