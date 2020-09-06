@@ -49,6 +49,8 @@ public class RecordDTO implements Serializable {
     /** 点赞数量 */
     private Integer likeCount;
 
+    private Integer userType;
+
 
     /**
      * 当地时区

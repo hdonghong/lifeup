@@ -42,7 +42,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_MEMBER_RECORD;
+import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_TASK;
 import static com.hdh.lifeup.model.constant.TaskConst.*;
+import static com.hdh.lifeup.model.enums.ActionEnum.*;
 
 /**
  * TeamTaskServiceImpl class<br/>
@@ -67,6 +70,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
     @Autowired
     private LikeService likeService;
+    @Resource
+    private AsyncTaskService asyncTaskService;
 
     @Autowired
     public TeamTaskServiceImpl(TeamTaskMapper teamTaskMapper,
@@ -111,6 +116,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         teamTaskDTO.setTeamId(teamTaskDO.getTeamId());
+        asyncTaskService.reportAction(teamTaskDO.getUserId(), CREATE_TEAM, teamTaskDO.getTeamId(), TEAM_TASK);
         return teamTaskDTO;
     }
 
@@ -147,7 +153,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         TeamMemberDTO memberDTO = new TeamMemberDTO().setTeamId(teamId)
                 .setTeamRole(TeamRole.OWNER)
                 .setLocalTimeZone(localTimeZone)
-                .setLocalCreateTime(localNow);
+                .setLocalCreateTime(localNow)
+                .setUserId(teamTaskDTO.getUserId());
         // 创建者默认发布第一条团队成员动态，此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                                             .setTeamId(teamId)
@@ -250,6 +257,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         int likeCount = likeService.getTeamLikeCount(teamId);
         teamDetailVO.setIsLike(isLike)
                 .setLikeCount(likeCount);
+        asyncTaskService.reportAction(UserContext.get().getUserId(), TEAM_DETAIL, teamId, TEAM_TASK);
         return teamDetailVO;
     }
 
@@ -362,7 +370,8 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 .setTeamId(teamId)
                 .setTeamRole(TeamRole.MEMBER)
                 .setLocalTimeZone(localTimeZone)
-                .setLocalCreateTime(localNow);
+                .setLocalCreateTime(localNow)
+                .setUserId(UserContext.get().getUserId());
         // 创建者默认发布第一条团队成员动态 此动态是没有所属的teamRecordId的，用teamId替代了
         TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
                 .setTeamId(teamId)
@@ -374,6 +383,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
                 .setLocalTimeZone(localTimeZone)
                 .setLocalCreateTime(localNow);
         memberService.addMember(memberDTO, memberRecordDTO);
+        asyncTaskService.reportAction(teamTaskDTO.getUserId(), JOIN_TEAM, teamTaskDTO.getTeamId(), TEAM_TASK);
         return nextSign;
     }
 
@@ -413,24 +423,24 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             log.error("【团队签到】成员逾期操作，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
             throw new GlobalException(CodeMsgEnum.TEAM_NOT_SIGN_TIME);
 
-        } else {
-            // 可以签到
-            TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
-                    .setTeamId(teamId)
-                    .setTeamTitle(teamTaskDTO.getTeamTitle())
-                    .setTeamRecordId(nextSign.getTeamRecordId())
-                    .setUserActivity(activityVO.getActivity())
-                    .setActivityImages(activityVO.getActivityImages())
-                    .setActivityIcon(activityIcon)
-                    .setCreateSource(teamTaskDTO.getCreateSource())
-                    .setLocalTimeZone(TimeZoneContext.get())
-                    .setLocalCreateTime(nowTime);
-            memberService.addMemberRecord(memberRecordDTO);
-            // 单次任务在这次签到完成后就直接完成了，没有下一次
-            if (teamTaskDTO.getTeamFreq() == 0) {
-                throw new SingleTaskException(CodeMsgEnum.TEAM_IS_END);
-            }
         }
+        // 可以签到
+        TeamMemberRecordDTO memberRecordDTO = new TeamMemberRecordDTO()
+                .setTeamId(teamId)
+                .setTeamTitle(teamTaskDTO.getTeamTitle())
+                .setTeamRecordId(nextSign.getTeamRecordId())
+                .setUserActivity(activityVO.getActivity())
+                .setActivityImages(activityVO.getActivityImages())
+                .setActivityIcon(activityIcon)
+                .setCreateSource(teamTaskDTO.getCreateSource())
+                .setLocalTimeZone(TimeZoneContext.get())
+                .setLocalCreateTime(nowTime);
+        memberService.addMemberRecord(memberRecordDTO);
+        // 单次任务在这次签到完成后就直接完成了，没有下一次
+        if (teamTaskDTO.getTeamFreq() == 0) {
+            throw new SingleTaskException(CodeMsgEnum.TEAM_IS_END);
+        }
+        asyncTaskService.reportAction(UserContext.get().getUserId(), SIGN_IN, memberRecordDTO.getTeamRecordId(), TEAM_MEMBER_RECORD);
 
         return this.getNextSign(teamTaskDTO);
     }
@@ -538,5 +548,6 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             teamTaskDTO.setIsLike(isLike)
                     .setLikeCount(likeCount);
         });
+        asyncTaskService.reportAction(UserContext.get().getUserId(), BROWSE_TEAM, -1L, TEAM_TASK);
     }
 }

@@ -6,6 +6,7 @@ import com.hdh.lifeup.dao.UserAchievementMapper;
 import com.hdh.lifeup.model.ao.UserAchievementAO;
 import com.hdh.lifeup.model.domain.UserAchievementDO;
 import com.hdh.lifeup.model.dto.UserAchievementDTO;
+import com.hdh.lifeup.service.AsyncTaskService;
 import com.hdh.lifeup.service.UserAchievementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -13,7 +14,11 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static com.hdh.lifeup.model.constant.BizTypeConst.USER_ACHIEVEMENT;
+import static com.hdh.lifeup.model.enums.ActionEnum.UNLOCK_ACHIEVEMENT;
 
 /**
  * UserAchievementServiceImpl class<br/>
@@ -27,6 +32,8 @@ public class UserAchievementServiceImpl implements UserAchievementService {
 
     @Resource
     private UserAchievementMapper userAchievementMapper;
+    @Resource
+    private AsyncTaskService asyncTaskService;
 
     @Override
     public void sync(UserAchievementAO userAchievementAO) {
@@ -42,6 +49,10 @@ public class UserAchievementServiceImpl implements UserAchievementService {
             return;
         }
         userAchievementMapper.update(userAchievementDO, achievementQueryWrapper);
+        if (Objects.equals(1, userAchievementAO.getHasComplete())) {
+            asyncTaskService.reportAction(userAchievementAO.getUserId(), UNLOCK_ACHIEVEMENT, userAchievementDO.getAchievementId(), USER_ACHIEVEMENT);
+        }
+
     }
 
     @Override

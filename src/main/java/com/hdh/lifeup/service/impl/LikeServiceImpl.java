@@ -2,6 +2,7 @@ package com.hdh.lifeup.service.impl;
 
 import com.hdh.lifeup.dao.LikeCountUserMapper;
 import com.hdh.lifeup.exception.GlobalException;
+import com.hdh.lifeup.model.constant.BizTypeConst;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
@@ -18,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import static com.hdh.lifeup.model.enums.ActionEnum.LIKE_ACTIVITY;
+import static com.hdh.lifeup.model.enums.ActionEnum.LIKE_TEAM;
 
 /**
  * LikeServiceImpl class<br/>
@@ -62,6 +66,7 @@ public class LikeServiceImpl implements LikeService {
 
         // 异步写库
         asyncTaskService.doLike(userId, memberRecordDTO);
+        asyncTaskService.reportAction(userId, LIKE_ACTIVITY, memberRecordId, BizTypeConst.TEAM_MEMBER_RECORD);
         return (int) redisOperator.scard(LikeKey.ACTIVITY, memberRecordId);
     }
 
@@ -142,6 +147,7 @@ public class LikeServiceImpl implements LikeService {
 
         // 异步写库
         asyncTaskService.doLike(userId, teamTaskDTO);
+        asyncTaskService.reportAction(userId, LIKE_TEAM, teamId, BizTypeConst.TEAM_TASK);
         return (int) redisOperator.scard(LikeKey.TEAM, teamId);
     }
 

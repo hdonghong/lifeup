@@ -63,6 +63,9 @@ public class UserDetailVO {
     @ApiModelProperty("获赞的数量")
     private Integer likeCount;
 
+    @ApiModelProperty("1表示是付费用户")
+    private Integer userType;
+
     public UserDetailVO() {
         this.teamAmount = 0;
         this.followingAmount = 0L;

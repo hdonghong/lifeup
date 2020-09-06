@@ -8,14 +8,17 @@ import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.TokenContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.base.BaseDTO;
+import com.hdh.lifeup.dao.RedeemCodeMapper;
 import com.hdh.lifeup.dao.UserInfoMapper;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.domain.RedeemCodeDO;
 import com.hdh.lifeup.model.domain.UserInfoDO;
 import com.hdh.lifeup.model.dto.AttributeDTO;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
+import com.hdh.lifeup.model.enums.RedeemCodeEnum;
 import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import com.hdh.lifeup.redis.RedisOperator;
@@ -37,7 +40,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.hdh.lifeup.model.constant.BizTypeConst.USER_INFO;
 import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
+import static com.hdh.lifeup.model.enums.ActionEnum.GET_USER;
 
 /**
  * UserInfoServiceImpl class<br/>
@@ -64,6 +69,10 @@ public class UserInfoServiceImpl implements UserInfoService {
     private LikeService likeService;
     @Resource
     private UserRankService userRankService;
+    @Resource
+    private RedeemCodeMapper redeemCodeMapper;
+    @Resource
+    private AsyncTaskService asyncTaskService;
 
     @Override
     public UserInfoDTO getOne(@NonNull Long userId) {
@@ -144,7 +153,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         userDetailVO.setIsFollow(getFollowStatus(UserContext.get().getUserId(), userId));
         // 获赞数量
         userDetailVO.setLikeCount(likeService.getUserLikeCount(userId));
-
+        // 用户类型
+        userDetailVO.setUserType(getUserType(userId));
+        asyncTaskService.reportAction(userId, GET_USER, userId, USER_INFO);
         return userDetailVO;
     }
 
@@ -259,6 +270,15 @@ public class UserInfoServiceImpl implements UserInfoService {
         return userInfoDOPage.getRecords().stream()
                 .map(userInfoDO -> UserInfoDTO.from(userInfoDO, UserInfoDTO.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer getUserType(Long userId) {
+        QueryWrapper<RedeemCodeDO> queryWrapper = new QueryWrapper<RedeemCodeDO>()
+                .eq("user_id", userId)
+                .eq("status", RedeemCodeEnum.REDEEMED.getStatus());
+        Integer count = redeemCodeMapper.selectCount(queryWrapper);
+        return count > 0 ? 1 : 0;
     }
 
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {

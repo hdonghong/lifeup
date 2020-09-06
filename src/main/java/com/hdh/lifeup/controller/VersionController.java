@@ -7,9 +7,7 @@ import com.hdh.lifeup.model.vo.ResultVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * VersionController class<br/>
@@ -31,9 +29,9 @@ public class VersionController {
 
     @ApiOperation(value = "获取最新版本号")
     @GetMapping
-    public ResultVO<AppVersionDTO> getLastVersion() {
+    public ResultVO<AppVersionDTO> getLastVersion(@RequestParam(value = "versionType", required = false, defaultValue = "0") Integer versionType) {
         return Result.success(
-                appVersionService.getLastVersion()
+                appVersionService.getLastVersion(versionType)
         );
     }
 }

@@ -8,8 +8,10 @@ import com.hdh.lifeup.model.constant.TaskConst.ActivityIcon;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
 import com.hdh.lifeup.model.domain.LikeMemberRecordDO;
 import com.hdh.lifeup.model.domain.LikeTeamTaskDO;
+import com.hdh.lifeup.model.dto.ActionRecordDTO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
+import com.hdh.lifeup.model.enums.ActionEnum;
 import com.hdh.lifeup.model.vo.TeamActivityRankVO;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
@@ -19,6 +21,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.Objects;
 
 /**
@@ -41,6 +44,7 @@ public class AsyncTaskService {
     private RedisOperator redisOperator;
 
     @Autowired
+    @Lazy
     private TeamTaskService teamTaskService;
 
     @Autowired
@@ -49,6 +53,9 @@ public class AsyncTaskService {
 
     @Autowired
     private LikeTeamTaskMapper likeTeamTaskMapper;
+
+    @Resource
+    private ActionRecordService actionRecordService;
 
     /**
      * 点赞动态
@@ -175,4 +182,25 @@ public class AsyncTaskService {
         teamTaskService.incrTeamRank(teamId, teamActivityRankVO.getTeamRank());
     }
 
+    /**
+     * 上报用户行为
+     * @param userId
+     * @param actionEnum
+     * @param relatedId
+     * @param relatedType
+     */
+    @Async("taskExecutor")
+    public void reportAction(Long userId, ActionEnum actionEnum, Long relatedId, String relatedType) {
+        ActionRecordDTO actionRecordDTO = new ActionRecordDTO()
+            .setUserId(userId)
+            .setActionId(actionEnum.getActionId())
+            .setRelatedId(relatedId)
+            .setRelatedType(relatedType)
+            .setActionSource("lifeup-server");
+        try {
+            actionRecordService.reportAction(actionRecordDTO);
+        } catch (Exception e) {
+            log.error("actionRecordService.reportAction error ", e);
+        }
+    }
 }

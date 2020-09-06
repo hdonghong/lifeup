@@ -27,10 +27,12 @@ public class AppVersionServiceImpl implements AppVersionService {
     }
 
     @Override
-    public AppVersionDTO getLastVersion() {
+    public AppVersionDTO getLastVersion(Integer versionType) {
         List<AppVersionDO> versionDOList = appVersionMapper.selectList(
-                new QueryWrapper<AppVersionDO>().orderByDesc("version_id")
+                new QueryWrapper<AppVersionDO>().lt("version_type", versionType + 1).orderByDesc("version_id")
         );
-        return AppVersionDTO.from(versionDOList.get(0), AppVersionDTO.class);
+        AppVersionDTO appVersionDTO = AppVersionDTO.from(versionDOList.get(0), AppVersionDTO.class);
+        appVersionDTO.setVersionId(null);
+        return appVersionDTO;
     }
 }

@@ -29,4 +29,5 @@ public class AppVersionDTO extends BaseDTO<AppVersionDO> {
 
     private String downloadUrl;
 
+    private Integer versionType;
 }

@@ -10,5 +10,5 @@ import com.hdh.lifeup.model.dto.AppVersionDTO;
  */
 public interface AppVersionService {
 
-    AppVersionDTO getLastVersion();
+    AppVersionDTO getLastVersion(Integer versionType);
 }

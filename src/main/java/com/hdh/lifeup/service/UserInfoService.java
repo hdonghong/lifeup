@@ -88,4 +88,6 @@ public interface UserInfoService {
      * @return
      */
     List<UserInfoDTO> listUser(int current, int limit);
+
+    Integer getUserType(Long userId);
 }

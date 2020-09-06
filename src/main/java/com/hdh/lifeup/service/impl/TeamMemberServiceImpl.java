@@ -26,6 +26,7 @@ import com.hdh.lifeup.redis.UserKey;
 import com.hdh.lifeup.service.AsyncTaskService;
 import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.TeamMemberService;
+import com.hdh.lifeup.service.UserInfoService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +34,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.TemporalField;
 import java.time.temporal.WeekFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_MEMBER_RECORD;
 import static com.hdh.lifeup.model.constant.TaskConst.*;
 import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
+import static com.hdh.lifeup.model.enums.ActionEnum.ADD_ACTIVITY;
+import static com.hdh.lifeup.model.enums.ActionEnum.BROWSE_ACTIVITY;
 
 /**
  * TeamMemberServiceImpl class<br/>
@@ -72,6 +74,9 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
     @Resource
     private AsyncTaskService asyncTaskService;
+
+    @Resource
+    private UserInfoService userInfoService;
 
     @Override
     public TeamMemberDTO getOne(@NonNull Long teamId, @NonNull Long userId) {
@@ -123,26 +128,28 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             }
         }
         teamMemberRecordDTO.setUserId(memberUserId);
-        Integer result = memberRecordMapper.insert(teamMemberRecordDTO.toDO(TeamMemberRecordDO.class));
+        TeamMemberRecordDO teamMemberRecordDO = teamMemberRecordDTO.toDO(TeamMemberRecordDO.class);
+        Integer result = memberRecordMapper.insert(teamMemberRecordDO);
         if (!Objects.equals(1, result)) {
             log.error("【团队成员发布动态】新增失败, teamMemberRecordDTO = [{}]", teamMemberRecordDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
+        teamMemberRecordDTO.setMemberRecordId(teamMemberRecordDO.getMemberRecordId());
         // 异步更新团队活跃度
         asyncTaskService.updateTeamRank(
                 teamMemberRecordDTO.getTeamId(), teamMemberRecordDTO.getUserId(), teamMemberRecordDTO.getActivityIcon());
+        asyncTaskService.reportAction(UserContext.get().getUserId(), ADD_ACTIVITY, teamMemberRecordDO.getMemberRecordId(), TEAM_MEMBER_RECORD);
+
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void addMember(TeamMemberDTO memberDTO, TeamMemberRecordDTO memberRecordDTO) {
-        Long userId = UserContext.get().getUserId();
-        if (this.isMember(memberDTO.getTeamId(), userId) != 0) {
+        if (this.isMember(memberDTO.getTeamId(), memberDTO.getUserId()) != 0) {
             log.error("【加入团队】禁止重复加入团队，memberDTO = [{}]", memberDTO);
             throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
         }
 
-        memberDTO.setUserId(userId);
         this.insert(memberDTO);
         this.addMemberRecord(memberRecordDTO);
     }
@@ -198,6 +205,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             Long userId = UserContext.get().getUserId();
             assembleRecordList(recordList, userId);
         }
+        asyncTaskService.reportAction(UserContext.get().getUserId(), BROWSE_ACTIVITY, teamId, TEAM_MEMBER_RECORD);
 
         return PageDTO.<RecordDTO>builder()
                 .currentPage(currentPage)
@@ -211,8 +219,11 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             Long memberRecordId = recordDTO.getMemberRecordId();
             int isLike = likeService.isLike(LikeKey.ACTIVITY, memberRecordId, userId);
             int likeCount = likeService.getRecordLikeCount(memberRecordId);
+            Integer userType = userInfoService.getUserType(recordDTO.getUserId());
             recordDTO.setIsLike(isLike)
-                    .setLikeCount(likeCount);
+                    .setLikeCount(likeCount)
+
+                    .setUserType(userType);
         });
     }
 
@@ -271,6 +282,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             }
         }
         assembleRecordList(recordList, userId);
+        asyncTaskService.reportAction(UserContext.get().getUserId(), BROWSE_ACTIVITY, null, TEAM_MEMBER_RECORD);
         return PageDTO.<RecordDTO>builder()
                       .currentPage(currentPage)
                       .list(recordList)
@@ -325,7 +337,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
 
     @Override
-    @Deprecated // FIXME 极丑的实现
+    // TODO
     public int getAttributeWeekly(Long userId) {
         Long attributeWeek = redisOperator.get(UserKey.ATTRIBUTE_WEEK, userId);
         if (attributeWeek != null) {

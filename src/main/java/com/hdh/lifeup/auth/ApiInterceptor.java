@@ -1,13 +1,9 @@
 package com.hdh.lifeup.auth;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Maps;
-import com.hdh.lifeup.dao.RedeemCodeMapper;
-import com.hdh.lifeup.model.domain.RedeemCodeDO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.model.enums.RedeemCodeEnum;
 import com.hdh.lifeup.redis.ApiKey;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.service.UserInfoService;
@@ -20,7 +16,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Enumeration;
@@ -39,9 +34,6 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
     private RedisOperator redisOperator;
 
     private UserInfoService userInfoService;
-
-    @Resource
-    private RedeemCodeMapper redeemCodeMapper;
 
     @Autowired
     public ApiInterceptor(RedisOperator redisOperator,
@@ -117,11 +109,7 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
             log.error("【Api接口拦截】不合法的Token或者Token失效");
             throw new GlobalException(CodeMsgEnum.TOKEN_INVALID);
         }
-        QueryWrapper<RedeemCodeDO> queryWrapper = new QueryWrapper<RedeemCodeDO>()
-                .eq("user_id", user.getUserId())
-                .eq("status", RedeemCodeEnum.REDEEMED.getStatus());
-        Integer count = redeemCodeMapper.selectCount(queryWrapper);
-        user.setUserType(count > 0 ? 1 : 0);
+        user.setUserType(userInfoService.getUserType(user.getUserId()));
         TokenContext.set(authenticityToken);
         return user;
     }

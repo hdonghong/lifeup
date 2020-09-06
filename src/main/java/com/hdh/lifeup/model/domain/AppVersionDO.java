@@ -31,6 +31,8 @@ public class AppVersionDO extends BaseDO {
 
     private String versionDesc;
 
+    private Integer versionType;
+
     private String downloadUrl;
 
     /** '0存在；1删除' */
