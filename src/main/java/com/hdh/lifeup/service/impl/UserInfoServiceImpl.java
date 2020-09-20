@@ -31,10 +31,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.comparator.Comparators;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -308,7 +310,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             userListVO.setIsFollow(followStatus);
             userList.add(userListVO);
         });
-
+        Collections.reverse(userList);
         return PageDTO.<UserListVO>builder()
                       .currentPage(pageDTO.getCurrentPage())
                       .list(userList)

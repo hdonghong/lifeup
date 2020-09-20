@@ -33,7 +33,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.Optional;
 
 import static com.hdh.lifeup.model.enums.CodeMsgEnum.TOKEN_INVALID;
 import static com.hdh.lifeup.model.enums.CodeMsgEnum.UNSUPPORTED_AUTH_TYPE;
@@ -106,19 +105,19 @@ public class UserAuthServiceImpl implements UserAuthService {
                     .eq("auth_identifier", userAuthDTO.getAuthIdentifier())
         );
 
-        // userId 非空 就查user_info，取user信息，userInfoDTO放到缓存，返回token
+        // userId 非空，用户登录
         UserInfoDTO userInfoResult;
         if (userAuthDO != null) {
             userInfoResult = userInfoService.getOne(userAuthDO.getUserId());
-            // 返回token
             return this.generateToken(userInfoResult);
         }
 
-        // userId 为空 插入userInfoDTO到user_info
+        // userId 为空，注册新用户，后再登录
         userInfoDTO.setAuthTypes(Lists.newArrayList(userAuthDTO.getAuthType()));
+        if (StringUtils.isEmpty(userInfoDTO.getNickname())) {
+            userInfoDTO.setNickname(userAuthDTO.getAuthType() + "_" + System.currentTimeMillis());
+        }
         userInfoResult = userInfoService.insert(userInfoDTO);
-
-        // 取生成的userInfoDTO.getUserId，set到userAuthDTO并存到user_auth
         userAuthDTO.setUserId(userInfoResult.getUserId());
         insert(userAuthDTO);
 

@@ -25,7 +25,7 @@ public class UserAuthVO implements Serializable {
     private static final long serialVersionUID = -8361866541896304535L;
 
     /** '用户昵称' */
-    @NotEmpty
+//    @NotEmpty
     private String nickname;
 
     /** '0女，1男，2保密' */
