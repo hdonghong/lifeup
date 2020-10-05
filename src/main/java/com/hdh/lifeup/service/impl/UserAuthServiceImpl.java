@@ -209,11 +209,23 @@ public class UserAuthServiceImpl implements UserAuthService {
                     throw new GlobalException(TOKEN_INVALID);
                 }
                 return;
-            } catch (IOException e) {
+            } catch (IOException ignored) {
             } catch (HttpClientErrorException e) {
                 throw new GlobalException(TOKEN_INVALID);
             }
         } else if (AuthTypeConst.QQ.equals(authDTO.getAuthType())) {
+            String oauthUrl = "https://graph.qq.com/user/get_user_info?access_token=$access_token$&openid=$openid$&oauth_consumer_key=101492659";
+            oauthUrl = oauthUrl.replace("$access_token$", authDTO.getAccessToken())
+                .replace("$openid$", authDTO.getAuthIdentifier());
+            RestTemplate restTemplate = restTemplateBuilder.build();
+            ResponseEntity<String> responseEntity = restTemplate.exchange(oauthUrl, HttpMethod.GET, null, String.class);
+            try {
+                String ret = objectMapper.readTree(responseEntity.getBody()).get("ret").asText();
+                if (!Objects.equals("0", ret)) {
+                    throw new GlobalException(TOKEN_INVALID);
+                }
+            } catch (IOException ignored) {
+            }
             return;
         } else if (AuthTypeConst.GOOGLE.equals(authDTO.getAuthType())) {
             return;
