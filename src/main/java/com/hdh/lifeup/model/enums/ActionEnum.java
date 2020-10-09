@@ -124,4 +124,14 @@ public enum ActionEnum {
         this.score = score;
         this.maxLimit = maxLimit;
     }
+
+    public static int getMaxLimit(Long actionId) {
+        ActionEnum[] actionEnums = ActionEnum.values();
+        for (ActionEnum actionEnum : actionEnums) {
+            if (actionEnum.getActionId().equals(actionId)) {
+                return actionEnum.getMaxLimit();
+            }
+        }
+        return 0;
+    }
 }

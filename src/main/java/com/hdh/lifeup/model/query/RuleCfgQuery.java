@@ -1,6 +1,7 @@
 package com.hdh.lifeup.model.query;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -19,6 +20,7 @@ public class RuleCfgQuery implements Serializable {
     /**
      * 更新时间，如果匹配的规则与客户端传入的更新时间一致，说明客户端已持有该版本，不需要二次下发
      */
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     /**

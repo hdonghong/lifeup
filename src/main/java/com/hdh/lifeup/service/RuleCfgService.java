@@ -2,6 +2,7 @@ package com.hdh.lifeup.service;
 
 import com.hdh.lifeup.model.dto.RuleCfgDTO;
 import com.hdh.lifeup.model.query.RuleCfgQuery;
+import com.hdh.lifeup.model.vo.RuleCfgVO;
 
 import java.util.List;
 
@@ -19,5 +20,5 @@ public interface RuleCfgService {
      * @param ruleCfgQuery 规则配置查询
      * @return
      */
-    List<RuleCfgDTO> match(Long uid, RuleCfgQuery ruleCfgQuery);
+    List<RuleCfgVO> match(Long uid, RuleCfgQuery ruleCfgQuery);
 }

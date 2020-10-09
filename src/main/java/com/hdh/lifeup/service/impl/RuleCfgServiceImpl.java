@@ -7,8 +7,10 @@ import com.hdh.lifeup.model.domain.RuleCfgDO;
 import com.hdh.lifeup.model.dto.RuleCfgDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.model.query.RuleCfgQuery;
+import com.hdh.lifeup.model.vo.RuleCfgVO;
 import com.hdh.lifeup.service.RuleCfgService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -31,7 +33,7 @@ public class RuleCfgServiceImpl implements RuleCfgService {
     private RuleCfgMapper ruleCfgMapper;
 
     @Override
-    public List<RuleCfgDTO> match(Long uid, RuleCfgQuery ruleCfgQuery) {
+    public List<RuleCfgVO> match(Long uid, RuleCfgQuery ruleCfgQuery) {
         // 要求指定规则组
         if (StringUtils.isEmpty(ruleCfgQuery.getRuleGroupKey())) {
             throw new GlobalException(CodeMsgEnum.PARAMETER_ERROR);
@@ -91,6 +93,11 @@ public class RuleCfgServiceImpl implements RuleCfgService {
                     return false;
                 }
                 return uid % 100 < ruleCfgDTO.getUserGrayPercentage();
+            })
+            .map(ruleCfgDTO -> {
+                RuleCfgVO ruleCfgVO = new RuleCfgVO();
+                BeanUtils.copyProperties(ruleCfgDTO, ruleCfgVO);
+                return ruleCfgVO;
             })
             .collect(Collectors.toList());
     }

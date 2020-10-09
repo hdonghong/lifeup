@@ -2,9 +2,9 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.model.dto.RuleCfgDTO;
 import com.hdh.lifeup.model.query.RuleCfgQuery;
 import com.hdh.lifeup.model.vo.ResultVO;
+import com.hdh.lifeup.model.vo.RuleCfgVO;
 import com.hdh.lifeup.service.RuleCfgService;
 import com.hdh.lifeup.util.Result;
 import io.swagger.annotations.Api;
@@ -38,7 +38,7 @@ public class ConfigController {
         @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/rule")
-    public ResultVO<List<RuleCfgDTO>> matchRuleConfig(RuleCfgQuery ruleCfgQuery) {
+    public ResultVO<List<RuleCfgVO>> matchRuleConfig(RuleCfgQuery ruleCfgQuery) {
         return Result.success(
             ruleCfgService.match(UserContext.get().getUserId(), ruleCfgQuery)
         );

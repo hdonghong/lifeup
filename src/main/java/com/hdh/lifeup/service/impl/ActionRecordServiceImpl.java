@@ -10,6 +10,7 @@ import com.hdh.lifeup.model.dto.ActionRecordDTO;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserActionDTO;
 import com.hdh.lifeup.model.dto.UserActionRecordDTO;
+import com.hdh.lifeup.model.enums.ActionEnum;
 import com.hdh.lifeup.model.vo.ActionRecordVO;
 import com.hdh.lifeup.service.ActionRecordService;
 import com.hdh.lifeup.service.UserActionService;
@@ -44,6 +45,14 @@ public class ActionRecordServiceImpl implements ActionRecordService {
 
     @Override
     public void reportAction(ActionRecordDTO actionRecordDTO) {
+        QueryWrapper<ActionRecordDO> countQuery = new QueryWrapper<ActionRecordDO>()
+            .eq("user_id", actionRecordDTO.getUserId())
+            .eq("action_id", actionRecordDTO.getActionId())
+            .eq("Date(create_time)", LocalDate.now());
+        Integer actionCount = actionRecordMapper.selectCount(countQuery);
+        if (actionCount >= ActionEnum.getMaxLimit(actionRecordDTO.getActionId())) {
+            return;
+        }
         ActionRecordDO actionRecordDO = actionRecordDTO.toDO(ActionRecordDO.class);
         actionRecordMapper.insert(actionRecordDO);
     }
