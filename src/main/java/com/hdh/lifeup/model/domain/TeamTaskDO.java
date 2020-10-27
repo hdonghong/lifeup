@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDO;
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
@@ -74,7 +74,7 @@ public class TeamTaskDO extends BaseDO {
 
     /**
      * 团队团建来源 ： 国内/海外
-     * @see TaskConst.CreateSource
+     * @see CommonConst.CreateSource
      */
     private Integer createSource;
 

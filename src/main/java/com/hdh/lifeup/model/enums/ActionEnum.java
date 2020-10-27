@@ -72,6 +72,11 @@ public enum ActionEnum {
     UNLOCK_ACHIEVEMENT(10012L, 3, 15),
 
     /**
+     * 点赞商品
+     */
+    LIKE_GOODS(10013L, 1, 10),
+
+    /**
      * 本地部分-------------------------------------------
      */
     PRIVATE_TASK(20001L, 3, 15),

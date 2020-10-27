@@ -202,4 +202,11 @@ public class OtherTest {
         }
         return dp[s.length()];
     }
+
+    @Test
+    public void testUUID() {
+        System.out.println(UUID.randomUUID().toString().length());
+        Random random = new Random();
+        System.out.println(random.nextInt(16));
+    }
 }

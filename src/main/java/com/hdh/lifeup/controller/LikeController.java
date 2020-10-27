@@ -103,4 +103,26 @@ public class LikeController {
         LikeVO likeVO = new LikeVO().setLikeCount(count);
         return Result.success(likeVO);
     }
+
+
+    @ApiOperation(value = "点赞商品", notes = "指定goodsId")
+    @ApiLimiting(maxAccess = 10)
+    @PostMapping("/goods/{goodsId}")
+    public ResultVO<LikeVO> likeGoods(@PathVariable Long goodsId) {
+        Long userId = UserContext.get().getUserId();
+        int count = likeService.doLikeGoods(userId, goodsId);
+        LikeVO likeVO = new LikeVO().setLikeCount(count);
+        return Result.success(likeVO);
+    }
+
+
+    @ApiOperation(value = "取消点赞商品", notes = "指定goodsId")
+    @ApiLimiting(maxAccess = 10)
+    @DeleteMapping("/goods/{goodsId}")
+    public ResultVO<LikeVO> undoLikeGoods(@PathVariable Long goodsId) {
+        Long userId = UserContext.get().getUserId();
+        int count = likeService.undoLikeGoods(userId, goodsId);
+        LikeVO likeVO = new LikeVO().setLikeCount(count);
+        return Result.success(likeVO);
+    }
 }

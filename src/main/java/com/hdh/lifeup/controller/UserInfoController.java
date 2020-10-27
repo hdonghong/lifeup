@@ -5,7 +5,7 @@ import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.TimeZoneContext;
 import com.hdh.lifeup.auth.UserContext;
 import com.hdh.lifeup.config.QiniuConfig;
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.RecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.hdh.lifeup.model.constant.TaskConst.TIME_ZONE_GMT8;
+import static com.hdh.lifeup.model.constant.CommonConst.TIME_ZONE_GMT8;
 
 /**
  * UserInfoController class<br/>
@@ -157,7 +157,7 @@ public class UserInfoController {
             @PathVariable(value = "userId", required = false) Long userId, PageDTO pageDTO, Integer teamStatus,
             @RequestParam(defaultValue = "false", required = false) Boolean isOwner) {
         if (teamStatus == null) {
-            teamStatus = TaskConst.TaskStatus.DOING;
+            teamStatus = CommonConst.TaskStatus.DOING;
         }
         return Result.success(
                 teamTaskService.pageUserTeams(userId, pageDTO, teamStatus, isOwner)
@@ -234,8 +234,8 @@ public class UserInfoController {
                                                    @RequestParam(defaultValue = "0", required = false) Integer filter,
                                                    @RequestParam(defaultValue = "1", required = false) Integer createSource) {
         // 限定只能是朋友圈 或者 所有人
-        if (!TaskConst.ActivityScope.ALL.equals(scope)) {
-            scope = TaskConst.ActivityScope.MYFOLLOWERS;
+        if (!CommonConst.ActivityScope.ALL.equals(scope)) {
+            scope = CommonConst.ActivityScope.MYFOLLOWERS;
         }
         return Result.success(
                 teamMemberService.getMoments(pageDTO, scope, filter, createSource)

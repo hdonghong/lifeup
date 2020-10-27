@@ -32,7 +32,7 @@ public class ReportRecordDTO extends BaseDTO<ReportRecordDO> {
     @ApiModelProperty(value = "举报人的id")
     private Long reportUserId;
 
-    @ApiModelProperty(value = "举报项，比如team、user、activity等等", example = "team")
+    @ApiModelProperty(value = "举报项，比如team、user、activity, market_goods等等", example = "team")
     @NotEmpty(message = "举报项不能为空")
     private String reportItem;
 

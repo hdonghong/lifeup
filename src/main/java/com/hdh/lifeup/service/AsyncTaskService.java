@@ -2,13 +2,16 @@ package com.hdh.lifeup.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.hdh.lifeup.dao.LikeCountUserMapper;
+import com.hdh.lifeup.dao.LikeMarketGoodsMapper;
 import com.hdh.lifeup.dao.LikeMemberRecordMapper;
 import com.hdh.lifeup.dao.LikeTeamTaskMapper;
-import com.hdh.lifeup.model.constant.TaskConst.ActivityIcon;
+import com.hdh.lifeup.model.constant.CommonConst.ActivityIcon;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
+import com.hdh.lifeup.model.domain.LikeMarketGoodsDO;
 import com.hdh.lifeup.model.domain.LikeMemberRecordDO;
 import com.hdh.lifeup.model.domain.LikeTeamTaskDO;
 import com.hdh.lifeup.model.dto.ActionRecordDTO;
+import com.hdh.lifeup.model.dto.MarketGoodsDTO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.enums.ActionEnum;
@@ -56,6 +59,8 @@ public class AsyncTaskService {
 
     @Resource
     private ActionRecordService actionRecordService;
+    @Autowired
+    private LikeMarketGoodsMapper likeMarketGoodsMapper;
 
     /**
      * 点赞动态
@@ -201,6 +206,32 @@ public class AsyncTaskService {
             actionRecordService.reportAction(actionRecordDTO);
         } catch (Exception e) {
             log.error("actionRecordService.reportAction error ", e);
+        }
+    }
+
+    @Async("taskExecutor")
+    public void doLike(Long userId, MarketGoodsDTO marketGoodsDTO) {
+        LikeMarketGoodsDO likeMarketGoodsDO = new LikeMarketGoodsDO()
+            .setGoodsId(marketGoodsDTO.getGoodsId())
+            .setUserId(userId);
+        Integer result = likeMarketGoodsMapper.insert(likeMarketGoodsDO);
+        if (!Objects.equals(result, 1)) {
+            log.error("【doLike】likeMarketGoodsMapper.insert failed. userId = [{}], marketGoodsDTO = [{}]",
+                userId, marketGoodsDTO);
+            return;
+        }
+    }
+
+    @Async("taskExecutor")
+    public void undoLike(Long userId, MarketGoodsDTO marketGoodsDTO) {
+        QueryWrapper<LikeMarketGoodsDO> queryWrapper = new QueryWrapper<LikeMarketGoodsDO>()
+            .eq("goods_id", marketGoodsDTO.getGoodsId())
+            .eq("user_id", userId);
+        Integer result = likeMarketGoodsMapper.delete(queryWrapper);
+        if (!Objects.equals(result, 1)) {
+            log.error("【undoLike】likeMarketGoodsMapper.deleteById failed. userId = [{}], marketGoodsDTO = [{}]",
+                userId, marketGoodsDTO);
+            return;
         }
     }
 }

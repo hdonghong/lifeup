@@ -1,6 +1,6 @@
 package com.hdh.lifeup.service;
 
-import com.hdh.lifeup.model.ao.UserAchievementAO;
+import com.hdh.lifeup.model.vo.UserAchievementVO;
 import com.hdh.lifeup.model.dto.UserAchievementDTO;
 
 import java.util.List;
@@ -13,7 +13,7 @@ import java.util.List;
  */
 public interface UserAchievementService {
 
-    void sync(UserAchievementAO userAchievementAO);
+    void sync(UserAchievementVO userAchievementAO);
 
     List<UserAchievementDTO> listAchievements(Long userId, Integer hasComplete);
 

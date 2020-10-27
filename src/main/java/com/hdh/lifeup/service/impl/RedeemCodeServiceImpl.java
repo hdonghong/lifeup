@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Random;
 
 /**
  * RedeemCodeServiceImpl class<br/>
@@ -57,12 +58,17 @@ public class RedeemCodeServiceImpl implements RedeemCodeService {
 
     @Override
     public boolean createCodes(int limit) {
-        if (limit > 100) {
+        if (limit > 1000) {
             return false;
         }
+        Random random = new Random();
         while (limit-- > 0) {
             RedeemCodeDO redeemCodeDO = new RedeemCodeDO();
-            redeemCodeDO.setRedeemCode("LIFEUP@" + TokenUtil.get().substring(0, 16).toUpperCase());
+            String str = TokenUtil.get().substring(0, 16 + random.nextInt(8)).toUpperCase();
+            if (str.endsWith("-")) {
+                str = str.substring(0, str.length() - 2);
+            }
+            redeemCodeDO.setRedeemCode("LIFEUP@" + str);
             redeemCodeMapper.insert(redeemCodeDO);
         }
         return true;

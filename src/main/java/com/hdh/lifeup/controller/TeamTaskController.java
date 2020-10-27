@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.TimeZoneContext;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.hdh.lifeup.model.constant.TaskConst.TIME_ZONE_GMT8;
+import static com.hdh.lifeup.model.constant.CommonConst.TIME_ZONE_GMT8;
 
 /**
  * TeamTaskController class<br/>
@@ -51,7 +51,7 @@ public class TeamTaskController {
     @PostMapping("/new")
     public ResultVO<NextSignVO> addTeam(@RequestBody TeamTaskVO teamTaskVO) {
         // 非海外的需要过滤
-        if (!Objects.equal(TaskConst.CreateSource.OVERSEAS, teamTaskVO.getCreateSource())) {
+        if (!Objects.equal(CommonConst.CreateSource.OVERSEAS, teamTaskVO.getCreateSource())) {
             teamTaskVO.setTeamTitle(SensitiveFilter.filter(teamTaskVO.getTeamTitle()))
                     .setTeamDesc(SensitiveFilter.filter(teamTaskVO.getTeamDesc()));
         }

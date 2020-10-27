@@ -18,6 +18,13 @@ public interface UserInfoService {
 
     UserInfoDTO getOne(@NonNull Long userId);
 
+    /**
+     * 脱敏的
+     * @param userId
+     * @return
+     */
+    UserInfoDTO getOneSafely(@NonNull Long userId);
+
     UserInfoDTO insert(@NonNull UserInfoDTO userInfoDTO);
 
     UserInfoDTO update(@NonNull UserInfoDTO userInfoDTO);

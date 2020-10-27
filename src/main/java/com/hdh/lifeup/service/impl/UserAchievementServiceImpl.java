@@ -3,7 +3,7 @@ package com.hdh.lifeup.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Preconditions;
 import com.hdh.lifeup.dao.UserAchievementMapper;
-import com.hdh.lifeup.model.ao.UserAchievementAO;
+import com.hdh.lifeup.model.vo.UserAchievementVO;
 import com.hdh.lifeup.model.domain.UserAchievementDO;
 import com.hdh.lifeup.model.dto.UserAchievementDTO;
 import com.hdh.lifeup.service.AsyncTaskService;
@@ -36,7 +36,7 @@ public class UserAchievementServiceImpl implements UserAchievementService {
     private AsyncTaskService asyncTaskService;
 
     @Override
-    public void sync(UserAchievementAO userAchievementAO) {
+    public void sync(UserAchievementVO userAchievementAO) {
         Preconditions.checkNotNull(userAchievementAO);
         UserAchievementDO userAchievementDO = new UserAchievementDO();
         BeanUtils.copyProperties(userAchievementAO, userAchievementDO);

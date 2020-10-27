@@ -41,7 +41,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_MEMBER_RECORD;
-import static com.hdh.lifeup.model.constant.TaskConst.*;
+import static com.hdh.lifeup.model.constant.CommonConst.*;
 import static com.hdh.lifeup.model.constant.UserConst.FollowStatus;
 import static com.hdh.lifeup.model.enums.ActionEnum.ADD_ACTIVITY;
 import static com.hdh.lifeup.model.enums.ActionEnum.BROWSE_ACTIVITY;

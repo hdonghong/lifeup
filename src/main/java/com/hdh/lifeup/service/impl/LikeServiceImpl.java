@@ -4,6 +4,7 @@ import com.hdh.lifeup.dao.LikeCountUserMapper;
 import com.hdh.lifeup.exception.GlobalException;
 import com.hdh.lifeup.model.constant.BizTypeConst;
 import com.hdh.lifeup.model.domain.LikeCountUserDO;
+import com.hdh.lifeup.model.dto.MarketGoodsDTO;
 import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
@@ -11,10 +12,7 @@ import com.hdh.lifeup.redis.KeyPrefix;
 import com.hdh.lifeup.redis.LikeKey;
 import com.hdh.lifeup.redis.RedisOperator;
 import com.hdh.lifeup.redis.UserKey;
-import com.hdh.lifeup.service.AsyncTaskService;
-import com.hdh.lifeup.service.LikeService;
-import com.hdh.lifeup.service.TeamMemberService;
-import com.hdh.lifeup.service.TeamTaskService;
+import com.hdh.lifeup.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -48,6 +46,8 @@ public class LikeServiceImpl implements LikeService {
 
     @Autowired
     private TeamTaskService teamTaskService;
+    @Autowired
+    private MarketGoodsService marketGoodsService;
 
     @Override
     public int doLike(Long userId, Long memberRecordId) {
@@ -156,7 +156,7 @@ public class LikeServiceImpl implements LikeService {
         TeamTaskDTO teamTaskDTO = teamTaskService.getOne(teamId);
         long result = redisOperator.srem(LikeKey.TEAM, teamId, userId);
         if (result == 0) {
-            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], memberRecordId = [{}]",
+            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], teamId = [{}]",
                     userId, teamId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -169,5 +169,42 @@ public class LikeServiceImpl implements LikeService {
     @Override
     public int getTeamLikeCount(Long teamId) {
         return (int) redisOperator.scard(LikeKey.TEAM, teamId);
+    }
+
+    @Override
+    public int doLikeGoods(Long userId, Long goodsId) {
+        MarketGoodsDTO marketGoodsDTO = marketGoodsService.getOne(goodsId);
+        // 哪个团队被谁点赞了
+        long result = redisOperator.sadd(LikeKey.GOODS, goodsId, userId);
+        if (result == 0) {
+            log.error("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], goodsId = [{}]",
+                userId, goodsId);
+            throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
+        }
+
+        // 异步写库
+        asyncTaskService.doLike(userId, marketGoodsDTO);
+//        asyncTaskService.reportAction(userId, LIKE_TEAM, goodsId, BizTypeConst.TEAM_TASK);
+        return (int) redisOperator.scard(LikeKey.GOODS, goodsId);
+    }
+
+    @Override
+    public int undoLikeGoods(Long userId, Long goodsId) {
+        MarketGoodsDTO marketGoodsDTO = marketGoodsService.getOne(goodsId);
+        long result = redisOperator.srem(LikeKey.GOODS, goodsId, userId);
+        if (result == 0) {
+            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], goodsId = [{}]",
+                userId, goodsId);
+            throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
+        }
+
+        // 异步写库
+        asyncTaskService.undoLike(userId, marketGoodsDTO);
+        return (int) redisOperator.scard(LikeKey.GOODS, goodsId);
+    }
+
+    @Override
+    public int getGoodsLikeCount(Long goodsId) {
+        return (int) redisOperator.scard(LikeKey.GOODS, goodsId);
     }
 }

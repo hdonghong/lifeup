@@ -1,17 +1,17 @@
-package com.hdh.lifeup.model.ao;
+package com.hdh.lifeup.model.vo;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 /**
- * UserAchievementAO class<br/>
+ * UserAchievementVO class<br/>
  *
  * @author hdonghong
  * @since 2019/12/28
  */
 @Data
-public class UserAchievementAO {
+public class UserAchievementVO {
 
     /**
      * 是否已解锁

@@ -29,4 +29,10 @@ public interface LikeService {
     int undoLikeTeam(Long userId, Long teamId);
 
     int getTeamLikeCount(Long teamId);
+
+    int doLikeGoods(Long userId, Long goodsId);
+
+    int undoLikeGoods(Long userId, Long goodsId);
+
+    int getGoodsLikeCount(Long goodsId);
 }

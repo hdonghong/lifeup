@@ -25,6 +25,6 @@ public class RedeemCodeServiceImplTest {
 
     @Test
     public void createCodes() {
-        redeemCodeService.createCodes(100);
+        redeemCodeService.createCodes(1000);
     }
 }

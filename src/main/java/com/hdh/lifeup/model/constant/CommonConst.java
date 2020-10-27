@@ -1,12 +1,12 @@
 package com.hdh.lifeup.model.constant;
 
 /**
- * TaskConst class<br/>
- * 任务的常量类
+ * CommonConst class<br/>
+ * 通用的常量类
  * @author hdonghong
  * @since 2018/09/11
  */
-public class TaskConst {
+public class CommonConst {
 
     /**
      * 团队成员角色
@@ -47,8 +47,18 @@ public class TaskConst {
     /** 排序规则 */
     public static class RankRule {
 
-        /** 团队活跃度优先 */
-        public static final Integer TEAM_RANK_FIRST = 1;
+        /**
+         * 创建时间倒序
+         */
+        public static final Integer CREATE_TIME_DESC = 0;
+
+        /** 活跃度优先 */
+        public static final Integer ACTIVITY_FIRST = 1;
+
+        /**
+         * 点赞量优先
+         */
+        public static final Integer LIKE_COUNT_FIRST = 2;
     }
 
     /**
@@ -65,6 +75,16 @@ public class TaskConst {
          * 海外
          */
         public static final Integer OVERSEAS = 2;
+    }
+
+    /**
+     * 查询过滤条件
+     */
+    public static class QueryFilter {
+        /**
+         * 只保留指定的用户
+         */
+        public static final String ONLY_THE_USER = "only_the_user";
     }
 
     public static final String TIME_ZONE_GMT8 = "+8";

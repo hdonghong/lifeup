@@ -11,7 +11,7 @@ import com.hdh.lifeup.base.BaseDTO;
 import com.hdh.lifeup.dao.RedeemCodeMapper;
 import com.hdh.lifeup.dao.UserInfoMapper;
 import com.hdh.lifeup.exception.GlobalException;
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import com.hdh.lifeup.model.domain.RedeemCodeDO;
 import com.hdh.lifeup.model.domain.UserInfoDO;
 import com.hdh.lifeup.model.dto.AttributeDTO;
@@ -31,7 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.comparator.Comparators;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -84,6 +83,17 @@ public class UserInfoServiceImpl implements UserInfoService {
             throw new GlobalException(CodeMsgEnum.USER_NOT_EXIST);
         }
         return BaseDTO.from(userInfoDO, UserInfoDTO.class);
+    }
+
+    @Override
+    public UserInfoDTO getOneSafely(Long userId) {
+        UserInfoDTO userInfoDTO = getOne(userId);
+        userInfoDTO.setAuthTypes(null);
+        userInfoDTO.setPwdSalt(null);
+        userInfoDTO.setCreateTime(null);
+        userInfoDTO.setPhone(null);
+        userInfoDTO.setUserStatus(null);
+        return userInfoDTO;
     }
 
     @Override
@@ -145,7 +155,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         BeanUtils.copyProperties(userInfoDTO, userDetailVO);
         // 加入的团队数量（进行中的）
         userId = userInfoDTO.getUserId();
-        userDetailVO.setTeamAmount(memberService.countUserTeamsWithStatus(userId, TaskConst.TaskStatus.DOING));
+        userDetailVO.setTeamAmount(memberService.countUserTeamsWithStatus(userId, CommonConst.TaskStatus.DOING));
 //        userDetailVO.setTeamAmount(memberService.countUserTeams(userId));
         // 粉丝数量
         userDetailVO.setFollowerAmount(redisOperator.zcard(UserKey.FOLLOWER, userId));

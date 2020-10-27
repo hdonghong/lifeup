@@ -1,6 +1,6 @@
 package com.hdh.lifeup.model.vo;
 
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import com.hdh.lifeup.model.dto.TeamSubTaskDTO;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -69,7 +69,7 @@ public class TeamTaskVO implements Serializable {
 
     /**
      * 团队团建来源 ： 国内/海外
-     * @see TaskConst.CreateSource
+     * @see CommonConst.CreateSource
      */
     @ApiModelProperty(value = "国内:1；海外2")
     private Integer createSource;

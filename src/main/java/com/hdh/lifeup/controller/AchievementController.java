@@ -2,7 +2,7 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
-import com.hdh.lifeup.model.ao.UserAchievementAO;
+import com.hdh.lifeup.model.vo.UserAchievementVO;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserAchievementDTO;
 import com.hdh.lifeup.service.UserAchievementService;
@@ -14,7 +14,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -55,7 +54,7 @@ public class AchievementController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/sync")
-    public ResultVO<Void> syncAchievement(@RequestBody List<UserAchievementAO> userAchievementAOList) {
+    public ResultVO<Void> syncAchievement(@RequestBody List<UserAchievementVO> userAchievementAOList) {
         Long userId = UserContext.get().getUserId();
         userAchievementAOList.forEach(userAchievementAO -> {
             userAchievementAO.setUserId(userId);
@@ -71,12 +70,12 @@ public class AchievementController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping
-    public ResultVO<List<UserAchievementAO>> listAchievements(
+    public ResultVO<List<UserAchievementVO>> listAchievements(
             @RequestParam(value = "hasComplete", defaultValue = "1", required = false) Integer hasComplete) {
         List<UserAchievementDTO> userAchievementDTOList = userAchievementService.listAchievements(
                 UserContext.get().getUserId(), hasComplete);
-        List<UserAchievementAO> achievementAOList = userAchievementDTOList.stream().map(userAchievementDTO -> {
-            UserAchievementAO userAchievementAO = new UserAchievementAO();
+        List<UserAchievementVO> achievementAOList = userAchievementDTOList.stream().map(userAchievementDTO -> {
+            UserAchievementVO userAchievementAO = new UserAchievementVO();
             BeanUtils.copyProperties(userAchievementDTO, userAchievementAO);
             return userAchievementAO;
         }).collect(Collectors.toList());

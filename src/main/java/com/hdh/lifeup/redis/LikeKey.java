@@ -19,4 +19,8 @@ public class LikeKey<T> extends BasePrefix<T> {
 	public static final LikeKey<Long> TEAM = new LikeKey<>(
 			TokenUtil.EXPIRE_SECONDS, "team", Long.class
 	);
+
+	public static final LikeKey<Long> GOODS = new LikeKey<>(
+			TokenUtil.EXPIRE_SECONDS, "goods", Long.class
+	);
 }

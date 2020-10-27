@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_MEMBER_RECORD;
 import static com.hdh.lifeup.model.constant.BizTypeConst.TEAM_TASK;
-import static com.hdh.lifeup.model.constant.TaskConst.*;
+import static com.hdh.lifeup.model.constant.CommonConst.*;
 import static com.hdh.lifeup.model.enums.ActionEnum.*;
 
 /**
@@ -188,7 +188,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
         wrapper.eq("create_source", createSource);
         // 处理团队排序规则
-        if (RankRule.TEAM_RANK_FIRST.equals(rankRule)) {
+        if (RankRule.ACTIVITY_FIRST.equals(rankRule)) {
             wrapper.orderByDesc("team_rank");
         }
         wrapper.orderByDesc("team_id");
@@ -233,7 +233,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public TeamDetailVO getDetail(@NonNull Long teamId) {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
         int memberAmount = memberService.countMembersByTeamId(teamId);
-        UserInfoDTO owner = userInfoService.getOne(teamTaskDTO.getUserId());
+        UserInfoDTO owner = userInfoService.getOneSafely(teamTaskDTO.getUserId());
         NextSignVO nextSign;
         try {
             nextSign = this.getNextSign(teamTaskDTO);

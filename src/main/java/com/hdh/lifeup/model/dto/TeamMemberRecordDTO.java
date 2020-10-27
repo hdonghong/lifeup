@@ -2,7 +2,7 @@ package com.hdh.lifeup.model.dto;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.hdh.lifeup.base.BaseDTO;
-import com.hdh.lifeup.model.constant.TaskConst;
+import com.hdh.lifeup.model.constant.CommonConst;
 import com.hdh.lifeup.model.domain.TeamMemberRecordDO;
 import com.hdh.lifeup.util.JsonUtil;
 import lombok.Data;
@@ -47,7 +47,7 @@ public class TeamMemberRecordDTO extends BaseDTO<TeamMemberRecordDO> {
 
     /**
      * 团队团建来源 ： 国内/海外
-     * @see TaskConst.CreateSource
+     * @see CommonConst.CreateSource
      */
     private Integer createSource;
 

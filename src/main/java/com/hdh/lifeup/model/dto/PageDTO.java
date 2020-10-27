@@ -54,6 +54,15 @@ public class PageDTO<T> implements Serializable {
                       .build();
     }
 
+    /**
+     * 将T类型转成指定的valueClass类型
+     * @param iPage
+     * @param valueClass
+     * @param ignoreProperties
+     * @param <T>
+     * @param <V>
+     * @return
+     */
     public static <T, V> PageDTO<V> createFreely(IPage<T> iPage, Class<V> valueClass, String... ignoreProperties) {
         Preconditions.checkNotNull(iPage, "iPage不能为空");
         List<T> pageList = iPage.getRecords();
