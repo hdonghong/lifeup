@@ -15,4 +15,6 @@ public interface BizTypeConst {
     String USER_ACHIEVEMENT = "user_achievement";
 
     String USER_INFO = "user_info";
+
+    String MARKET_GOODS = "market_goods";
 }

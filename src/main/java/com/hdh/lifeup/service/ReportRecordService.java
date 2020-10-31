@@ -1,6 +1,7 @@
 package com.hdh.lifeup.service;
 
 import com.hdh.lifeup.model.dto.ReportRecordDTO;
+import com.hdh.lifeup.model.vo.ReportResultVO;
 
 /**
  * ReportRecordService interface<br/>
@@ -10,5 +11,5 @@ import com.hdh.lifeup.model.dto.ReportRecordDTO;
  */
 public interface ReportRecordService {
 
-    boolean insert(ReportRecordDTO reportRecordDTO);
+    ReportResultVO insert(ReportRecordDTO reportRecordDTO);
 }

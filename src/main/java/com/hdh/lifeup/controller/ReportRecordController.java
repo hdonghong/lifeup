@@ -2,6 +2,7 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.model.dto.ReportRecordDTO;
+import com.hdh.lifeup.model.vo.ReportResultVO;
 import com.hdh.lifeup.service.ReportRecordService;
 import com.hdh.lifeup.util.Result;
 import com.hdh.lifeup.model.vo.ResultVO;
@@ -38,8 +39,9 @@ public class ReportRecordController {
             @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/new")
-    public ResultVO<?> addRecord(@RequestBody @Valid ReportRecordDTO reportRecordDTO) {
-        reportRecordService.insert(reportRecordDTO);
-        return Result.success();
+    public ResultVO<ReportResultVO> addRecord(@RequestBody @Valid ReportRecordDTO reportRecordDTO) {
+        return Result.success(
+            reportRecordService.insert(reportRecordDTO)
+        );
     }
 }

@@ -21,6 +21,7 @@ import com.hdh.lifeup.redis.LikeKey;
 import com.hdh.lifeup.service.LikeService;
 import com.hdh.lifeup.service.MarketGoodsService;
 import com.hdh.lifeup.service.UserInfoService;
+import com.hdh.lifeup.util.sensitive.SensitiveFilter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -54,11 +55,15 @@ public class MarketGoodsServiceImpl implements MarketGoodsService {
     }
 
     @Override
-    public Long shareGoods(Long userId, GoodsShareVO goodsShareAO) {
+    public Long shareGoods(Long userId, GoodsShareVO goodsShareVO) {
+        // 敏感词过滤
+        goodsShareVO.setGoodsName(SensitiveFilter.filter(goodsShareVO.getGoodsName()))
+            .setGoodsDesc(SensitiveFilter.filter(goodsShareVO.getGoodsDesc()));
+
         MarketGoodsDO marketGoodsDO = new MarketGoodsDO();
-        BeanUtils.copyProperties(goodsShareAO, marketGoodsDO);
+        BeanUtils.copyProperties(goodsShareVO, marketGoodsDO);
         marketGoodsDO.setUserId(userId);
-        if (goodsShareAO.getGoodsId() == null) {
+        if (goodsShareVO.getGoodsId() == null) {
             return createGoods(marketGoodsDO);
         }
         return updateGoods(marketGoodsDO);

@@ -4,6 +4,7 @@ import com.hdh.lifeup.model.constant.CommonConst;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
  * GoodsShareVO class<br/>
@@ -13,6 +14,7 @@ import lombok.Data;
  */
 @ApiModel("商品信息分享模型")
 @Data
+@Accessors(chain = true)
 public class GoodsShareVO {
 
     @ApiModelProperty(value = "id，新建时不允许提交")

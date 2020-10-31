@@ -32,6 +32,12 @@ public class RedeemCodeDO extends BaseDO {
      */
     private String redeemCode;
 
+    /**
+     * 兑换码级别
+     * -1:管理员; 0:普通用户; 1:1级付费用户;
+     */
+    private Integer codeLevel;
+
     private Long userId;
 
     /** 0，未发放；1，已发放；2，已兑换 */

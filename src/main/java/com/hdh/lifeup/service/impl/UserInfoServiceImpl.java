@@ -289,8 +289,8 @@ public class UserInfoServiceImpl implements UserInfoService {
         QueryWrapper<RedeemCodeDO> queryWrapper = new QueryWrapper<RedeemCodeDO>()
                 .eq("user_id", userId)
                 .eq("status", RedeemCodeEnum.REDEEMED.getStatus());
-        Integer count = redeemCodeMapper.selectCount(queryWrapper);
-        return count > 0 ? 1 : 0;
+        RedeemCodeDO redeemCodeDO = redeemCodeMapper.selectOne(queryWrapper);
+        return redeemCodeDO == null ? 0 : redeemCodeDO.getCodeLevel();
     }
 
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {

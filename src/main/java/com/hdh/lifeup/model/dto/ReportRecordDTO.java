@@ -32,7 +32,10 @@ public class ReportRecordDTO extends BaseDTO<ReportRecordDO> {
     @ApiModelProperty(value = "举报人的id")
     private Long reportUserId;
 
-    @ApiModelProperty(value = "举报项，比如team、user、activity, market_goods等等", example = "team")
+    /**
+     * @see com.hdh.lifeup.model.constant.BizTypeConst
+     */
+    @ApiModelProperty(value = "举报项，team_task、user_info、team_member_record, market_goods", example = "team")
     @NotEmpty(message = "举报项不能为空")
     private String reportItem;
 
