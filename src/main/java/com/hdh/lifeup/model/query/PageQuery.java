@@ -21,7 +21,7 @@ public class PageQuery {
     @ApiModelProperty("当前页展示的数据量，大于0，查询必传")
     private Long size;
 
-    @ApiModelProperty("通用排序字段，使用前需确认对应值是否支持；1时间倒序；2活跃度优先；3点赞量优先")
+    @ApiModelProperty("通用排序字段，使用前需确认对应值是否支持；0时间倒序；1活跃度优先；2点赞量优先")
     private Integer rank;
 
     @ApiModelProperty("来源，1国内；2海外")
@@ -29,6 +29,12 @@ public class PageQuery {
 
     @ApiModelProperty("过滤器：only_the_user只保留指定用户；")
     private String filter;
+
+    @ApiModelProperty("过滤器值为only_the_user时才有效")
+    private Long userId;
+
+    @ApiModelProperty("关键词搜索")
+    private String keywords;
 
     public Long getCurrentPage() {
         return currentPage == null || createSource < 1 ? 1 : currentPage;

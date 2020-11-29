@@ -58,7 +58,7 @@ public class ReportRecordServiceImpl implements ReportRecordService {
     private boolean doPublishment(ReportRecordDTO reportRecordDTO) {
         // 检查对同一项的用户举报人数在7天内是否超过阈值
         QueryWrapper<ReportRecordDO> countWrapper = new QueryWrapper<ReportRecordDO>()
-            .select("distinct report_user_id")
+            .select("DISTINCT(report_user_id) ")
             .eq("item_id", reportRecordDTO.getItemId())
             .gt("create_time", LocalDateTime.now().minusDays(7L));
         Integer reportCount = reportRecordMapper.selectCount(countWrapper);

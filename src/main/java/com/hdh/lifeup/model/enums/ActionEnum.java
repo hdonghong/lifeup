@@ -139,4 +139,14 @@ public enum ActionEnum {
         }
         return 0;
     }
+
+    public static ActionEnum getEnum(Long actionId) {
+        ActionEnum[] actionEnums = ActionEnum.values();
+        for (ActionEnum actionEnum : actionEnums) {
+            if (actionEnum.getActionId().equals(actionId)) {
+                return actionEnum;
+            }
+        }
+        return null;
+    }
 }

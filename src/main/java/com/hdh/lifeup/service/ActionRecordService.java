@@ -4,6 +4,7 @@ import com.hdh.lifeup.model.dto.ActionRecordDTO;
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserActionRecordDTO;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -34,4 +35,13 @@ public interface ActionRecordService {
      * @return
      */
     List<UserActionRecordDTO> listGroupByAction(String language, Long userId);
+
+    /**
+     * 获取指定用户在一段时间内的行为总分
+     * @param userId
+     * @param from
+     * @param to
+     * @return
+     */
+    Integer getTotalScore(Long userId, LocalDateTime from, LocalDateTime to);
 }

@@ -228,6 +228,24 @@ public class UserAuthServiceImpl implements UserAuthService {
             }
             return;
         } else if (AuthTypeConst.GOOGLE.equals(authDTO.getAuthType())) {
+            String oauthUrl = "http://178.128.26.36:8080/tokenInfo?id_token=$access_token$";
+            if (StringUtils.isEmpty(authDTO.getAccessToken())) {
+                return;
+            }
+            oauthUrl = oauthUrl.replace("$access_token$", authDTO.getAccessToken());
+            RestTemplate restTemplate = restTemplateBuilder.build();
+            try {
+                ResponseEntity<String> responseEntity = restTemplate.exchange(oauthUrl, HttpMethod.GET, null, String.class);
+                String data = objectMapper.readTree(responseEntity.getBody()).get("data").asText();
+                if (!StringUtils.isEmpty(data) && data.contains("error")) {
+                    throw new GlobalException(TOKEN_INVALID);
+                }
+                // body中返回值=400的情况也做限制 TODO
+            } catch (GlobalException e) {
+              throw e;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return;
         } else if (AuthTypeConst.YB.equals(authDTO.getAuthType())) {
             return;

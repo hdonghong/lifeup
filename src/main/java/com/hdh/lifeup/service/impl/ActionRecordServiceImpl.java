@@ -3,6 +3,7 @@ package com.hdh.lifeup.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.google.common.collect.Maps;
 import com.hdh.lifeup.dao.ActionRecordMapper;
 import com.hdh.lifeup.model.domain.ActionRecordDO;
 import com.hdh.lifeup.model.domain.ActionRecordGroupDO;
@@ -11,17 +12,16 @@ import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserActionDTO;
 import com.hdh.lifeup.model.dto.UserActionRecordDTO;
 import com.hdh.lifeup.model.enums.ActionEnum;
-import com.hdh.lifeup.model.vo.ActionRecordVO;
 import com.hdh.lifeup.service.ActionRecordService;
 import com.hdh.lifeup.service.UserActionService;
 import com.hdh.lifeup.service.UserInfoService;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -103,6 +103,41 @@ public class ActionRecordServiceImpl implements ActionRecordService {
                 .setActionScore(actionRecordGroupDO.getTimes() * userActionDTO.getActionScore());
             return userActionRecordDTO;
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    @Override
+    public Integer getTotalScore(Long userId, LocalDateTime from, LocalDateTime to) {
+        QueryWrapper<ActionRecordDO> query = new QueryWrapper<ActionRecordDO>()
+            .eq("user_id", userId)
+            .gt("create_time", from)
+            .lt("create_time", to)
+            .orderByAsc("action_record_id action_id");
+        List<ActionRecordDO> actionRecordDOList = actionRecordMapper.selectList(query);
+        if (CollectionUtils.isEmpty(actionRecordDOList)) {
+            return 0;
+        }
+        // 日期指针
+        LocalDate datePointer = null;
+        // 存储每个日期内每个action的总得分
+        Map<Long, Integer> actionIdToSource = null;
+        // 总得分
+        int totalScore = 0;
+        for (ActionRecordDO actionRecordDO : actionRecordDOList) {
+            LocalDate newDate = actionRecordDO.getCreateTime().toLocalDate();
+            if (!newDate.equals(datePointer)) {
+                datePointer = newDate;
+                actionIdToSource = Maps.newHashMap();
+            }
+            Long actionId = actionRecordDO.getActionId();
+            Integer actionScore = actionIdToSource.getOrDefault(actionId, 0);
+            ActionEnum actionEnum = ActionEnum.getEnum(actionId);
+            if (actionEnum == null || actionScore >= actionEnum.getMaxLimit()) {
+                continue;
+            }
+            actionIdToSource.put(actionId, actionScore + actionEnum.getScore());
+            totalScore += actionEnum.getScore();
+        }
+        return totalScore;
     }
 
 

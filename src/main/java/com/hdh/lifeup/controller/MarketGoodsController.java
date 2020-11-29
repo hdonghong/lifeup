@@ -48,6 +48,9 @@ public class MarketGoodsController {
     })
     @GetMapping("/list")
     public ResultVO<PageDTO<GoodsInfoVO>> listGoods(PageQuery pageQuery) {
+        if (pageQuery.getUserId() == null) {
+            pageQuery.setUserId(UserContext.get().getUserId());
+        }
         PageDTO<GoodsInfoVO> goodsPage = marketGoodsService.getGoodsPage(UserContext.get().getUserId(), pageQuery);
         return Result.success(goodsPage);
     }

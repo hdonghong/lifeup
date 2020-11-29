@@ -16,5 +16,12 @@ public interface UserRankService {
      */
     void updateRankValue(Long userId);
 
+    /**
+     * 更新用户排行榜排序值
+     * 2.0
+     * @param userId
+     */
+    void updateUserRank(Long userId);
+
     UserRankDTO getRankByUser(Long userId);
 }

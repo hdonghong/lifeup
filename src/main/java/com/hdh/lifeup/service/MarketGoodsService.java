@@ -26,6 +26,7 @@ public interface MarketGoodsService {
 
     /**
      * 获取商品列表分页
+     * @param userId 当前访问的用户
      * @param pageQuery
      * @return
      */

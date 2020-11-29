@@ -79,7 +79,11 @@ public class MarketGoodsServiceImpl implements MarketGoodsService {
         }
         // 过滤条件
         if (CommonConst.QueryFilter.ONLY_THE_USER.equals(pageQuery.getFilter())) {
-            wrapper.eq("user_id", userId);
+            wrapper.eq("user_id", pageQuery.getUserId());
+        }
+        if (!StringUtils.isEmpty(pageQuery.getKeywords())) {
+            wrapper.like("goods_name", "%" + pageQuery.getKeywords() + "%");
+//            wrapper.like("goods_desc", "%" + pageQuery.getKeywords() + "%");
         }
         // 查询
         IPage<MarketGoodsDO> marketGoodsDOIPage = marketGoodsMapper.selectPage(

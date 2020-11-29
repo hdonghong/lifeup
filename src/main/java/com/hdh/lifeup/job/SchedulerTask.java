@@ -41,6 +41,9 @@ public class SchedulerTask {
         });
     }
 
+    /**
+     * 用户排行榜更新机制
+     */
     @Scheduled(cron="*0 0 3 * * ?")
     public void updateUserRank() {
         int current = 1;
@@ -53,7 +56,7 @@ public class SchedulerTask {
                 break;
             }
             userInfoDTOList.forEach(userInfoDTO ->
-                    userRankService.updateRankValue(userInfoDTO.getUserId()));
+                    userRankService.updateUserRank(userInfoDTO.getUserId()));
             current++;
         }
     }

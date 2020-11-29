@@ -43,7 +43,7 @@ public class UserAuthDTO extends BaseDTO<UserAuthDO> {
 
     /** 'authType是手机号的话对应的是平台用户的密码' */
     @ApiModelProperty(name = "accessToken", value = "预留字段，目前只用于传递32位的密码", example = "sddjkgkclsi2k4h1kx9aksd33k1lsk8d")
-    @Length(min = 32, max = 32, message = "必须是32位的字符串")
+//    @Length(min = 32, max = 32, message = "必须是32位的字符串")
     private String accessToken;
 
     public static UserAuthDTO fromYbUser(JsonNode userInfoJson) {

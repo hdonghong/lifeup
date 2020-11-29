@@ -31,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
@@ -82,7 +83,9 @@ public class UserInfoServiceImpl implements UserInfoService {
             log.error("【获取用户】不存在的用户，userId = [{}]", userId);
             throw new GlobalException(CodeMsgEnum.USER_NOT_EXIST);
         }
-        return BaseDTO.from(userInfoDO, UserInfoDTO.class);
+        UserInfoDTO userInfoDTO = BaseDTO.from(userInfoDO, UserInfoDTO.class);
+        userInfoDTO.setUserType(getUserType(userId));
+        return userInfoDTO;
     }
 
     @Override
@@ -117,7 +120,21 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Transactional(rollbackFor = Exception.class)
     public UserInfoDTO update(@NonNull UserInfoDTO userInfoDTO) {
         UserInfoDTO cachedUserInfoDTO = UserContext.get();
-        BeanUtils.copyProperties(userInfoDTO, cachedUserInfoDTO, "userId", "createTime");
+        if (!StringUtils.isEmpty(userInfoDTO.getNickname())) {
+            cachedUserInfoDTO.setNickname(userInfoDTO.getNickname());
+        }
+        if (!StringUtils.isEmpty(userInfoDTO.getUserSex())) {
+            cachedUserInfoDTO.setUserSex(userInfoDTO.getUserSex());
+        }
+        if (!StringUtils.isEmpty(userInfoDTO.getUserAddress())) {
+            cachedUserInfoDTO.setUserAddress(userInfoDTO.getUserAddress());
+        }
+        if (!StringUtils.isEmpty(userInfoDTO.getUserHead())) {
+            cachedUserInfoDTO.setUserHead(userInfoDTO.getUserHead());
+        }
+        if (!StringUtils.isEmpty(userInfoDTO.getPhone())) {
+            cachedUserInfoDTO.setPhone(userInfoDTO.getPhone());
+        }
         Integer result = userInfoMapper.updateById(cachedUserInfoDTO.toDO(UserInfoDO.class));
         if (!Objects.equals(1, result)) {
             log.error("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
@@ -165,8 +182,6 @@ public class UserInfoServiceImpl implements UserInfoService {
         userDetailVO.setIsFollow(getFollowStatus(UserContext.get().getUserId(), userId));
         // 获赞数量
         userDetailVO.setLikeCount(likeService.getUserLikeCount(userId));
-        // 用户类型
-        userDetailVO.setUserType(getUserType(userId));
         asyncTaskService.reportAction(userId, GET_USER, userId, USER_INFO);
         return userDetailVO;
     }
