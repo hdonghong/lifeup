@@ -55,7 +55,7 @@ public class LikeServiceImpl implements LikeService {
         // 哪条记录被谁点赞了
         long result = redisOperator.sadd(LikeKey.ACTIVITY, memberRecordId, userId);
         if (result == 0) {
-            log.error("【点赞动态】点赞失败，可能是重复点赞，userId = [{}], memberRecordId = [{}]",
+            log.warn("【点赞动态】点赞失败，可能是重复点赞，userId = [{}], memberRecordId = [{}]",
                     userId, memberRecordId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -75,7 +75,7 @@ public class LikeServiceImpl implements LikeService {
         TeamMemberRecordDTO memberRecordDTO = teamMemberService.getOneMemberRecord(memberRecordId);
         long result = redisOperator.srem(LikeKey.ACTIVITY, memberRecordId, userId);
         if (result == 0) {
-            log.error("【点赞动态】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], memberRecordId = [{}]",
+            log.warn("【点赞动态】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], memberRecordId = [{}]",
                     userId, memberRecordId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -123,7 +123,7 @@ public class LikeServiceImpl implements LikeService {
         int exchangedLikeCount = getUserExchangedLikeCount(userId);
         // 如果总赞数少于已经兑换的赞数，说明不可兑换
         if (userLikeCount < exchangedLikeCount) {
-            log.error("【点赞兑换】userId = [{}], userLikeCount = [{}], exchangedLikeCount = [{}]",
+            log.warn("【点赞兑换】userId = [{}], userLikeCount = [{}], exchangedLikeCount = [{}]",
                     userId, userLikeCount, count);
             throw new GlobalException(CodeMsgEnum.LIKE_COUNT_NOT_ENOUGH);
         }
@@ -140,7 +140,7 @@ public class LikeServiceImpl implements LikeService {
         // 哪个团队被谁点赞了
         long result = redisOperator.sadd(LikeKey.TEAM, teamId, userId);
         if (result == 0) {
-            log.error("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], teamId = [{}]",
+            log.warn("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], teamId = [{}]",
                     userId, teamId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -156,7 +156,7 @@ public class LikeServiceImpl implements LikeService {
         TeamTaskDTO teamTaskDTO = teamTaskService.getOne(teamId);
         long result = redisOperator.srem(LikeKey.TEAM, teamId, userId);
         if (result == 0) {
-            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], teamId = [{}]",
+            log.warn("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], teamId = [{}]",
                     userId, teamId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -177,7 +177,7 @@ public class LikeServiceImpl implements LikeService {
         // 哪个团队被谁点赞了
         long result = redisOperator.sadd(LikeKey.GOODS, goodsId, userId);
         if (result == 0) {
-            log.error("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], goodsId = [{}]",
+            log.warn("【点赞团队】点赞失败，可能是重复点赞，userId = [{}], goodsId = [{}]",
                 userId, goodsId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }
@@ -193,7 +193,7 @@ public class LikeServiceImpl implements LikeService {
         MarketGoodsDTO marketGoodsDTO = marketGoodsService.getOne(goodsId);
         long result = redisOperator.srem(LikeKey.GOODS, goodsId, userId);
         if (result == 0) {
-            log.error("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], goodsId = [{}]",
+            log.warn("【点赞团队】点赞取消失败，没有点过赞或系统缓存异常，userId = [{}], goodsId = [{}]",
                 userId, goodsId);
             throw new GlobalException(CodeMsgEnum.LIKE_ERROR);
         }

@@ -89,7 +89,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         Preconditions.checkNotNull(teamId, "[TeamTaskServiceImpl.getOne] teamId is null");
         TeamTaskDO teamTaskDO = teamTaskMapper.selectById(teamId);
         if (teamTaskDO == null) {
-            log.error("【TeamTaskServiceImpl.getOne】不存在的团队任务，teamId = [{}]", teamId);
+            log.warn("【TeamTaskServiceImpl.getOne】不存在的团队任务，teamId = [{}]", teamId);
             throw new GlobalException(CodeMsgEnum.TEAM_NOT_EXIST);
         }
         return BaseDTO.from(teamTaskDO, TeamTaskDTO.class);
@@ -112,7 +112,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         TeamTaskDO teamTaskDO = teamTaskDTO.toDO(TeamTaskDO.class);
         Integer result = teamTaskMapper.insert(teamTaskDO);
         if (!Objects.equals(1   , result)) {
-            log.error("【TeamTaskServiceImpl.insert】插入新teamTask记录失败，teamTaskDTO = [{}]", teamTaskDTO);
+            log.warn("【TeamTaskServiceImpl.insert】插入新teamTask记录失败，teamTaskDTO = [{}]", teamTaskDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         teamTaskDTO.setTeamId(teamTaskDO.getTeamId());
@@ -359,7 +359,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         String localTimeZone = TimeZoneContext.get();
         LocalDateTime localNow = LocalDateTimeUtil.now(localTimeZone);
         if (localNow.toLocalDate().isAfter(teamTaskDTO.getStartDate())) {
-            log.error("【加入团队】已超过加入团队的截止日期，startDate() = [{}]", teamTaskDTO.getStartDate());
+            log.warn("【加入团队】已超过加入团队的截止日期，startDate() = [{}]", teamTaskDTO.getStartDate());
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
 
@@ -407,7 +407,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         TeamTaskDTO teamTaskDTO = this.getOne(teamId);
         // 判断当前用户是否团队成员
         if (memberService.isMember(teamId, UserContext.get().getUserId()) == 0) {
-            log.error("【团队签到】用户不是团队成员");
+            log.warn("【团队签到】用户不是团队成员");
             throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
         }
 
@@ -420,7 +420,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
 
         } else if (nowTime.isAfter(nextSign.getNextEndTime())) {
             // 超过签到时间
-            log.error("【团队签到】成员逾期操作，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
+            log.warn("【团队签到】成员逾期操作，nowTime = [{}], nextSign = [{}]", nowTime, nextSign);
             throw new GlobalException(CodeMsgEnum.TEAM_NOT_SIGN_TIME);
 
         }
@@ -483,7 +483,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     public TeamTaskDTO update(TeamTaskDTO teamTaskDTO) {
         TeamTaskDTO teamTaskDTOFromDB = getOne(teamTaskDTO.getTeamId());
         if (!UserContext.get().getUserId().equals(teamTaskDTOFromDB.getUserId())) {
-            log.error("【修改团队信息】越权操作，user = [{}], team = [{}], update = [{}]",
+            log.warn("【修改团队信息】越权操作，user = [{}], team = [{}], update = [{}]",
                     UserContext.get(), teamTaskDTOFromDB, teamTaskDTO);
             throw new GlobalException(CodeMsgEnum.TEAM_INVALID_BEHAVIOR);
         }

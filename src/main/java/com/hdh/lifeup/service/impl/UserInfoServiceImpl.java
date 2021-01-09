@@ -80,7 +80,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     public UserInfoDTO getOne(@NonNull Long userId) {
         UserInfoDO userInfoDO = userInfoMapper.selectById(userId);
         if (userInfoDO == null) {
-            log.error("【获取用户】不存在的用户，userId = [{}]", userId);
+            log.warn("【获取用户】不存在的用户，userId = [{}]", userId);
             throw new GlobalException(CodeMsgEnum.USER_NOT_EXIST);
         }
         UserInfoDTO userInfoDTO = BaseDTO.from(userInfoDO, UserInfoDTO.class);
@@ -106,7 +106,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         UserInfoDO userInfoDO = userInfoDTO.toDO(UserInfoDO.class);
         Integer result = userInfoMapper.insert(userInfoDO);
         if (!Objects.equals(1, result)) {
-            log.error("【新增用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
+            log.warn("【新增用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         // 新建账号的时候需要顺便新建人物的属性表
@@ -137,7 +137,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         }
         Integer result = userInfoMapper.updateById(cachedUserInfoDTO.toDO(UserInfoDO.class));
         if (!Objects.equals(1, result)) {
-            log.error("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
+            log.warn("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         redisOperator.setex(UserKey.TOKEN, TokenContext.get(), cachedUserInfoDTO);
@@ -204,7 +204,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         long addFollowerResult = redisOperator.zadd(UserKey.FOLLOWER, userId, nowSecond, follower.getUserId());
         // 两个结果必须都等于1
         if (addFollowingResult != 1 || addFollowerResult != 1) {
-            log.error("【关注用户】已关注或者其它异常情况，addFollowingResult = [{}], addFollowerResult = [{}]",
+            log.warn("【关注用户】已关注或者其它异常情况，addFollowingResult = [{}], addFollowerResult = [{}]",
                     addFollowingResult, addFollowerResult);
             throw new GlobalException(CodeMsgEnum.FOLLOW_ERROR);
         }
@@ -227,7 +227,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         long remFollowerResult = redisOperator.zrem(UserKey.FOLLOWER, userId, follower.getUserId());
         // 两个结果必须都等于1
         if (remFollowingResult != 1 || remFollowerResult != 1) {
-            log.error("【取消关注】已取消关注或者其它异常情况，remFollowingResult = [{}], remFollowerResult = [{}]",
+            log.warn("【取消关注】已取消关注或者其它异常情况，remFollowingResult = [{}], remFollowerResult = [{}]",
                     remFollowingResult, remFollowerResult);
             throw new GlobalException(CodeMsgEnum.FOLLOW_ERROR);
         }

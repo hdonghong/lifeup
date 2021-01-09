@@ -74,7 +74,7 @@ public class AsyncTaskService {
                 .setUserId(userId);
         Integer result = likeMemberRecordMapper.insert(likeMemberRecordDO);
         if (!Objects.equals(result, 1)) {
-            log.error("【doLike】likeMemberRecordMapper.insert failed. userId = [{}], memberRecordDTO = [{}]",
+            log.warn("【doLike】likeMemberRecordMapper.insert failed. userId = [{}], memberRecordDTO = [{}]",
                     userId, memberRecordDTO);
             return;
         }
@@ -99,7 +99,7 @@ public class AsyncTaskService {
                 .setUserId(userId);
         Integer result = likeTeamTaskMapper.insert(likeTeamTaskDO);
         if (!Objects.equals(result, 1)) {
-            log.error("【doLike】likeTeamTaskMapper.insert failed. userId = [{}], teamTaskDTO = [{}]",
+            log.warn("【doLike】likeTeamTaskMapper.insert failed. userId = [{}], teamTaskDTO = [{}]",
                     userId, teamTaskDTO);
             return;
         }
@@ -117,7 +117,7 @@ public class AsyncTaskService {
                 .eq("user_id", userId);
         Integer result = likeMemberRecordMapper.delete(queryWrapper);
         if (!Objects.equals(result, 1)) {
-            log.error("【undoLike】likeMemberRecordMapper.delete failed. userId = [{}], memberRecordDTO = [{}]",
+            log.warn("【undoLike】likeMemberRecordMapper.delete failed. userId = [{}], memberRecordDTO = [{}]",
                     userId, memberRecordDTO);
             return;
         }
@@ -136,7 +136,7 @@ public class AsyncTaskService {
                 .eq("user_id", userId);
         Integer result = likeTeamTaskMapper.delete(queryWrapper);
         if (!Objects.equals(result, 1)) {
-            log.error("【undoLike】likeMemberRecordMapper.deleteById failed. userId = [{}], memberRecordDTO = [{}]",
+            log.warn("【undoLike】likeMemberRecordMapper.deleteById failed. userId = [{}], memberRecordDTO = [{}]",
                     userId, teamTaskDTO);
             return;
         }
@@ -205,7 +205,7 @@ public class AsyncTaskService {
         try {
             actionRecordService.reportAction(actionRecordDTO);
         } catch (Exception e) {
-            log.error("actionRecordService.reportAction error ", e);
+            log.warn("actionRecordService.reportAction error ", e);
         }
     }
 
@@ -216,7 +216,7 @@ public class AsyncTaskService {
             .setUserId(userId);
         Integer result = likeMarketGoodsMapper.insert(likeMarketGoodsDO);
         if (!Objects.equals(result, 1)) {
-            log.error("【doLike】likeMarketGoodsMapper.insert failed. userId = [{}], marketGoodsDTO = [{}]",
+            log.warn("【doLike】likeMarketGoodsMapper.insert failed. userId = [{}], marketGoodsDTO = [{}]",
                 userId, marketGoodsDTO);
             return;
         }
@@ -229,7 +229,7 @@ public class AsyncTaskService {
             .eq("user_id", userId);
         Integer result = likeMarketGoodsMapper.delete(queryWrapper);
         if (!Objects.equals(result, 1)) {
-            log.error("【undoLike】likeMarketGoodsMapper.deleteById failed. userId = [{}], marketGoodsDTO = [{}]",
+            log.warn("【undoLike】likeMarketGoodsMapper.deleteById failed. userId = [{}], marketGoodsDTO = [{}]",
                 userId, marketGoodsDTO);
             return;
         }

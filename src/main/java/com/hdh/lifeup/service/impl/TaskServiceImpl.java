@@ -37,12 +37,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public TaskDTO getOne(Long taskId) {
         if (taskId == null) {
-            log.error("【获取个人事项】taskId为空");
+            log.warn("【获取个人事项】taskId为空");
             throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
         }
         TaskDO taskDO = taskMapper.selectById(taskId);
         if (taskDO == null) {
-            log.error("【获取个人事项】不存在的个人事项，taskId = [{}]", taskId);
+            log.warn("【获取个人事项】不存在的个人事项，taskId = [{}]", taskId);
             throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
         }
         return BaseDTO.from(taskDO, TaskDTO.class);
@@ -55,7 +55,7 @@ public class TaskServiceImpl implements TaskService {
         TaskDO taskDO = taskDTO.toDO(TaskDO.class);
         Integer result = taskMapper.insert(taskDO);
         if (Objects.equals(1, result)) {
-            log.error("【新增个人事项】新增失败，taskDTO = [{}]", taskDTO);
+            log.warn("【新增个人事项】新增失败，taskDTO = [{}]", taskDTO);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }
         taskDTO.setTaskId(taskDO.getTaskId());
@@ -65,7 +65,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional(rollbackFor = Exception.class)
     public void update(@NonNull TaskDTO taskDTO) {
         if (taskDTO.getTaskId() == null) {
-            log.error("【更新个人事项】");
+            log.warn("【更新个人事项】");
             throw new GlobalException(CodeMsgEnum.PARAMETER_NULL);
         }
         taskDTO.setUserId(UserContext.get().getUserId());
@@ -75,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
                                           .eq("user_id", taskDTO.getUserId())
         );
         if (Objects.equals(1, result)) {
-            log.error("【删除个人事项】不存在的个人事项，taskDTO = [{}]", taskDTO);
+            log.warn("【删除个人事项】不存在的个人事项，taskDTO = [{}]", taskDTO);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }
     }
@@ -88,7 +88,7 @@ public class TaskServiceImpl implements TaskService {
                         .eq("user_id", UserContext.get().getUserId())
         );
         if (Objects.equals(1, result)) {
-            log.error("【删除个人事项】不存在的个人事项，taskId = [{}]", taskId);
+            log.warn("【删除个人事项】不存在的个人事项，taskId = [{}]", taskId);
             throw new GlobalException(CodeMsgEnum.TASK_NOT_EXIST);
         }
     }

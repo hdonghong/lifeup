@@ -111,7 +111,7 @@ public class ActionRecordServiceImpl implements ActionRecordService {
             .eq("user_id", userId)
             .gt("create_time", from)
             .lt("create_time", to)
-            .orderByAsc("action_record_id action_id");
+            .orderByAsc("action_record_id, action_id");
         List<ActionRecordDO> actionRecordDOList = actionRecordMapper.selectList(query);
         if (CollectionUtils.isEmpty(actionRecordDOList)) {
             return 0;

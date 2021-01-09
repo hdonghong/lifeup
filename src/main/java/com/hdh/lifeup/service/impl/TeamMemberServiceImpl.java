@@ -86,7 +86,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         );
         TeamMemberDTO teamMemberDTO = BaseDTO.from(teamMemberDO, TeamMemberDTO.class);
         if (teamMemberDTO == null) {
-            log.error("【获取团队某个成员】不存在的成员，teamId = [{}], userId = [{}]", teamId, userId);
+            log.warn("【获取团队某个成员】不存在的成员，teamId = [{}], userId = [{}]", teamId, userId);
             throw new GlobalException(CodeMsgEnum.MEMBER_NOT_IN_TEAM);
         }
         return teamMemberDTO;
@@ -98,7 +98,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         TeamMemberDO teamMemberDO = teamMemberDTO.toDO(TeamMemberDO.class);
         Integer result = memberMapper.insert(teamMemberDO);
         if (!Objects.equals(1, result)) {
-            log.error("【插入新成员】新增失败, teamMemberDTO = [{}]", teamMemberDTO);
+            log.warn("【插入新成员】新增失败, teamMemberDTO = [{}]", teamMemberDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         return teamMemberDTO;
@@ -131,7 +131,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
         TeamMemberRecordDO teamMemberRecordDO = teamMemberRecordDTO.toDO(TeamMemberRecordDO.class);
         Integer result = memberRecordMapper.insert(teamMemberRecordDO);
         if (!Objects.equals(1, result)) {
-            log.error("【团队成员发布动态】新增失败, teamMemberRecordDTO = [{}]", teamMemberRecordDTO);
+            log.warn("【团队成员发布动态】新增失败, teamMemberRecordDTO = [{}]", teamMemberRecordDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         teamMemberRecordDTO.setMemberRecordId(teamMemberRecordDO.getMemberRecordId());
@@ -146,7 +146,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
     @Transactional(rollbackFor = Exception.class)
     public void addMember(TeamMemberDTO memberDTO, TeamMemberRecordDTO memberRecordDTO) {
         if (this.isMember(memberDTO.getTeamId(), memberDTO.getUserId()) != 0) {
-            log.error("【加入团队】禁止重复加入团队，memberDTO = [{}]", memberDTO);
+            log.warn("【加入团队】禁止重复加入团队，memberDTO = [{}]", memberDTO);
             throw new GlobalException(CodeMsgEnum.SERVER_ERROR);
         }
 
@@ -371,7 +371,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                         .eq("team_role", TeamRole.MEMBER)
         );
         if (Optional.ofNullable(result).orElse(0) == 0) {
-            log.error("【退出团队】失败，teamId = [{}], user = [{}]", teamId, UserContext.get());
+            log.warn("【退出团队】失败，teamId = [{}], user = [{}]", teamId, UserContext.get());
         }
         return result;
     }
@@ -385,7 +385,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
 
         TeamMemberRecordDO memberRecordDO = memberRecordMapper.selectById(memberRecordId);
         if (memberRecordDO == null) {
-            log.error("【获取成员记录】不存在，memberRecordId = [{}]", memberRecordId);
+            log.warn("【获取成员记录】不存在，memberRecordId = [{}]", memberRecordId);
             throw new GlobalException(CodeMsgEnum.MEMBER_RECORD_NOT_EXIT);
         }
         teamMemberRecordDTO = BaseDTO.from(memberRecordDO, TeamMemberRecordDTO.class);
@@ -402,7 +402,7 @@ public class TeamMemberServiceImpl implements TeamMemberService {
                 .eq("user_id", userId)
         );
         if (!Objects.equals(ret, 1)) {
-            log.error("【删除动态】不存在的动态，memberRecordId = [{}], userId = [{}]", memberRecordId, userId);
+            log.warn("【删除动态】不存在的动态，memberRecordId = [{}], userId = [{}]", memberRecordId, userId);
             throw new GlobalException(CodeMsgEnum.MEMBER_RECORD_NOT_EXIT);
         }
     }

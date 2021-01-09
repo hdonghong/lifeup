@@ -104,7 +104,7 @@ public class UserAuthController {
         responseEntity = restTemplate.exchange(ybConfig.getUserInfoPath() + accessToken, HttpMethod.GET, null, String.class);
         JsonNode responseBody = objectMapper.readTree(responseEntity.getBody());
         if (!"success".equals(responseBody.get("status").asText())) {
-            log.error("【易班授权】获取登录信息失败，responseBody = [{}]", responseBody);
+            log.warn("【易班授权】获取登录信息失败，responseBody = [{}]", responseBody);
             throw new GlobalException(CodeMsgEnum.YB_ERROR);
         }
 
@@ -160,7 +160,7 @@ public class UserAuthController {
             ));
         } else {
             // 验证失败
-            log.error("【Mob短信登录验证】验证失败，responseEntity = [{}]", responseEntity);
+            log.warn("【Mob短信登录验证】验证失败，responseEntity = [{}]", responseEntity);
             throw new GlobalException(CodeMsgEnum.MOB_VERIFY_ERROR);
         }*/
         return Result.success(userAuthService.codeLogin(

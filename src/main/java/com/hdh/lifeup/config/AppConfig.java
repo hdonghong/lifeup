@@ -1,7 +1,9 @@
 package com.hdh.lifeup.config;
 
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,4 +28,15 @@ public class AppConfig {
 
     /** 应用appkey */
     private String appKey;
+
+    @Autowired
+    private ApplicationContext context;
+
+    /**
+     * 是否生产环境
+     * @return
+     */
+    public boolean isProd() {
+        return "prod".equals(context.getEnvironment().getActiveProfiles()[0]);
+    }
 }

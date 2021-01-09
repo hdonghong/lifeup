@@ -49,7 +49,7 @@ public class AttributeServiceImpl implements AttributeService {
                 new QueryWrapper<AttributeDO>().eq("user_id", userId)
         );
         if (attributeDO == null ) {
-            log.error("【更新人物属性】人物属性不存在，也可能是不存在的用户，user = [{}]", UserContext.get());
+            log.warn("【更新人物属性】人物属性不存在，也可能是不存在的用户，user = [{}]", UserContext.get());
             throw new GlobalException(CodeMsgEnum.ATTRIBUTE_NOT_EXIST);
         }
         BeanUtils.copyProperties(attributeDTO, attributeDO, "userId");
@@ -58,7 +58,7 @@ public class AttributeServiceImpl implements AttributeService {
                 new QueryWrapper<AttributeDO>().eq("user_id", userId)
         );
         if (!Objects.equals(1, result)) {
-            log.error("【更新人物属性】数据库更新操作失败，user = [{}], attributeDO = [{}]", UserContext.get(), attributeDO);
+            log.warn("【更新人物属性】数据库更新操作失败，user = [{}], attributeDO = [{}]", UserContext.get(), attributeDO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         return attributeDTO;
@@ -70,7 +70,7 @@ public class AttributeServiceImpl implements AttributeService {
                 new QueryWrapper<AttributeDO>().eq("user_id", userId)
         );
         if (attributeDO == null ) {
-            log.error("【userId获取人物属性】人物属性不存在，也可能是不存在的用户，userId = [{}]", userId);
+            log.warn("【userId获取人物属性】人物属性不存在，也可能是不存在的用户，userId = [{}]", userId);
             throw new GlobalException(CodeMsgEnum.ATTRIBUTE_NOT_EXIST);
         }
         return BaseDTO.from(attributeDO, AttributeDTO.class);

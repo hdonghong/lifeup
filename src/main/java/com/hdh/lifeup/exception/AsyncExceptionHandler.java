@@ -23,6 +23,6 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
             log.info("asyncException = [{}]", asyncException.getMsg());
         }
 
-        log.error("Exception :", ex);
+        log.warn("Exception :", ex);
     }
 }

@@ -31,7 +31,7 @@ public class SchedulerTask {
     /**
      * 团队活跃度缩减机制
      */
-    @Scheduled(cron="*0 0 5 * * ?")
+    @Scheduled(cron="0 0 5 * * ?")
     public void decrTeamRank() {
         List<TeamTaskDTO> teamTaskList = teamTaskService.getAllActiveTeams();
         teamTaskList.forEach(teamTask -> {
@@ -44,7 +44,7 @@ public class SchedulerTask {
     /**
      * 用户排行榜更新机制
      */
-    @Scheduled(cron="*0 0 3 * * ?")
+    @Scheduled(cron="0 0 3 * * ?")
     public void updateUserRank() {
         int current = 1;
         int limit = 500;

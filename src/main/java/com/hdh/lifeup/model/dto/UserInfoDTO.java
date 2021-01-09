@@ -54,6 +54,9 @@ public class UserInfoDTO extends BaseDTO<UserInfoDO> {
 
     private String pwdSalt;
 
+    /**
+     * 用户级别
+     */
     private Integer userType;
 
     public static UserInfoDTO fromYbUser(JsonNode userInfoJson) {

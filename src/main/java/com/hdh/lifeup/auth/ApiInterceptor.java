@@ -61,7 +61,9 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
 
             // 接口鉴权，将key拼接上用户id
             String key = request.getRequestURI();
-            if (apiLimiting.toAuth()) {
+            String authenticityToken = request.getHeader(TokenUtil.AUTHENTICITY_TOKEN);
+            // 当传递了token或者注解要求鉴权时，则走鉴权逻辑
+            if (!StringUtils.isEmpty(authenticityToken) || apiLimiting.toAuth()) {
                 UserInfoDTO user = this.getUser(request);
                 UserContext.set(user);
                 key +=  "-" + user.getUserId();
@@ -76,7 +78,7 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
             } else if (accessCount < maxAccess) {
                 redisOperator.incr(apiKey, key);
             } else {
-                log.error("【Api接口拦截】限流key = [{}]，accessCount = [{}], maxAccess = [{}]", key, accessCount, maxAccess);
+                log.warn("【Api接口拦截】限流key = [{}]，accessCount = [{}], maxAccess = [{}]", key, accessCount, maxAccess);
                 throw new GlobalException(CodeMsgEnum.TOO_MANY_ACCESSES);
             }
         }
@@ -101,12 +103,13 @@ public class ApiInterceptor extends HandlerInterceptorAdapter {
                 headersMap.put("\n\t" + headerName, request.getHeader(headerName));
             }
 
-            log.error("【Api接口拦截】Request Header中没有携带[{}], uri = [{}]\nHeaders = [{}]", TokenUtil.AUTHENTICITY_TOKEN, request.getRequestURI(), headersMap);
+            log.warn("【Api接口拦截】Request Header中没有携带[{}], uri = [{}]", TokenUtil.AUTHENTICITY_TOKEN, request.getRequestURI());
+//            log.warn("【Api接口拦截】Request Header中没有携带[{}], uri = [{}]\nHeaders = [{}]", TokenUtil.AUTHENTICITY_TOKEN, request.getRequestURI(), headersMap);
             throw new GlobalException(CodeMsgEnum.TOKEN_ABSENT);
         }
         UserInfoDTO user = userInfoService.getByToken(authenticityToken);
         if (user == null) {
-            log.error("【Api接口拦截】不合法的Token或者Token失效");
+            log.warn("【Api接口拦截】不合法的Token或者Token失效");
             throw new GlobalException(CodeMsgEnum.TOKEN_INVALID);
         }
         user.setUserType(userInfoService.getUserType(user.getUserId()));

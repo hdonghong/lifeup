@@ -2,6 +2,7 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.model.query.RuleCfgQuery;
 import com.hdh.lifeup.model.vo.ResultVO;
 import com.hdh.lifeup.model.vo.RuleCfgVO;
@@ -32,15 +33,17 @@ public class ConfigController {
     @Autowired
     private RuleCfgService ruleCfgService;
 
-    @ApiLimiting
+    @ApiLimiting(toAuth = false)
     @ApiOperation(value = "获取规则匹配的配置，可能存在多个配置匹配到同一规则")
     @ApiImplicitParams({
         @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @GetMapping("/rule")
     public ResultVO<List<RuleCfgVO>> matchRuleConfig(RuleCfgQuery ruleCfgQuery) {
+        UserInfoDTO currentUser = UserContext.get();
+        Long userId = (currentUser == null) ? null : currentUser.getUserId();
         return Result.success(
-            ruleCfgService.match(UserContext.get().getUserId(), ruleCfgQuery)
+            ruleCfgService.match(userId, ruleCfgQuery)
         );
     }
 }

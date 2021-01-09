@@ -76,13 +76,13 @@ public class UserAuthServiceImpl implements UserAuthService {
                         .eq("auth_identifier", userAuthDO.getAuthIdentifier())
         );
         if (queryResult != null) {
-            log.error("【新增用户授权】该授权类型对应的唯一标识已经被注册过，UserAuthDO = [{}]", queryResult);
+            log.warn("【新增用户授权】该授权类型对应的唯一标识已经被注册过，UserAuthDO = [{}]", queryResult);
             throw new GlobalException(CodeMsgEnum.ACCOUNT_ALREADY_EXISTED);
         }
 
         Integer result = userAuthMapper.insert(userAuthDO);
         if (!Objects.equals(1, result)) {
-            log.error("【新增用户授权】插入记录数量 = [{}], UserAuthDTO = [{}]", result, userAuthDTO);
+            log.warn("【新增用户授权】插入记录数量 = [{}], UserAuthDTO = [{}]", result, userAuthDTO);
             throw new GlobalException(CodeMsgEnum.DATABASE_EXCEPTION);
         }
         userAuthDTO.setAuthId(userAuthDO.getAuthId());
@@ -139,7 +139,7 @@ public class UserAuthServiceImpl implements UserAuthService {
         boolean match = PasswordUtil.checkPwd(
                     userAuthDTO.getAccessToken(), userInfoResult.getPwdSalt(), userAuthDO.getAccessToken());
         if (!match) {
-            log.error("【APP账号登录】密码错误");
+            log.warn("【APP账号登录】密码错误");
             throw new GlobalException(CodeMsgEnum.PASSWORD_ERROR);
         }
         // 返回token
@@ -192,6 +192,9 @@ public class UserAuthServiceImpl implements UserAuthService {
      */
     private String generateToken(UserInfoDTO userInfoDTO) {
         String token = TokenUtil.get();
+        // 设置用户级别
+        Integer userType = userInfoService.getUserType(userInfoDTO.getUserId());
+        userInfoDTO.setUserType(userType);
         redisOperator.setex(UserKey.TOKEN, token, userInfoDTO);
         return token;
     }

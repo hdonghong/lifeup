@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler(value = { GlobalException.class, SingleTaskException.class})
     public ResultVO<?> handlerGlobalException(GlobalException e) {
-        log.error("【系统预知异常】e = [{}]", e.toString());
+        log.warn("【系统预知异常】e = [{}]", e.toString());
         return Result.error((e.getCodeMsgEnum()));
     }
 
