@@ -44,5 +44,5 @@ public interface MarketGoodsService {
      * @param userId
      * @param goodsId
      */
-    void importGoods(Long userId, Long goodsId);
+    GoodsInfoVO importGoods(Long userId, Long goodsId);
 }

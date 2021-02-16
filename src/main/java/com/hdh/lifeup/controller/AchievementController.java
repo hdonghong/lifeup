@@ -58,7 +58,7 @@ public class AchievementController {
         Long userId = UserContext.get().getUserId();
         userAchievementAOList.forEach(userAchievementAO -> {
             userAchievementAO.setUserId(userId);
-            userAchievementService.sync(userAchievementAO);
+            // userAchievementService.sync(userAchievementAO);
         });
         return Result.success();
     }

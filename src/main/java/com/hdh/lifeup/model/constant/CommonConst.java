@@ -85,6 +85,7 @@ public class CommonConst {
          * 只保留指定的用户
          */
         public static final String ONLY_THE_USER = "only_the_user";
+        public static final String LAST_SOME_DAYS = "last_some_days";
     }
 
     public static final String TIME_ZONE_GMT8 = "+8";

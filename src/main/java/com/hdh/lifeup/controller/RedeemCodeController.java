@@ -2,8 +2,11 @@ package com.hdh.lifeup.controller;
 
 import com.hdh.lifeup.auth.ApiLimiting;
 import com.hdh.lifeup.auth.UserContext;
+import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.enums.CodeLevelEnum;
 import com.hdh.lifeup.model.vo.ResultVO;
 import com.hdh.lifeup.service.RedeemCodeService;
+import com.hdh.lifeup.service.UserInfoService;
 import com.hdh.lifeup.util.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -27,6 +30,8 @@ public class RedeemCodeController {
 
     @Resource
     private RedeemCodeService redeemCodeService;
+    @Resource
+    private UserInfoService userInfoService;
 
     @ApiOperation(value = "兑换", notes = "指定动态id")
     @ApiLimiting(maxAccess = 10)
@@ -34,6 +39,10 @@ public class RedeemCodeController {
     public ResultVO<?> redeemCode(String redeemCode) {
         Long userId = UserContext.get().getUserId();
         boolean result = redeemCodeService.redeem(userId, redeemCode);
+        if (result) {
+            UserInfoDTO userInfoDTO = UserContext.get().setUserType(CodeLevelEnum.VIP.getLevel());
+            userInfoService.update(userInfoDTO);
+        }
         HashMap<String, Integer> map = new HashMap<>();
         map.put("redeemStatus", result ? 1 : 0);
         return Result.success(map);

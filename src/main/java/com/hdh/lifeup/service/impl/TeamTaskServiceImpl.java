@@ -172,7 +172,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
     }
 
     @Override
-    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle, Integer rankRule, Boolean startDateFilter, Integer createSource) {
+    public PageDTO<TeamTaskDTO> page(PageDTO pageDTO, String teamTitle, Integer daysCount, Integer rankRule, Boolean startDateFilter, Integer createSource) {
 //        log.info("pageNo = " + pageDTO.getCurrentPage());
         QueryWrapper<TeamTaskDO> wrapper = new QueryWrapper<TeamTaskDO>()
                 .ne("team_status", TaskStatus.COMPLETE);
@@ -185,6 +185,9 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
         if (createSource == null) {
             createSource = CreateSource.CHINA;
+        }
+        if (daysCount != null && daysCount > 0) {
+            wrapper.gt("create_time", LocalDateTime.now().minusDays(daysCount));
         }
         wrapper.eq("create_source", createSource);
         // 处理团队排序规则

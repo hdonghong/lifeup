@@ -10,6 +10,7 @@ import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.RecordDTO;
 import com.hdh.lifeup.model.dto.TeamTaskDTO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.query.PageQuery;
 import com.hdh.lifeup.service.TeamMemberService;
 import com.hdh.lifeup.service.TeamTaskService;
 import com.hdh.lifeup.service.UserInfoService;
@@ -240,5 +241,19 @@ public class UserInfoController {
         return Result.success(
                 teamMemberService.getMoments(pageDTO, scope, filter, createSource)
         );
+    }
+
+    @ApiLimiting
+    @ApiOperation(value = "商品列表")
+    @ApiImplicitParams({
+        @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
+    })
+    @GetMapping("/list")
+    public ResultVO<PageDTO<UserDetailVO>> listGoods(PageQuery pageQuery) {
+        if (pageQuery.getUserId() == null) {
+            pageQuery.setUserId(UserContext.get().getUserId());
+        }
+        PageDTO<UserDetailVO> userPage = userInfoService.getUserPage(pageQuery);
+        return Result.success(userPage);
     }
 }

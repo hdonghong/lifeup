@@ -1,6 +1,5 @@
 package com.hdh.lifeup;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
@@ -12,15 +11,13 @@ import com.hdh.lifeup.model.dto.TeamMemberRecordDTO;
 import com.hdh.lifeup.model.vo.NextSignVO;
 import com.hdh.lifeup.util.LocalDateTimeUtil;
 import com.hdh.lifeup.util.sensitive.SensitiveFilter;
-import org.apache.tomcat.jni.Local;
 import org.junit.Test;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.util.Pair;
 
 import java.io.IOException;
 import java.time.*;
 import java.util.*;
-
-import static java.util.Comparator.naturalOrder;
 
 /**
  * OtherTest class<br/>
@@ -208,5 +205,44 @@ public class OtherTest {
         System.out.println(UUID.randomUUID().toString().length());
         Random random = new Random();
         System.out.println(random.nextInt(16));
+    }
+
+    private Pair<LocalDateTime, Counter> timeCounter = null;
+    /**
+     * 每分钟计数
+     */
+    private void countPerMinute() {
+        try {
+            LocalDateTime now = LocalDateTime.now().withSecond(0).withNano(0);
+            if (timeCounter == null) {
+                timeCounter = Pair.of(now, new Counter());
+            }
+            // 时间不同，先把上一次的计数打印；再记录初始化计数器
+            if (!now.equals(timeCounter.getFirst())) {
+                System.out.println("TimeCounter_time=[{}]_count=[{}]" + timeCounter.getFirst() + "_" + timeCounter.getSecond());
+                timeCounter = Pair.of(now, new Counter());
+            }
+            timeCounter.getSecond().incr();
+        } catch (Exception e) {
+        }
+    }
+
+    private static class Counter {
+        private int cnt;
+        private int incr() {
+            return ++cnt;
+        }
+        @Override
+        public String toString() {
+            return String.valueOf(cnt);
+        }
+    }
+
+    @Test
+    public void test() {
+        countPerMinute();
+        countPerMinute();
+        countPerMinute();
+        countPerMinute();
     }
 }

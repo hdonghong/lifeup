@@ -27,7 +27,7 @@ public class PageQuery {
     @ApiModelProperty("来源，1国内；2海外")
     private Integer createSource;
 
-    @ApiModelProperty("过滤器：only_the_user只保留指定用户；")
+    @ApiModelProperty("过滤器：only_the_user只保留指定用户；last_some_days过去多少天")
     private String filter;
 
     @ApiModelProperty("过滤器值为only_the_user时才有效")
@@ -35,6 +35,9 @@ public class PageQuery {
 
     @ApiModelProperty("关键词搜索")
     private String keywords;
+
+    @ApiModelProperty("过滤器值为last_some_days时才有效")
+    private Integer daysCount;
 
     public Long getCurrentPage() {
         return currentPage == null || createSource < 1 ? 1 : currentPage;

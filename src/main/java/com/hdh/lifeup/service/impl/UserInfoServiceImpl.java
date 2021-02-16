@@ -19,6 +19,7 @@ import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
 import com.hdh.lifeup.model.enums.CodeMsgEnum;
 import com.hdh.lifeup.model.enums.RedeemCodeEnum;
+import com.hdh.lifeup.model.query.PageQuery;
 import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import com.hdh.lifeup.redis.RedisOperator;
@@ -135,6 +136,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (!StringUtils.isEmpty(userInfoDTO.getPhone())) {
             cachedUserInfoDTO.setPhone(userInfoDTO.getPhone());
         }
+        if (userInfoDTO.getUserType() != null) {
+            cachedUserInfoDTO.setUserType(userInfoDTO.getUserType());
+        }
         Integer result = userInfoMapper.updateById(cachedUserInfoDTO.toDO(UserInfoDO.class));
         if (!Objects.equals(1, result)) {
             log.warn("【修改用户信息】插入记录数量 = [{}], UserInfoDTO = [{}]", result, userInfoDTO);
@@ -157,7 +161,9 @@ public class UserInfoServiceImpl implements UserInfoService {
         long expire = redisOperator.ttl(UserKey.TOKEN, authenticityToken);
         if (expire < TokenUtil.MIN_EXPIRED) {
             log.info("【通过token获取用户】当前用户Token有效时长expire = [{}], 重设", expire);
-            redisOperator.expire(UserKey.TOKEN, authenticityToken);
+            Integer userType = getUserType(userInfoDTO.getUserId());
+            userInfoDTO.setUserType(userType);
+            redisOperator.setex(UserKey.TOKEN, TokenContext.get(), userInfoDTO);
         }
         return userInfoDTO;
     }
@@ -306,6 +312,18 @@ public class UserInfoServiceImpl implements UserInfoService {
                 .eq("status", RedeemCodeEnum.REDEEMED.getStatus());
         RedeemCodeDO redeemCodeDO = redeemCodeMapper.selectOne(queryWrapper);
         return redeemCodeDO == null ? 0 : redeemCodeDO.getCodeLevel();
+    }
+
+    @Override
+    public PageDTO<UserDetailVO> getUserPage(PageQuery pageQuery) {
+        if (StringUtils.isEmpty(pageQuery.getKeywords())) {
+            return PageDTO.emptyPage(0);
+        }
+        IPage<UserInfoDO> userInfoDOPage = userInfoMapper.selectPage(
+            new Page<>(pageQuery.getCurrentPage(), pageQuery.getSize()),
+            new QueryWrapper<UserInfoDO>().like("nickname", "%" + pageQuery.getKeywords() + "%")
+        );
+        return PageDTO.createFreely(userInfoDOPage, UserDetailVO.class);
     }
 
     private PageDTO<UserListVO> getUserListVOs(Long userId, PageDTO pageDTO, UserKey<Long> userKey) {

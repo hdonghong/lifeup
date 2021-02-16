@@ -72,8 +72,8 @@ public class MarketGoodsController {
         @ApiImplicitParam(name = "authenticity-token", required = true, paramType = "header", dataType = "String"),
     })
     @PostMapping("/{goodsId}/import")
-    public ResultVO<?> importGoods(@PathVariable("goodsId") Long goodsId) {
-        marketGoodsService.importGoods(UserContext.get().getUserId(), goodsId);
-        return Result.success();
+    public ResultVO<GoodsInfoVO> importGoods(@PathVariable("goodsId") Long goodsId) {
+        GoodsInfoVO goodsInfoVO = marketGoodsService.importGoods(UserContext.get().getUserId(), goodsId);
+        return Result.success(goodsInfoVO);
     }
 }

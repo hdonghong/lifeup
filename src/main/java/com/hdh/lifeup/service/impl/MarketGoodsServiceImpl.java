@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -80,6 +81,8 @@ public class MarketGoodsServiceImpl implements MarketGoodsService {
         // 过滤条件
         if (CommonConst.QueryFilter.ONLY_THE_USER.equals(pageQuery.getFilter())) {
             wrapper.eq("user_id", pageQuery.getUserId());
+        } else if (CommonConst.QueryFilter.LAST_SOME_DAYS.equals(pageQuery.getFilter())) {
+            wrapper.gt("create_time", LocalDateTime.now().minusDays(pageQuery.getDaysCount()));
         }
         if (!StringUtils.isEmpty(pageQuery.getKeywords())) {
             wrapper.like("goods_name", "%" + pageQuery.getKeywords() + "%");
@@ -112,18 +115,22 @@ public class MarketGoodsServiceImpl implements MarketGoodsService {
     }
 
     @Override
-    public void importGoods(Long userId, Long goodsId) {
+    public GoodsInfoVO importGoods(Long userId, Long goodsId) {
         QueryWrapper<MarketGoodsImportationDO> queryWrapper = new QueryWrapper<>();
         queryWrapper = queryWrapper.eq("goods_id", goodsId)
             .eq("user_id", userId);
         MarketGoodsImportationDO marketGoodsImportationDO = marketGoodsImportationMapper.selectOne(queryWrapper);
+        MarketGoodsDTO marketGoodsDTO = getOne(goodsId);
+        GoodsInfoVO goodsInfoVO = new GoodsInfoVO();
+        BeanUtils.copyProperties(marketGoodsDTO, goodsInfoVO);
         if (marketGoodsImportationDO != null) {
-            return;
+            return goodsInfoVO;
         }
         marketGoodsImportationDO = new MarketGoodsImportationDO()
             .setGoodsId(goodsId)
             .setUserId(userId);
         marketGoodsImportationMapper.insert(marketGoodsImportationDO);
+        return goodsInfoVO;
     }
 
     /**

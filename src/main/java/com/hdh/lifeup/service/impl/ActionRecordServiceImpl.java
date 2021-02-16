@@ -49,12 +49,15 @@ public class ActionRecordServiceImpl implements ActionRecordService {
             .eq("user_id", actionRecordDTO.getUserId())
             .eq("action_id", actionRecordDTO.getActionId())
             .eq("Date(create_time)", LocalDate.now());
+        /* 影响性能
         Integer actionCount = actionRecordMapper.selectCount(countQuery);
         if (actionCount >= ActionEnum.getMaxLimit(actionRecordDTO.getActionId())) {
             return;
         }
         ActionRecordDO actionRecordDO = actionRecordDTO.toDO(ActionRecordDO.class);
         actionRecordMapper.insert(actionRecordDO);
+
+         */
     }
 
     @Override

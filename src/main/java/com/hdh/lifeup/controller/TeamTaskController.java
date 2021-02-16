@@ -113,9 +113,10 @@ public class TeamTaskController {
     public ResultVO<PageDTO<TeamTaskDTO>> getPage(
             PageDTO pageDTO, String teamTitle, Integer teamRank,
             @RequestParam(defaultValue = "true", required = false) Boolean startDateFilter,
-            @RequestParam(defaultValue = "1", required = false) Integer createSource) {
+            @RequestParam(defaultValue = "1", required = false) Integer createSource,
+            @RequestParam(defaultValue = "0", required = false) Integer daysCount) {
         return Result.success(
-                teamTaskService.page(pageDTO, teamTitle, teamRank, startDateFilter, createSource)
+                teamTaskService.page(pageDTO, teamTitle, daysCount, teamRank, startDateFilter, createSource)
         );
     }
 

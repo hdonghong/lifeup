@@ -2,6 +2,7 @@ package com.hdh.lifeup.service;
 
 import com.hdh.lifeup.model.dto.PageDTO;
 import com.hdh.lifeup.model.dto.UserInfoDTO;
+import com.hdh.lifeup.model.query.PageQuery;
 import com.hdh.lifeup.model.vo.UserDetailVO;
 import com.hdh.lifeup.model.vo.UserListVO;
 import lombok.NonNull;
@@ -97,4 +98,6 @@ public interface UserInfoService {
     List<UserInfoDTO> listUser(int current, int limit);
 
     Integer getUserType(Long userId);
+
+    PageDTO<UserDetailVO> getUserPage(PageQuery pageQuery);
 }
