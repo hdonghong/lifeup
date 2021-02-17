@@ -29,10 +29,10 @@ public class TeamRecordDO extends BaseDO {
 
     private Long teamId;
 
-    /** 下一次的提醒开始签到的时间 */
+    /** 开始签到的时间 */
     private LocalDateTime nextStartTime;
 
-    /** 下一次的结束签到的时间 */
+    /** 结束签到的时间 */
     private LocalDateTime nextEndTime;
 
     /** 当前已签到的人数 */

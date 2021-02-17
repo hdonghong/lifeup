@@ -296,7 +296,7 @@ public class TeamTaskServiceImpl implements TeamTaskService {
         }
 
 
-        // 倒序取距离当前时间最近一次的签到信息，签到开始时间早于当前时间的
+        // 倒序取距离当前时间最近一次的签到信息，签到开始时间早于当前时间的 【且签到结束时间晚于当前时间
         TeamRecordDO teamRecordSrc = null;
         int i;
         for (i = teamRecordDOList.size() - 1; i >= 0; i--) {
@@ -313,26 +313,14 @@ public class TeamTaskServiceImpl implements TeamTaskService {
             return nextSignVO;
         }
 
-        // 判断是否已经签到了，result == 1说明学员已经签到了最近一次
+        // 判断是否已经签到了，或者超过签到结束时间，result == 1说明学员已经签到了最近一次
         int result = memberService.hasSignedIn(teamRecordSrc.getTeamRecordId(), UserContext.get().getUserId());
-        if (result == 1) {
-            // 已经签到了则需要取下一次签到信息，直接取 / 新增 取决于当前数据库是否已经生成
+        if (result == 1 || nowTime.isAfter(teamRecordSrc.getNextEndTime())) {
+            // 需要取下一次签到信息，直接取 / 新增 取决于当前数据库是否已经生成
             teamRecordSrc = i < teamRecordDOList.size() - 1 ?
                     teamRecordDOList.get(i + 1) : this.addTeamRecord(teamTaskDTO, 2);
         }
 
-        // 这种做法会导致在某个时段内一直只有两条。比如firstStartTime:11-21; firstEndTime:11-31; freq:1;
-        // 用户在11-25日加入时，可以连续签到 11-21~11-31 和 11-22~12-1，但是之后会一直拿不到签到信息，需要等到过了11-31后才能拿到；
-        // 因为此时 teamRecordDOList 的 size 才小于 2  ↓↓↓↓↓
-        // 如果当前已经生成了下下次签到的记录就直接返回，否则生成下下次签到记录
-        // 假设还没有签到最近一次的
-//        TeamRecordDO teamRecordSrc = teamRecordDOList.get(0);
-//        int result = memberService.hasSignedIn(teamRecordSrc.getTeamRecordId(), UserContext.get().getUserId());
-//        // 判断是否已经签到了，result == 1说明学员已经签到了最近一次
-//        if (result == 1) {
-//             teamRecordSrc = (teamRecordDOList.size() == 2) ?
-//                    teamRecordDOList.get(1) : this.addTeamRecord(teamTaskDTO, 2);
-//        }
         BeanUtils.copyProperties(teamRecordSrc, nextSignVO);
         return nextSignVO;
     }

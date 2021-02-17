@@ -222,7 +222,6 @@ public class TeamMemberServiceImpl implements TeamMemberService {
             Integer userType = userInfoService.getUserType(recordDTO.getUserId());
             recordDTO.setIsLike(isLike)
                     .setLikeCount(likeCount)
-
                     .setUserType(userType);
         });
     }
